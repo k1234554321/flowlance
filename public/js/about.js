@@ -1,5 +1,4 @@
 const form = document.getElementById('ticket-form');
-const msg = document.getElementById('ticket-msg');
 
 document.querySelectorAll('#faq .faq-stack details').forEach((det) => {
   det.addEventListener('toggle', () => {
@@ -12,9 +11,7 @@ document.querySelectorAll('#faq .faq-stack details').forEach((det) => {
 
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  msg.textContent = '';
-  const payload = {
-    email: document.getElementById('ticket-email').value.trim(),
+  const payload = {    email: document.getElementById('ticket-email').value.trim(),
     name: document.getElementById('ticket-name').value.trim(),
     subject: document.getElementById('ticket-subject').value.trim(),
     body: document.getElementById('ticket-body').value.trim()
@@ -27,9 +24,9 @@ form?.addEventListener('submit', async (e) => {
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || `Ошибка ${r.status}`);
-    msg.textContent = 'Обращение принято. Мы ответим на почту.';
+    showToast('Обращение принято — ответим на почту');
     form.reset();
   } catch (err) {
-    msg.textContent = err.message || 'Не удалось отправить';
+    showToast(err.message || 'Не удалось отправить', 'err');
   }
 });

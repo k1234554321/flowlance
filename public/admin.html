@@ -5,50 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlowLance — админ-панель</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
   </head>
-  <body>
+  <body class="page-admin theme-hub">
     <div class="bg-blur"></div>
     <div class="bg-grid"></div>
 
-    <header class="site-header glass nav-hero-anim">
+    <header class="navbar glass nav-hero-anim" style="width: min(1100px, 94%); margin: 12px auto 0">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
-      <nav class="menu">
-        <a href="/feed">Лента</a>
-        <a href="/dashboard">Кабинет</a>
-        <a href="/admin" class="active">Админка</a>
-        <a href="/auth" class="btn btn-outline btn-small">Вход</a>
+      <nav class="nav-menu nav-mega">
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/sources" class="nav-pill">Биржи</a>
+        <a href="/about" class="nav-pill muted-link">О сервисе</a>
+        <a href="/dashboard" class="nav-pill">Кабинет</a>
+        <a href="/admin" class="nav-pill active-pill">Админка</a>
       </nav>
+      <div class="nav-actions">
+        <a href="/" class="btn btn-outline btn-small">На сайт</a>
+      </div>
     </header>
 
-    <main class="page-content section">
-      <h1 class="reveal">Панель администратора</h1>
-      <p class="muted reveal reveal-delay-1" style="margin-bottom: 18px">Меняй тексты и блоки главной страницы (JSON). После сохранения обнови главную.</p>
+    <main class="cabinet-shell" id="admin-root">
+      <h1 class="reveal" style="font-size: 1.5rem; margin-bottom: 6px">Панель администратора</h1>
+      <p class="muted reveal reveal-delay-1" id="admin-mode" style="margin-bottom: 18px"></p>
 
       <div class="stats-grid reveal reveal-delay-2">
         <article class="glass reveal reveal-delay-1"><h3>Пользователи</h3><p id="users-stat">-</p></article>
         <article class="glass reveal reveal-delay-2"><h3>Всего заказов</h3><p id="offers-stat">-</p></article>
         <article class="glass reveal reveal-delay-3"><h3>Новых сегодня</h3><p id="today-stat">-</p></article>
       </div>
-      <p id="admin-mode" class="admin-msg reveal reveal-delay-3"></p>
 
       <section class="glass admin-editor reveal reveal-delay-1" style="padding: 18px; border-radius: 18px; margin-top: 12px">
         <div class="admin-toolbar">
-          <button type="button" class="btn btn-neon" id="load-site-btn">Загрузить из файла</button>
+          <button type="button" class="btn btn-hub-solid" id="load-site-btn">Загрузить JSON</button>
           <button type="button" class="btn btn-outline" id="save-site-btn">Сохранить на сервер</button>
           <span class="admin-msg" id="site-editor-msg"></span>
         </div>
-        <label class="muted" for="site-json" style="display: block; margin: 10px 0 6px">data/siteContent.json</label>
-        <textarea id="site-json" spellcheck="false" placeholder='{ "brandLine": "..." }'></textarea>
-        <p class="muted" style="font-size: 0.88rem; margin-top: 8px">
-          Подсказка: не удаляй кавычки и запятые. Ошибка JSON — сервер вернёт 500 и не перезапишет файл.
-        </p>
+        <label class="muted" for="site-json" style="display: block; margin: 10px 0 6px">Контент главной (siteContent.json)</label>
+        <textarea id="site-json" spellcheck="false" placeholder='{ "hero": { ... } }'></textarea>
+        <p class="muted" style="font-size: 0.88rem; margin-top: 8px">Проверь JSON перед сохранением — при ошибке файл не перезапишется.</p>
       </section>
 
       <section class="glass admin-editor reveal reveal-delay-2" style="padding: 18px; border-radius: 18px; margin-top: 16px">
         <h2 style="margin-bottom: 10px">Тикеты поддержки</h2>
-        <p class="muted" style="margin-bottom: 12px">Ответ сохраняется в файле на сервере. Статус: new / in_progress / closed.</p>
-        <button type="button" class="btn btn-outline" id="reload-tickets">Обновить список</button>
+        <p class="muted" style="margin-bottom: 12px">Ответ и статус сохраняются на сервере.</p>
+        <button type="button" class="btn btn-outline" id="reload-tickets">Обновить</button>
         <div id="admin-tickets" class="admin-tickets" style="margin-top: 14px"></div>
+      </section>
+
+      <section class="glass admin-editor reveal reveal-delay-3" style="padding: 18px; border-radius: 18px; margin-top: 16px">
+        <h2 style="margin-bottom: 10px">Отзывы на модерации</h2>
+        <p class="muted" style="margin-bottom: 12px">Одобренные попадают в блок отзывов на главной.</p>
+        <button type="button" class="btn btn-outline" id="reload-reviews">Обновить очередь</button>
+        <div id="admin-reviews" class="admin-tickets" style="margin-top: 14px"></div>
       </section>
     </main>
 

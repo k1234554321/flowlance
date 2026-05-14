@@ -339,6 +339,18 @@ body {
   background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
   background-size: 36px 36px;
   mask-image: radial-gradient(circle at center, black 30%, transparent 90%);
+  animation: bgGridDrift 28s ease-in-out infinite;
+}
+@keyframes bgGridDrift {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.32;
+    transform: translate3d(-14px, -10px, 0) scale(1.015);
+  }
 }
 
 .glass {
@@ -1358,10 +1370,43 @@ body {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
 }
 
+.feed-grid .offer-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.offer-fav {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.28);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, transform 0.22s ease, background 0.25s ease;
+}
+.offer-fav:hover {
+  transform: scale(1.06);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.85);
+}
+.offer-fav.fav-on {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .feed-card .accent-price {
   color: var(--cyan);
   font-weight: 800;
   font-size: 1.12rem;
+}
+.page-feed.theme-hub .feed-card .accent-price {
+  color: #f2f2f2;
 }
 
 .offer-card-actions {
@@ -1688,6 +1733,15 @@ body.theme-hub .auth-layout h2 {
   color: var(--hub-white);
   margin-bottom: 12px;
 }
+.auth-inline-error {
+  color: #ffb4b4;
+  font-size: 14px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.auth-inline-error.hidden {
+  display: none;
+}
 
 body.theme-hub .auth-layout .form-stack input {
   background: rgba(255, 255, 255, 0.06);
@@ -1713,6 +1767,17 @@ body.theme-hub .about-split {
 
 body.theme-hub .about-block {
   padding: 26px 24px;
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    box-shadow 0.45s ease,
+    background 0.35s ease;
+}
+body.theme-hub .about-block:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.045);
 }
 
 body.theme-hub .about-block h2 {
@@ -1835,6 +1900,24 @@ body.theme-hub .auth-layout .btn.btn-search {
   margin-top: 12px;
   font-size: 12px;
   color: var(--hub-gray-600);
+}
+.footer-soc-inline {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+}
+.footer-soc-inline a {
+  color: var(--hub-gray-400);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+.footer-soc-inline a:hover {
+  color: var(--hub-white);
 }
 
 /* ——— FlowLance AI widget (B/W) ——— */
@@ -2018,6 +2101,25 @@ body.theme-hub .auth-layout .btn.btn-search {
   color: var(--hub-white);
   margin: 0;
 }
+.source-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.source-letter {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--hub-border);
+  color: var(--hub-white);
+  flex-shrink: 0;
+}
 .source-badge {
   font-size: 11px;
   text-transform: uppercase;
@@ -2048,6 +2150,26 @@ body.theme-hub .auth-layout .btn.btn-search {
     grid-template-columns: 1fr;
   }
 }
+.source-mini-feed {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.source-feed-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--hub-border);
+  color: var(--hub-gray-400);
+}
+.source-feed-tag.is-live {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--hub-white);
+}
+
 .source-mini {
   font-size: 11px;
   text-transform: uppercase;
@@ -2064,7 +2186,7 @@ body.theme-hub .auth-layout .btn.btn-search {
   line-height: 1.55;
 }
 .source-pros-list li {
-  color: #9bf0cb;
+  color: var(--hub-gray-400);
 }
 .source-cons-list li {
   color: var(--hub-gray-400);
@@ -2120,6 +2242,15 @@ body.theme-hub .auth-layout .btn.btn-search {
   margin: 22px 0 10px;
   color: var(--hub-white);
   font-size: 1rem;
+}
+.about-ticket-panel {
+  max-width: min(640px, 100%);
+  margin: 0 auto;
+  width: 100%;
+}
+.about-support .about-ticket-panel .ticket-form-shell {
+  max-width: 100%;
+  margin: 0;
 }
 .ticket-form {
   display: flex;
@@ -2194,4 +2325,35 @@ body.theme-hub .auth-layout .btn.btn-search {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   padding: 8px 10px;
+}
+
+.fl-toast-root {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate3d(-50%, 120%, 0);
+  z-index: 10000;
+  max-width: min(420px, 92vw);
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(10, 10, 10, 0.92);
+  color: #f4f4f4;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+.fl-toast-root.fl-toast-show {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+  pointer-events: auto;
+}
+.fl-toast-root.fl-toast--err {
+  border-color: rgba(255, 120, 120, 0.45);
+  color: #ffd6d6;
 }

@@ -1,4 +1,5 @@
 const state = { offers: [] };
+const favIdSet = new Set();
 const offersGrid = document.getElementById('offers-grid');
 const sourceFilter = document.getElementById('source-filter');
 const categoryFilter = document.getElementById('category-filter');
@@ -148,10 +149,12 @@ function buildFiltered() {
 function offerCard(offer, idx) {
   const url = offer.external_url ? `href="${esc(offer.external_url)}"` : '';
   const d = (idx % 4) + 1;
+  const favOn = favIdSet.has(offer.id) ? ' fav-on' : '';
   return `
     <article class="card glass offer-card feed-card reveal reveal-delay-${d}">
       <div class="offer-card-top">
         <p class="price accent-price">${esc(offer.budget)}</p>
+        <button type="button" class="offer-fav${favOn}" data-fav="${esc(offer.id)}" title="В избранное" aria-label="В избранное">★</button>
       </div>
       <small class="meta">${esc(offer.source)} · ${esc(offer.category)}</small>
       <h3>${esc(offer.title)}</h3>
@@ -186,10 +189,41 @@ function appendOffer(offer) {
   renderOffers();
 }
 
+async function refreshFavIds() {
+  try {
+    const { ids } = await api('/api/favorites/ids');
+    favIdSet.clear();
+    (ids || []).forEach((id) => favIdSet.add(id));
+  } catch {
+    favIdSet.clear();
+  }
+}
+
+offersGrid?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-fav]');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const id = btn.getAttribute('data-fav');
+  try {
+    const { inList } = await api('/api/favorites/toggle', { method: 'POST', body: JSON.stringify({ id }) });
+    btn.classList.toggle('fav-on', inList);
+    showToast(inList ? 'В избранном' : 'Убрано из избранного');
+  } catch (err) {
+    const m = err.message || '';
+    if (m.includes('авториза') || m.includes('401')) {
+      showToast('Войди в аккаунт, чтобы сохранять заказы', 'err');
+      return;
+    }
+    showError(err);
+  }
+});
+
 async function loadOffers() {
   try {
     const offers = await api('/api/offers?limit=120');
     state.offers = offers;
+    await refreshFavIds();
     rebuildDynamicFilters();
     renderOffers();
   } catch (error) {

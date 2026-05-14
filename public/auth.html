@@ -28,6 +28,7 @@
       <section class="auth-layout">
         <div class="card glass reveal reveal-delay-1">
           <h2>Вход</h2>
+          <p id="login-error" class="auth-inline-error hidden" role="alert"></p>
           <form id="login-form" class="form-stack">
             <input type="email" id="login-email" placeholder="Email" required />
             <input type="password" id="login-password" placeholder="Пароль" required />
@@ -36,6 +37,7 @@
         </div>
         <div class="card glass reveal reveal-delay-2">
           <h2>Регистрация</h2>
+          <p id="register-error" class="auth-inline-error hidden" role="alert"></p>
           <form id="register-form" class="form-stack">
             <input type="text" id="register-name" placeholder="Имя" required />
             <input type="email" id="register-email" placeholder="Email" required />

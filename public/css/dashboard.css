@@ -1,34 +1,98 @@
-/* dashboard styles (visual polish) */
+/* Личный кабинет / админка — ч/б в духе theme-hub */
 
-.profile-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-items:start;}
-
-.avatar{
-  width:96px;
-  height:96px;
-  border-radius:18px;
-  object-fit:cover;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.04);
+body.page-dashboard .logo span,
+body.page-admin .logo span {
+  color: #fff;
+  text-shadow: none;
 }
 
-.muted{color:#a7badf;}
+body.page-dashboard.theme-hub .cabinet-card:hover,
+body.page-admin.theme-hub .glass:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.42);
+}
 
-/* textarea / inputs consistency */
-.form-stack textarea{
-  width:100%;
-  background: rgba(255,255,255,0.04);
-  color:#eaf1ff;
-  border: 1px solid var(--stroke);
+body.page-dashboard.theme-hub .progress-fill {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.85), rgba(180, 180, 180, 0.45));
+  box-shadow: none;
+}
+
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.fav-card {
+  padding: 16px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.fav-card:hover {
+  transform: translateY(-4px);
+}
+
+.fav-meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.fav-title {
+  font-size: 1rem;
+  color: #fff;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.fav-budget {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.footer-social {
+  width: min(1100px, 94%);
+  margin: 0 auto 48px;
+  padding: 22px 24px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.footer-social-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 10px;
+}
+
+.footer-social-row {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.soc-link {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 10px 20px;
   border-radius: 12px;
-  padding: 12px 14px;
-  outline: none;
-  resize: vertical;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
 }
 
-.form-stack textarea::placeholder{color: rgba(242,246,255,.55);}
+.soc-link:hover {
+  border-color: #fff;
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.06);
+}
 
-.form-stack input::placeholder{color: rgba(242,246,255,.55);}
-
-/* remove plain white artifacts on placeholder/browsers */
-input, textarea{ -webkit-text-fill-color: inherit; }
-
+body.page-admin .admin-toolbar .btn-hub-solid {
+  min-width: auto;
+}

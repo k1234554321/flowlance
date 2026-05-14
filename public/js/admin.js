@@ -1,5 +1,20 @@
 const siteMsg = document.getElementById('site-editor-msg');
 
+async function gateAdmin() {
+  try {
+    const user = await api('/api/profile');
+    if (user.role !== 'admin') {
+      showToast('Нужны права администратора', 'err');
+      window.location.href = '/dashboard';
+      return false;
+    }
+    return true;
+  } catch {
+    window.location.href = '/auth';
+    return false;
+  }
+}
+
 async function loadStats() {
   try {
     const stats = await api('/api/admin/stats');
@@ -8,7 +23,7 @@ async function loadStats() {
     document.getElementById('today-stat').textContent = stats.todayOffers;
     document.getElementById('admin-mode').textContent = `Режим: ${stats.mode}`;
   } catch (error) {
-    document.getElementById('admin-mode').textContent = error.message || 'Нужен вход под администратором.';
+    document.getElementById('admin-mode').textContent = error.message || 'Ошибка статистики';
   }
 }
 
@@ -39,16 +54,15 @@ document.getElementById('save-site-btn')?.addEventListener('click', async () => 
   }
   try {
     await api('/api/admin/site/content', { method: 'PUT', body: JSON.stringify(parsed) });
-    siteMsg.textContent = 'Сохранено. Обнови главную страницу.';
+    siteMsg.textContent = 'Сохранено.';
+    showToast('Контент сайта обновлён');
   } catch (error) {
     siteMsg.textContent = error.message || 'Ошибка сохранения';
   }
 });
 
-loadStats();
-loadSiteJson();
-
 const ticketRoot = document.getElementById('admin-tickets');
+const reviewsRoot = document.getElementById('admin-reviews');
 
 function escHtml(s) {
   return String(s || '')
@@ -85,7 +99,7 @@ async function loadTickets() {
             <option value="in_progress" ${t.status === 'in_progress' ? 'selected' : ''}>in_progress</option>
             <option value="closed" ${t.status === 'closed' ? 'selected' : ''}>closed</option>
           </select>
-          <button type="button" class="btn btn-neon btn-small" data-save="1">Сохранить</button>
+          <button type="button" class="btn btn-hub-solid btn-small" data-save="1">Сохранить</button>
         </div>
         <p class="admin-msg ticket-save-msg"></p>
       </article>`
@@ -115,9 +129,76 @@ ticketRoot?.addEventListener('click', async (e) => {
       body: JSON.stringify({ adminReply: reply, status })
     });
     if (msg) msg.textContent = 'Сохранено.';
+    showToast('Тикет обновлён');
   } catch (error) {
     if (msg) msg.textContent = error.message || 'Ошибка';
   }
 });
 
-loadTickets();
+async function loadReviewsPending() {
+  if (!reviewsRoot) return;
+  reviewsRoot.textContent = 'Загрузка…';
+  try {
+    const { reviews } = await api('/api/admin/reviews/pending');
+    if (!reviews.length) {
+      reviewsRoot.textContent = 'Очередь пуста.';
+      return;
+    }
+    reviewsRoot.innerHTML = reviews
+      .map(
+        (r, i) => `
+      <article class="ticket-card glass reveal reveal-delay-${(i % 4) + 1}" data-rid="${escHtml(r.id)}">
+        <div class="ticket-head">
+          <strong>${escHtml(r.name)}</strong>
+          <span class="muted">${escHtml(r.createdAt)}</span>
+        </div>
+        <p class="muted">${escHtml(r.email)}</p>
+        <p class="ticket-body">${escHtml(r.text)}</p>
+        <div class="ticket-actions">
+          <button type="button" class="btn btn-hub-solid btn-small" data-approve="1">Одобрить</button>
+          <button type="button" class="btn btn-outline btn-small" data-reject="1">Удалить</button>
+        </div>
+        <p class="admin-msg review-act-msg"></p>
+      </article>`
+      )
+      .join('');
+    window.initRevealScroll?.();
+  } catch (error) {
+    reviewsRoot.textContent = error.message || 'Ошибка';
+  }
+}
+
+document.getElementById('reload-reviews')?.addEventListener('click', () => loadReviewsPending());
+
+reviewsRoot?.addEventListener('click', async (e) => {
+  const approve = e.target.closest('[data-approve]');
+  const reject = e.target.closest('[data-reject]');
+  if (!approve && !reject) return;
+  const card = e.target.closest('[data-rid]');
+  if (!card) return;
+  const id = card.dataset.rid;
+  const msg = card.querySelector('.review-act-msg');
+  if (msg) msg.textContent = '';
+  try {
+    if (approve) {
+      await api(`/api/admin/reviews/${encodeURIComponent(id)}/approve`, { method: 'POST', body: '{}' });
+      showToast('Отзыв опубликован на главной');
+    } else {
+      await api(`/api/admin/reviews/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      showToast('Отзыв удалён из очереди');
+    }
+    card.remove();
+    if (reviewsRoot && !reviewsRoot.querySelector('[data-rid]')) reviewsRoot.textContent = 'Очередь пуста.';
+  } catch (error) {
+    if (msg) msg.textContent = error.message || 'Ошибка';
+  }
+});
+
+(async function boot() {
+  const ok = await gateAdmin();
+  if (!ok) return;
+  loadStats();
+  loadSiteJson();
+  loadTickets();
+  loadReviewsPending();
+})();

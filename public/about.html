@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body class="page-about theme-hub">
+    <div class="bg-blur"></div>
+    <div class="bg-grid"></div>
     <header class="navbar glass nav-hero-anim">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
       <nav class="nav-menu nav-mega">
@@ -70,14 +72,16 @@
         </div>
 
         <h3 class="about-h3">Тикет в поддержку</h3>
-        <div class="ticket-form-shell">
-          <form id="ticket-form" class="ticket-form">
-            <input type="email" id="ticket-email" required placeholder="Email для ответа" />
-            <input type="text" id="ticket-name" placeholder="Имя" />
-            <input type="text" id="ticket-subject" required placeholder="Тема" />
-            <textarea id="ticket-body" required rows="4" placeholder="Опиши ситуацию: раздел сайта, что ожидал и что произошло"></textarea>
-            <button type="submit" class="btn btn-hub-solid">Отправить обращение</button>
-          </form>
+        <div class="about-ticket-panel">
+          <div class="ticket-form-shell">
+            <form id="ticket-form" class="ticket-form">
+              <input type="email" id="ticket-email" required placeholder="Email для ответа" />
+              <input type="text" id="ticket-name" placeholder="Имя" />
+              <input type="text" id="ticket-subject" required placeholder="Тема" />
+              <textarea id="ticket-body" required rows="4" placeholder="Опиши ситуацию: раздел сайта, что ожидал и что произошло"></textarea>
+              <button type="submit" class="btn btn-hub-solid">Отправить обращение</button>
+            </form>
+          </div>
         </div>
         <p class="ticket-msg" id="ticket-msg"></p>
       </section>
@@ -104,10 +108,19 @@
         <a class="btn btn-hub-solid btn-lg" href="/feed">Перейти в ленту</a>
         <a class="btn btn-outline btn-lg" href="/">На главную</a>
       </div>
+
+      <footer class="footer-social glass reveal" style="width: min(1100px, 94%); margin: 40px auto 0">
+        <p class="footer-social-label">Мы на связи</p>
+        <div class="footer-social-row">
+          <a class="soc-link" href="https://vk.com" target="_blank" rel="noopener noreferrer">VK</a>
+          <a class="soc-link" href="https://t.me" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </div>
+      </footer>
     </main>
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/common.js"></script>
     <script src="/js/about.js"></script>
     <script src="/js/ai-widget.js"></script>
   </body>

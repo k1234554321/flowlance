@@ -1,6 +1,5 @@
 const profileForm = document.getElementById('profile-form');
 const logoutLink = document.getElementById('logout-link');
-const promoLink = document.getElementById('promo-link');
 const avatarPreview = document.getElementById('avatar-preview');
 const profileName = document.getElementById('profile-name');
 const profileEmail = document.getElementById('profile-email');
@@ -8,17 +7,20 @@ const profileBio = document.getElementById('profile-bio');
 const cabUsername = document.getElementById('cab-username');
 const portfolioPct = document.getElementById('portfolio-pct');
 const portfolioBar = document.getElementById('portfolio-bar');
-const coinBalance = document.getElementById('coin-balance');
-const taskProjects = document.getElementById('task-projects');
-const taskProjectsBar = document.getElementById('task-projects-bar');
-const btnBumpProject = document.getElementById('btn-bump-project');
-const btnClaimProjects = document.getElementById('btn-claim-projects');
-const btnClaimDaily = document.getElementById('btn-claim-daily');
-const btnClaimProfile = document.getElementById('btn-claim-profile');
 const adminLink = document.getElementById('admin-link');
+const favGrid = document.getElementById('fav-grid');
+const favEmpty = document.getElementById('fav-empty');
+const reviewForm = document.getElementById('review-form');
 
 let user = null;
-let cabinet = null;
+
+function esc(s = '') {
+  return String(s || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
 
 function portfolioScore(u) {
   let pts = 0;
@@ -32,56 +34,42 @@ function renderPortfolio() {
   const pct = portfolioScore(user);
   portfolioPct.textContent = String(pct);
   portfolioBar.style.width = `${pct}%`;
-  cabUsername.textContent = user?.name || 'Гость';
-}
-
-function renderSocial() {
-  const map = {
-    vkConnected: document.getElementById('soc-vk'),
-    googleConnected: document.getElementById('soc-google'),
-    yandexConnected: document.getElementById('soc-yandex')
-  };
-  Object.entries(map).forEach(([key, el]) => {
-    if (!el || !cabinet) return;
-    const on = Boolean(cabinet[key]);
-    el.classList.toggle('connected', on);
-    const btn = el.querySelector('[data-action="toggle"]');
-    if (btn) btn.textContent = on ? 'Отключить' : 'Подключить';
-  });
-}
-
-function renderBonuses() {
-  if (!cabinet) return;
-  coinBalance.textContent = String(cabinet.coins ?? 0);
-  const p = cabinet.projectTaskProgress ?? 0;
-  taskProjects.textContent = `Прогресс: ${p} / 10`;
-  taskProjectsBar.style.width = `${Math.min(100, p * 10)}%`;
-
-  const canClaimProjects = p >= 10 && !cabinet.projectsBonusClaimed;
-  btnClaimProjects.disabled = !canClaimProjects;
-
-  const today = new Date().toISOString().slice(0, 10);
-  const dailyDone = cabinet.lastClaimDate === today;
-  btnClaimDaily.disabled = dailyDone;
-  btnClaimDaily.textContent = dailyDone ? 'Уже получено сегодня' : 'Получить 10 Flow Coin';
-
-  btnClaimProfile.disabled = Boolean(cabinet.profileBonusClaimed);
-  btnClaimProfile.textContent = cabinet.profileBonusClaimed ? 'Бонус получен' : 'Получить бонус';
-}
-
-async function loadCabinet() {
-  cabinet = await api('/api/cabinet/state');
-  renderSocial();
-  renderBonuses();
+  cabUsername.textContent = user?.name || '—';
 }
 
 function renderProfile(u) {
   user = u;
-  avatarPreview.src = u.avatar_url || 'https://placehold.co/96x96/1a1f2e/8899cc/png?text=FL';
+  avatarPreview.src = u.avatar_url || 'https://placehold.co/96x96/0a0a0a/ffffff/png?text=FL';
   profileName.textContent = u.name || 'Без имени';
   profileEmail.textContent = u.email || '';
-  profileBio.textContent = u.bio || 'Расскажи о своём опыте.';
+  profileBio.textContent = u.bio || 'Добавь описание — так проще доверять профилю.';
   renderPortfolio();
+}
+
+async function loadFavorites() {
+  if (!favGrid) return;
+  favGrid.innerHTML = '';
+  try {
+    const { offers } = await api('/api/favorites');
+    if (!offers?.length) {
+      favEmpty.hidden = false;
+      return;
+    }
+    favEmpty.hidden = true;
+    favGrid.innerHTML = offers
+      .map(
+        (o) => `
+      <article class="fav-card glass">
+        <p class="fav-meta">${esc(o.source)} · ${esc(o.category)}</p>
+        <h3 class="fav-title">${esc(o.title)}</h3>
+        <p class="fav-budget">${esc(o.budget)}</p>
+        <a class="btn btn-outline btn-small" href="${esc(o.external_url || '/feed')}" target="_blank" rel="noopener noreferrer">На биржу</a>
+      </article>`
+      )
+      .join('');
+  } catch {
+    favEmpty.hidden = false;
+  }
 }
 
 async function loadProfile() {
@@ -92,64 +80,11 @@ async function loadProfile() {
     document.getElementById('bio').value = user.bio || '';
     renderProfile(user);
     if (user.role === 'admin') adminLink.classList.remove('hidden');
-    await loadCabinet();
+    await loadFavorites();
   } catch {
     window.location.href = '/auth';
   }
 }
-
-document.querySelectorAll('.social-card').forEach((card) => {
-  const key = card.dataset.provider;
-  card.querySelector('.social-btn')?.addEventListener('click', async () => {
-    if (!cabinet || !key) return;
-    const next = !cabinet[key];
-    try {
-      cabinet = await api('/api/cabinet/state', {
-        method: 'PUT',
-        body: JSON.stringify({ [key]: next })
-      });
-      renderSocial();
-    } catch (e) {
-      showError(e);
-    }
-  });
-});
-
-btnBumpProject?.addEventListener('click', async () => {
-  try {
-    cabinet = await api('/api/cabinet/bump-project-task', { method: 'POST' });
-    renderBonuses();
-  } catch (e) {
-    showError(e);
-  }
-});
-
-btnClaimProjects?.addEventListener('click', async () => {
-  try {
-    cabinet = await api('/api/cabinet/claim-projects', { method: 'POST' });
-    renderBonuses();
-  } catch (e) {
-    showError(e);
-  }
-});
-
-btnClaimDaily?.addEventListener('click', async () => {
-  try {
-    cabinet = await api('/api/cabinet/claim-daily', { method: 'POST' });
-    renderBonuses();
-  } catch (e) {
-    showError(e);
-  }
-});
-
-btnClaimProfile?.addEventListener('click', async () => {
-  try {
-    cabinet = await api('/api/cabinet/claim-profile', { method: 'POST' });
-    renderBonuses();
-  } catch (e) {
-    showError(e);
-  }
-});
 
 profileForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -162,7 +97,7 @@ profileForm?.addEventListener('submit', async (event) => {
     await api('/api/profile', { method: 'PUT', body: JSON.stringify(payload) });
     user = { ...user, ...payload };
     renderProfile(user);
-    alert('Профиль сохранён');
+    showToast('Профиль сохранён');
   } catch (error) {
     showError(error);
   }
@@ -174,13 +109,15 @@ logoutLink?.addEventListener('click', async (e) => {
   window.location.href = '/auth';
 });
 
-promoLink?.addEventListener('click', (e) => {
+reviewForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const code = window.prompt('Введите промокод (демо):', '');
-  if (code && String(code).toLowerCase() === 'flow') {
-    alert('Промокод принят! В реальной версии здесь будет начисление.');
-  } else if (code) {
-    alert('Промокод не найден.');
+  const text = document.getElementById('review-text')?.value?.trim() || '';
+  try {
+    await api('/api/reviews', { method: 'POST', body: JSON.stringify({ text }) });
+    showToast('Отзыв отправлен на модерацию');
+    reviewForm.reset();
+  } catch (err) {
+    showError(err);
   }
 });
 

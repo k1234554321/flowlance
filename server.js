@@ -15,6 +15,7 @@ const fs = require('fs').promises;
 
 const SITE_CONTENT_PATH = path.join(__dirname, 'data', 'siteContent.json');
 const TICKETS_PATH = path.join(__dirname, 'data', 'tickets.json');
+const REVIEWS_PENDING_PATH = path.join(__dirname, 'data', 'reviewsPending.json');
 
 const app = express();
 const server = http.createServer(app);
@@ -61,6 +62,40 @@ function memoryOffersSorted(limit) {
 async function respondOffersFromMemory(limit, res) {
   await fillMemoryOffersIfEmpty();
   res.json(memoryOffersSorted(limit).map(formatOffer));
+}
+
+async function getOfferById(id) {
+  const sid = String(id || '').trim();
+  if (!sid) return null;
+  if (inMemoryOffers.has(sid)) return inMemoryOffers.get(sid);
+  if (!isDbEnabled()) return null;
+  try {
+    const pool = getPool();
+    const [rows] = await pool.query('SELECT * FROM offers WHERE id = ? LIMIT 1', [sid]);
+    return rows[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+function ensureFavorites(req) {
+  if (!Array.isArray(req.session.favorites)) req.session.favorites = [];
+  return req.session.favorites;
+}
+
+async function readReviewsPending() {
+  try {
+    const raw = await fs.readFile(REVIEWS_PENDING_PATH, 'utf8');
+    const j = JSON.parse(raw);
+    return Array.isArray(j) ? j : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writeReviewsPending(list) {
+  await fs.mkdir(path.dirname(REVIEWS_PENDING_PATH), { recursive: true });
+  await fs.writeFile(REVIEWS_PENDING_PATH, JSON.stringify(list, null, 2), 'utf8');
 }
 
 async function ensureDb() {
@@ -317,7 +352,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   if (!isDbEnabled()) {
     req.session.user = { id: 1, name, email, role: 'user', bio: '', avatar_url: '' };
-    return res.json({ message: 'Режим демо: пользователь создан локально', user: req.session.user });
+    return res.json({ message: 'Аккаунт создан', user: req.session.user });
   }
 
   const pool = getPool();
@@ -339,9 +374,13 @@ app.post('/api/auth/login', async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Нужны email и пароль' });
 
   if (!isDbEnabled()) {
-    const role = email.includes('admin') ? 'admin' : 'user';
-    req.session.user = { id: 1, name: 'Demo User', email, role, bio: 'Демо профиль', avatar_url: '' };
-    return res.json({ message: 'Вход в демо-режиме', user: req.session.user });
+    const emailLower = String(email).toLowerCase();
+    const adminEmail = String(process.env.DEFAULT_ADMIN_EMAIL || 'admin@aggregator.local').toLowerCase();
+    const role = emailLower === adminEmail ? 'admin' : 'user';
+    const local = String(email).split('@')[0] || 'Пользователь';
+    const prettyName = local.replace(/[._+-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    req.session.user = { id: 1, name: prettyName, email, role, bio: '', avatar_url: '' };
+    return res.json({ message: 'Вход выполнен', user: req.session.user });
   }
 
   const pool = getPool();
@@ -382,7 +421,7 @@ app.put('/api/profile', requireAuth, async (req, res) => {
   const { name, bio, avatar_url } = req.body;
   if (!isDbEnabled()) {
     req.session.user = { ...req.session.user, name: name || req.session.user.name, bio: bio || '', avatar_url: avatar_url || '' };
-    return res.json({ message: 'Профиль обновлен (демо)', user: req.session.user });
+    return res.json({ message: 'Профиль обновлён', user: req.session.user });
   }
   const pool = getPool();
   await pool.query('UPDATE users SET name = ?, bio = ?, avatar_url = ? WHERE id = ?', [
@@ -398,6 +437,89 @@ app.put('/api/profile', requireAuth, async (req, res) => {
     avatar_url: avatar_url || ''
   };
   res.json({ message: 'Профиль обновлен' });
+});
+
+app.get('/api/favorites/ids', requireAuth, (req, res) => {
+  res.json({ ids: [...ensureFavorites(req)] });
+});
+
+app.get('/api/favorites', requireAuth, async (req, res) => {
+  const favs = ensureFavorites(req);
+  const offers = [];
+  for (const id of favs) {
+    const o = await getOfferById(id);
+    if (o) offers.push(formatOffer(o));
+  }
+  res.json({ offers });
+});
+
+app.post('/api/favorites/toggle', requireAuth, async (req, res) => {
+  const id = String(req.body?.id || '').trim();
+  if (!id) return res.status(400).json({ error: 'Нужен id заказа' });
+  const favs = ensureFavorites(req);
+  const idx = favs.indexOf(id);
+  let inList;
+  if (idx >= 0) {
+    favs.splice(idx, 1);
+    inList = false;
+  } else {
+    const offer = await getOfferById(id);
+    if (!offer) return res.status(404).json({ error: 'Заказ не найден в ленте' });
+    favs.unshift(id);
+    if (favs.length > 60) favs.length = 60;
+    inList = true;
+  }
+  res.json({ ids: [...favs], inList });
+});
+
+app.post('/api/reviews', requireAuth, async (req, res) => {
+  const text = String(req.body?.text || '').trim();
+  if (text.length < 15) return res.status(400).json({ error: 'Минимум 15 символов в отзыве' });
+  if (text.length > 1200) return res.status(400).json({ error: 'Слишком длинный текст' });
+  const u = req.session.user;
+  const list = await readReviewsPending();
+  const row = {
+    id: `rv${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    userId: u.id,
+    name: String(u.name || 'Пользователь').slice(0, 80),
+    email: String(u.email || '').slice(0, 120),
+    text: text.slice(0, 1200),
+    createdAt: new Date().toISOString()
+  };
+  list.unshift(row);
+  await writeReviewsPending(list.slice(0, 200));
+  res.json({ ok: true, id: row.id });
+});
+
+app.get('/api/admin/reviews/pending', requireAdmin, async (_, res) => {
+  res.json({ reviews: await readReviewsPending() });
+});
+
+app.post('/api/admin/reviews/:id/approve', requireAdmin, async (req, res) => {
+  const id = String(req.params.id || '');
+  const list = await readReviewsPending();
+  const idx = list.findIndex((x) => x.id === id);
+  if (idx < 0) return res.status(404).json({ error: 'Отзыв не найден в очереди' });
+  const [item] = list.splice(idx, 1);
+  const site = await readSiteContent();
+  if (!site) return res.status(500).json({ error: 'Не удалось прочитать контент сайта' });
+  if (!Array.isArray(site.reviews)) site.reviews = [];
+  site.reviews.unshift({
+    text: item.text,
+    name: item.name,
+    role: 'Пользователь'
+  });
+  site.reviews = site.reviews.slice(0, 40);
+  await fs.writeFile(SITE_CONTENT_PATH, JSON.stringify(site, null, 2), 'utf8');
+  await writeReviewsPending(list);
+  res.json({ ok: true });
+});
+
+app.delete('/api/admin/reviews/:id', requireAdmin, async (req, res) => {
+  const id = String(req.params.id || '');
+  const list = (await readReviewsPending()).filter((x) => x.id !== id);
+  await writeReviewsPending(list);
+  res.json({ ok: true });
 });
 
 app.get('/api/offers', async (req, res) => {

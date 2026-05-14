@@ -57,9 +57,9 @@ function esc(s) {
     .replaceAll('"', '&quot;');
 }
 
-function badgeFor(p) {
-  if (p.inFeed) return 'В потоке ленты';
-  return 'Справочно · переход';
+function initials(name) {
+  const s = String(name || '').trim();
+  return (s[0] || '?').toUpperCase();
 }
 
 function render() {
@@ -67,16 +67,21 @@ function render() {
   if (!grid) return;
   grid.innerHTML = PLATFORMS.map((p, idx) => {
     const d = (idx % 4) + 1;
+    const tag = p.inFeed
+      ? '<span class="source-feed-tag is-live">В потоке ленты</span>'
+      : '<span class="source-feed-tag">Справочно</span>';
     return `
     <article class="source-card glass ${p.inFeed ? 'is-live' : ''} reveal reveal-delay-${d}">
       <div class="source-card-top">
-        <h2 class="source-card-title">${esc(p.name)}</h2>
-        <span class="source-badge">${esc(badgeFor(p))}</span>
+        <div class="source-brand">
+          <span class="source-letter" aria-hidden="true">${esc(initials(p.name))}</span>
+          <h2 class="source-card-title">${esc(p.name)}</h2>
+        </div>
       </div>
       <p class="source-card-blurb">${esc(p.blurb)}</p>
       <div class="source-lists">
         <div>
-          <h3 class="source-mini">Плюсы</h3>
+          <h3 class="source-mini source-mini-feed">Плюсы ${tag}</h3>
           <ul class="source-pros-list">${p.pros.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         </div>
         <div>
@@ -84,7 +89,7 @@ function render() {
           <ul class="source-cons-list">${p.cons.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         </div>
       </div>
-      <a class="btn btn-neon source-go" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Перейти на площадку</a>
+      <a class="btn btn-hub-solid source-go" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Перейти на площадку</a>
     </article>`;
   }).join('');
   window.initRevealScroll?.();
