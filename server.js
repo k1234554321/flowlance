@@ -141,7 +141,14 @@ async function ensureDb() {
     }
   } catch (error) {
     disableDb();
-    console.warn('MySQL недоступен — включён режим без БД (данные в памяти). Ошибка:', error.message);
+    const denied =
+      error.code === 'ER_ACCESS_DENIED_ERROR' ||
+      error.errno === 1045 ||
+      String(error.message || '').includes('Access denied');
+    const hint = denied
+      ? ' Проверь на ЭТОЙ машине файл .env: DB_USER и DB_PASSWORD должны совпадать с пользователем MySQL (см. GRANT для этой базы).'
+      : '';
+    console.warn('MySQL недоступен — включён режим без БД (данные в памяти). Ошибка:', error.message + hint);
   }
 }
 
