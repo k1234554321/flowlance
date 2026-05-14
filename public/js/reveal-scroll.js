@@ -8,6 +8,15 @@
     });
   }
 
+  /** На десктопе выше «окно» видимости — иначе пол-экрана сразу получает .visible и анимация пропадает. */
+  function ioOptions() {
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    if (coarse) {
+      return { threshold: 0.08, rootMargin: '0px 0px -56px 0px' };
+    }
+    return { threshold: 0.22, rootMargin: '0px 0px -14% 0px' };
+  }
+
   window.initRevealScroll = function initRevealScroll() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       revealAll();
@@ -17,6 +26,7 @@
       observer.disconnect();
       observer = null;
     }
+    const opts = ioOptions();
     observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -27,9 +37,8 @@
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      opts
     );
-    // Два кадра: после шрифтов/динамической вёрстки, иначе IO иногда не срабатывает для новых узлов.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         document.querySelectorAll('.reveal').forEach((el) => {

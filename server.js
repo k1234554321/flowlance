@@ -495,6 +495,24 @@ app.get('/api/admin/reviews/pending', requireAdmin, async (_, res) => {
   res.json({ reviews: await readReviewsPending() });
 });
 
+app.get('/api/admin/reviews/published', requireAdmin, async (_, res) => {
+  const site = await readSiteContent();
+  if (!site) return res.status(500).json({ error: 'Не удалось прочитать контент сайта' });
+  res.json({ reviews: Array.isArray(site.reviews) ? site.reviews : [] });
+});
+
+app.delete('/api/admin/reviews/published/:index', requireAdmin, async (req, res) => {
+  const i = Number.parseInt(String(req.params.index), 10);
+  if (!Number.isFinite(i) || i < 0) return res.status(400).json({ error: 'Неверный номер отзыва' });
+  const site = await readSiteContent();
+  if (!site || !Array.isArray(site.reviews) || i >= site.reviews.length) {
+    return res.status(404).json({ error: 'Отзыв не найден на главной' });
+  }
+  site.reviews.splice(i, 1);
+  await fs.writeFile(SITE_CONTENT_PATH, JSON.stringify(site, null, 2), 'utf8');
+  res.json({ ok: true });
+});
+
 app.post('/api/admin/reviews/:id/approve', requireAdmin, async (req, res) => {
   const id = String(req.params.id || '');
   const list = await readReviewsPending();
@@ -507,7 +525,9 @@ app.post('/api/admin/reviews/:id/approve', requireAdmin, async (req, res) => {
   site.reviews.unshift({
     text: item.text,
     name: item.name,
-    role: 'Пользователь'
+    role: 'Пользователь',
+    publishedFromQueueId: item.id,
+    publishedAt: new Date().toISOString()
   });
   site.reviews = site.reviews.slice(0, 40);
   await fs.writeFile(SITE_CONTENT_PATH, JSON.stringify(site, null, 2), 'utf8');
@@ -515,7 +535,7 @@ app.post('/api/admin/reviews/:id/approve', requireAdmin, async (req, res) => {
   res.json({ ok: true });
 });
 
-app.delete('/api/admin/reviews/:id', requireAdmin, async (req, res) => {
+app.delete('/api/admin/reviews/pending/:id', requireAdmin, async (req, res) => {
   const id = String(req.params.id || '');
   const list = (await readReviewsPending()).filter((x) => x.id !== id);
   await writeReviewsPending(list);

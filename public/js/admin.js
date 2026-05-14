@@ -155,8 +155,8 @@ async function loadReviewsPending() {
         <p class="muted">${escHtml(r.email)}</p>
         <p class="ticket-body">${escHtml(r.text)}</p>
         <div class="ticket-actions">
-          <button type="button" class="btn btn-hub-solid btn-small" data-approve="1">Одобрить</button>
-          <button type="button" class="btn btn-outline btn-small" data-reject="1">Удалить</button>
+          <button type="button" class="btn btn-hub-solid btn-small" data-approve="1">Опубликовать на главной</button>
+          <button type="button" class="btn btn-outline btn-small" data-reject="1">Отклонить (из очереди)</button>
         </div>
         <p class="admin-msg review-act-msg"></p>
       </article>`
@@ -170,6 +170,60 @@ async function loadReviewsPending() {
 
 document.getElementById('reload-reviews')?.addEventListener('click', () => loadReviewsPending());
 
+const reviewsPublishedRoot = document.getElementById('admin-reviews-published');
+
+async function loadPublishedReviews() {
+  if (!reviewsPublishedRoot) return;
+  reviewsPublishedRoot.textContent = 'Загрузка…';
+  try {
+    const { reviews } = await api('/api/admin/reviews/published');
+    if (!reviews.length) {
+      reviewsPublishedRoot.textContent = 'На главной пока нет отзывов в JSON.';
+      return;
+    }
+    reviewsPublishedRoot.innerHTML = reviews
+      .map(
+        (r, i) => `
+      <article class="ticket-card glass reveal reveal-delay-${(i % 4) + 1}" data-pub-idx="${i}">
+        <div class="ticket-head">
+          <strong>${escHtml(r.name)}</strong>
+          <span class="muted">#${i + 1} на главной</span>
+        </div>
+        <p class="muted">${escHtml(r.role || '')}</p>
+        <p class="ticket-body">${escHtml(r.text)}</p>
+        <div class="ticket-actions">
+          <button type="button" class="btn btn-outline btn-small" data-remove-published="1">Убрать с главной</button>
+        </div>
+        <p class="admin-msg published-act-msg"></p>
+      </article>`
+      )
+      .join('');
+    window.initRevealScroll?.();
+  } catch (error) {
+    reviewsPublishedRoot.textContent = error.message || 'Ошибка';
+  }
+}
+
+document.getElementById('reload-published-reviews')?.addEventListener('click', () => loadPublishedReviews());
+
+reviewsPublishedRoot?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-remove-published]');
+  if (!btn || !reviewsPublishedRoot) return;
+  const card = btn.closest('[data-pub-idx]');
+  if (!card) return;
+  const idx = Number(card.dataset.pubIdx);
+  const msg = card.querySelector('.published-act-msg');
+  if (msg) msg.textContent = '';
+  try {
+    await api(`/api/admin/reviews/published/${idx}`, { method: 'DELETE' });
+    showToast('Отзыв убран с главной');
+    await loadPublishedReviews();
+    await loadSiteJson();
+  } catch (error) {
+    if (msg) msg.textContent = error.message || 'Ошибка';
+  }
+});
+
 reviewsRoot?.addEventListener('click', async (e) => {
   const approve = e.target.closest('[data-approve]');
   const reject = e.target.closest('[data-reject]');
@@ -182,9 +236,11 @@ reviewsRoot?.addEventListener('click', async (e) => {
   try {
     if (approve) {
       await api(`/api/admin/reviews/${encodeURIComponent(id)}/approve`, { method: 'POST', body: '{}' });
-      showToast('Отзыв опубликован на главной');
+      showToast('Отзыв опубликован — появится на главной после обновления страницы');
+      await loadPublishedReviews();
+      await loadSiteJson();
     } else {
-      await api(`/api/admin/reviews/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      await api(`/api/admin/reviews/pending/${encodeURIComponent(id)}`, { method: 'DELETE' });
       showToast('Отзыв удалён из очереди');
     }
     card.remove();
@@ -201,4 +257,5 @@ reviewsRoot?.addEventListener('click', async (e) => {
   loadSiteJson();
   loadTickets();
   loadReviewsPending();
+  loadPublishedReviews();
 })();

@@ -54,10 +54,20 @@
       </section>
 
       <section class="glass admin-editor reveal reveal-delay-3" style="padding: 18px; border-radius: 18px; margin-top: 16px">
-        <h2 style="margin-bottom: 10px">Отзывы на модерации</h2>
-        <p class="muted" style="margin-bottom: 12px">Одобренные попадают в блок отзывов на главной.</p>
+        <h2 style="margin-bottom: 10px">Отзывы пользователей (очередь)</h2>
+        <p class="muted" style="margin-bottom: 12px">
+          Пользователь оставил отзыв в кабинете → ты проверяешь текст →
+          <strong>«Опубликовать на главной»</strong> добавляет его в блок отзывов на главной. «Отклонить» — только убирает из очереди (на сайт не попадает).
+        </p>
         <button type="button" class="btn btn-outline" id="reload-reviews">Обновить очередь</button>
         <div id="admin-reviews" class="admin-tickets" style="margin-top: 14px"></div>
+      </section>
+
+      <section class="glass admin-editor reveal" style="padding: 18px; border-radius: 18px; margin-top: 16px">
+        <h2 style="margin-bottom: 10px">Отзывы на главной (опубликованные)</h2>
+        <p class="muted" style="margin-bottom: 12px">Список того, что сейчас показывается на главной. «Убрать» — удалит с главной (JSON обновится). Редактировать текст удобнее через блок JSON выше — поле <code>reviews</code>.</p>
+        <button type="button" class="btn btn-outline" id="reload-published-reviews">Обновить список</button>
+        <div id="admin-reviews-published" class="admin-tickets" style="margin-top: 14px"></div>
       </section>
     </main>
 

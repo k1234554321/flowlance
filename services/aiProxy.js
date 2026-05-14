@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 const SYSTEM_PROMPT = `Ты консультант сервиса FlowLance — агрегатора вакансий и проектов для фриланса и удалённой работы.
+Пользователи могут быть из любой страны: помогай всем одинаково вежливо, не отказывай из‑за предполагаемой геолокации собеседника.
 Отвечай только на темы: фриланс, удалённая работа, поиск заказов, отклики, портфолио, ценообразование, фильтры и разделы сайта FlowLance, биржи и типичные задачи на них.
 Если вопрос не про фриланс, удалённую работу или FlowLance — вежливо откажись в одном коротком абзаце, без советов по другим темам.
 Пиши по-русски, кратко и по делу, без выдуманных функций сайта: если не уверен, скажи что точнее подскажет раздел «Лента» или «О сервисе».`;
@@ -56,8 +57,16 @@ async function askAi(prompt) {
 
     return text || 'Модель не вернула текст.';
   } catch (error) {
-    const detail = error.response?.data?.error?.message || error.message;
-    return `Ошибка запроса к модели: ${error.response?.status || ''} ${detail}`.trim();
+    const status = error.response?.status;
+    const detail = String(error.response?.data?.error?.message || error.message || '');
+    const geo =
+      status === 403 ||
+      status === 451 ||
+      /country|region|unsupported|not available|blocked|forbidden/i.test(detail);
+    if (geo) {
+      return 'Запрос к модели отклонён на стороне провайдера (часто из‑за региона, где стоит сервер). Решение: в .env укажи PROXY_API_URL + PROXY_API_KEY на API, доступный из страны хостинга, либо перенеси бэкенд на площадку без таких ограничений.';
+    }
+    return `Ошибка запроса к модели: ${status || ''} ${detail}`.trim();
   }
 }
 

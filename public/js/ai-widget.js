@@ -18,7 +18,7 @@
         <span>FlowLance · помощник</span>
         <button type="button" class="fl-ai-close" id="fl-ai-close" aria-label="Закрыть">×</button>
       </div>
-      <p class="fl-ai-hint">Только фриланс, удалённая работа и вопросы по сервису.</p>
+      <p class="fl-ai-hint">Фриланс, удалёнка и сервис FlowLance — для пользователей из любых стран.</p>
       <div class="fl-ai-chat" id="fl-ai-chat"></div>
       <form class="fl-ai-form" id="fl-ai-form">
         <input type="text" id="fl-ai-input" maxlength="2000" placeholder="Спроси про ленту, отклик или фильтры…" autocomplete="off" />
