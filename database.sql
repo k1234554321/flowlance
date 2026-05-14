@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS aggregator_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE aggregator_db;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(120) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  avatar_url VARCHAR(255) DEFAULT '',
+  role ENUM('user', 'admin') DEFAULT 'user',
+  bio TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS offers (
+  id VARCHAR(40) PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  source VARCHAR(120) NOT NULL,
+  category VARCHAR(80) NOT NULL,
+  budget_min INT NOT NULL,
+  budget_max INT NOT NULL,
+  currency VARCHAR(10) NOT NULL,
+  external_url VARCHAR(500) DEFAULT '',
+  posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

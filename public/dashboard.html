@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — личный кабинет</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+  <body>
+    <div class="bg-blur"></div>
+    <div class="bg-grid"></div>
+
+    <div class="cabinet-topbar glass reveal">
+      <span>Действия:</span>
+      <div class="cabinet-actions">
+        <a href="#" id="promo-link">Ввести промокод</a>
+        <a href="/feed">Лента заказов</a>
+        <a href="/" id="admin-link" class="hidden">Админка</a>
+        <a href="#" id="logout-link">Выйти из аккаунта</a>
+      </div>
+    </div>
+
+    <header class="navbar glass nav-hero-anim" style="width: min(1100px, 94%); margin: 12px auto 0">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu">
+        <a href="/feed">Лента</a>
+        <a href="/dashboard" class="active">Кабинет</a>
+        <a href="/sources">Биржи</a>
+      </nav>
+    </header>
+
+    <main class="cabinet-shell">
+      <section class="cabinet-card glass reveal reveal-delay-1">
+        <h2>Портфолио</h2>
+        <p class="cab-sub">Ваше профессиональное резюме на FlowLance</p>
+        <div class="cabinet-row">
+          <div>
+            <p class="cab-username" id="cab-username">—</p>
+            <div class="progress-wrap">
+              <p class="progress-label">Заполненность портфолио: <span id="portfolio-pct">0</span>%</p>
+              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" id="portfolio-bar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          <a class="btn btn-neon btn-glow" href="#profile-edit">Заполнить сейчас</a>
+        </div>
+      </section>
+
+      <section class="cabinet-card glass reveal reveal-delay-2">
+        <div class="bonus-head">
+          <h2 style="margin: 0">Бонусная программа</h2>
+          <p class="bonus-balance">Баланс: <span id="coin-balance">0</span> Flow Coin</p>
+        </div>
+        <p class="cab-sub">Награды за активность (сохраняются в сессии на сервере)</p>
+        <div class="bonus-grid">
+          <article class="bonus-card glass reveal reveal-delay-1">
+            <h3>Сегодня</h3>
+            <p>Добавь в избранное или отметь 10 проектов в ленте (симуляция кнопкой ниже).</p>
+            <p class="bonus-progress" id="task-projects">Прогресс: 0 / 10</p>
+            <div class="progress-bar"><div class="progress-fill" id="task-projects-bar" style="width: 0%"></div></div>
+            <button type="button" class="btn btn-outline btn-block" id="btn-bump-project">+1 проект</button>
+            <button type="button" class="btn btn-neon btn-block" id="btn-claim-projects" disabled>Получить 100 Flow Coin</button>
+          </article>
+          <article class="bonus-card glass reveal reveal-delay-2">
+            <h3>Ежедневное посещение</h3>
+            <p>Заходи на платформу каждый день и забирай бонус.</p>
+            <button type="button" class="btn btn-neon btn-block" id="btn-claim-daily">Получить 10 Flow Coin</button>
+          </article>
+          <article class="bonus-card glass reveal reveal-delay-3">
+            <h3>Заполни профиль</h3>
+            <p>Имя, аватар и описание — доверие заказчиков растёт.</p>
+            <button type="button" class="btn btn-neon btn-block" id="btn-claim-profile">Получить бонус</button>
+          </article>
+        </div>
+      </section>
+
+      <div class="cabinet-split reveal" id="profile-edit">
+        <section class="cabinet-card glass reveal reveal-delay-1">
+          <h2>Редактирование</h2>
+          <p class="cab-sub">Данные профиля</p>
+          <form id="profile-form" class="form-stack">
+            <input id="name" type="text" placeholder="Имя" />
+            <input id="avatar_url" type="url" placeholder="Ссылка на аватар" />
+            <textarea id="bio" placeholder="Кратко о себе, стек, ссылки"></textarea>
+            <button class="btn btn-neon" type="submit">Сохранить</button>
+          </form>
+        </section>
+        <section class="cabinet-card glass reveal reveal-delay-2">
+          <h2>Предпросмотр</h2>
+          <p class="cab-sub">Как видят тебя другие</p>
+          <img id="avatar-preview" class="avatar" alt="avatar" />
+          <p id="profile-name" class="cab-username" style="margin-top: 12px">Имя</p>
+          <p id="profile-email" class="muted"></p>
+          <p id="profile-bio" class="muted" style="margin-top: 8px; line-height: 1.5"></p>
+        </section>
+      </div>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

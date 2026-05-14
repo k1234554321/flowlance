@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — биржи и площадки</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="page-sources theme-hub">
+    <header class="navbar glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/sources" class="nav-pill active-pill">Биржи</a>
+        <a href="/about" class="nav-pill muted-link">О сервисе</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/auth" class="btn btn-outline btn-small">Войти</a>
+      </div>
+    </header>
+
+    <main class="sources-main">
+      <section class="sources-hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="sources-hero-inner">
+          <span class="section-kicker hero-load-1">Площадки</span>
+          <h1 class="section-title-hub hero-load-2">Откуда берутся заказы</h1>
+          <p class="hero-sub hub-sub-center hero-load-3">
+            Здесь и в ленте: две площадки уже отдают задачи в общий поток (Freelancer и RemoteOK). Остальные — справочные карточки с плюсами, минусами и кнопкой перехода на сайт биржи.
+          </p>
+        </div>
+      </section>
+
+      <section class="sources-grid-wrap reveal">
+        <div id="sources-grid" class="sources-grid"></div>
+      </section>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/sources.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — лента заказов</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="page-feed theme-hub">
+    <div class="bg-blur"></div>
+    <div class="bg-grid"></div>
+
+    <header class="navbar glass feed-nav nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/feed" class="nav-pill active-pill">Лента</a>
+        <a href="/" class="nav-pill">Главная</a>
+        <a href="/sources" class="nav-pill">Биржи</a>
+        <a href="/about" class="nav-pill muted-link">О сервисе</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/auth" class="btn btn-outline btn-glow btn-small">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small">Кабинет</a>
+      </div>
+    </header>
+
+    <main class="feed-layout">
+      <section class="feed-hero glass reveal">
+        <h1 class="feed-title hero-load-2">Актуальные заказы</h1>
+        <p class="hero-sub hero-load-3">
+          Настрой источник, категорию, период, валюту, диапазон бюджета и поиск по тексту — затем нажми кнопку показа, чтобы перейти к списку.
+        </p>
+      </section>
+
+      <section class="feed-filter-panel glass reveal">
+        <div class="feed-filter-grid">
+          <label class="feed-field">
+            <span>Период</span>
+            <select id="period-filter">
+              <option value="">За всё время</option>
+              <option value="1">За последний час</option>
+              <option value="3">За 3 часа</option>
+              <option value="12">За 12 часов</option>
+              <option value="24">За сутки</option>
+              <option value="72">За 3 дня</option>
+              <option value="168">За неделю</option>
+              <option value="720">За месяц</option>
+            </select>
+          </label>
+          <label class="feed-field">
+            <span>Источник</span>
+            <select id="source-filter">
+              <option value="">Все биржи</option>
+            </select>
+          </label>
+          <label class="feed-field">
+            <span>Категория</span>
+            <select id="category-filter">
+              <option value="">Все категории</option>
+              <option value="Frontend">Frontend</option>
+              <option value="Backend">Backend</option>
+              <option value="Design">Design</option>
+              <option value="Mobile">Mobile</option>
+              <option value="DevOps">DevOps</option>
+              <option value="AI">AI</option>
+              <option value="General">General</option>
+            </select>
+          </label>
+          <label class="feed-field feed-field-wide">
+            <span>Поиск по тексту</span>
+            <input id="search-filter" type="search" placeholder="Ключевые слова, стек, название задачи" autocomplete="off" />
+          </label>
+          <label class="feed-field">
+            <span>Валюта</span>
+            <select id="currency-filter">
+              <option value="">Любая</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="RUB">RUB</option>
+            </select>
+          </label>
+          <label class="feed-field">
+            <span>Бюджет от</span>
+            <input id="price-min" type="number" min="0" placeholder="0" />
+          </label>
+          <label class="feed-field">
+            <span>до</span>
+            <input id="price-max" type="number" min="0" placeholder="∞" />
+          </label>
+          <div class="feed-field feed-submit">
+            <span class="feed-submit-label">Готово</span>
+            <button type="button" class="btn btn-neon btn-glow feed-show-btn" id="apply-filters">
+              Показать <strong id="filtered-count">0</strong> предложений
+            </button>
+          </div>
+        </div>
+        <div class="feed-pills-row">
+          <span class="feed-pills-label">Быстрые категории:</span>
+          <div class="chip-row" id="feed-cat-pills"></div>
+        </div>
+      </section>
+
+      <section class="feed-results section reveal">
+        <div class="section-head">
+          <p class="hero-sub live-inline"><span class="live-dot">LIVE</span> Обновление потока каждые ~15 сек.</p>
+        </div>
+        <div id="offers-grid" class="orders-grid feed-grid"></div>
+      </section>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/feed.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

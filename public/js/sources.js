@@ -1,0 +1,93 @@
+const PLATFORMS = [
+  {
+    name: 'Freelancer',
+    inFeed: true,
+    url: 'https://www.freelancer.com/',
+    blurb: 'Крупная международная биржа: от микрозадач до долгих контрактов.',
+    pros: ['Огромный поток заказов', 'Международные проекты и валюты', 'Удобный поиск по навыкам'],
+    cons: ['Высокая конкуренция', 'Комиссии и иногда шум в откликах', 'Нужен сильный английский для части задач']
+  },
+  {
+    name: 'RemoteOK',
+    inFeed: true,
+    url: 'https://remoteok.com/',
+    blurb: 'Фокус на удалённых вакансиях и контрактах в IT и смежных областях.',
+    pros: ['Чистый формат вакансий', 'Много IT и продуктовых ролей', 'Быстрый просмотр условий'],
+    cons: ['Меньше локальных задач на русском', 'Часть позиций только full-time', 'Нужно следить за таймзонами']
+  },
+  {
+    name: 'FL.ru',
+    inFeed: false,
+    url: 'https://www.fl.ru/',
+    blurb: 'Классическая российская биржа: широкий спектр digital-задач.',
+    pros: ['Привычный формат для РФ', 'Разные уровни бюджета', 'Много категорий'],
+    cons: ['Нужно внимательно читать ТЗ', 'Конкуренция среди исполнителей', 'Сроки обсуждаются индивидуально']
+  },
+  {
+    name: 'Kwork',
+    inFeed: false,
+    url: 'https://kwork.ru/',
+    blurb: 'Маркетплейс услуг и готовых кворков — удобно для типовых пакетов.',
+    pros: ['Понятные пакеты «под ключ»', 'Быстрый старт для простых задач', 'Рейтинги и отзывы'],
+    cons: ['Меньше гибкости в нестандартных проектах', 'Цена часто фиксирована пакетом', 'Нужно следить за доп. опциями']
+  },
+  {
+    name: 'Habr Freelance',
+    inFeed: false,
+    url: 'https://freelance.habr.com/',
+    blurb: 'Профильная площадка с упором на разработку, продукт и инженерные задачи.',
+    pros: ['Сильное IT-комьюнити', 'Часто адекватные ТЗ', 'Удобно для команд и middle+'],
+    cons: ['Планка по навыкам выше среднего', 'Не всегда много мелких задач', 'Нужно аккуратно оценивать сроки']
+  },
+  {
+    name: 'Freelance.ru',
+    inFeed: false,
+    url: 'https://freelance.ru/',
+    blurb: 'Универсальная биржа с разными категориями и форматами сотрудничества.',
+    pros: ['Разнообразие заказов', 'Знакомый многим формат', 'Можно наращивать репутацию'],
+    cons: ['Нужен дисциплинированный отклик', 'Важно фиксировать договорённости', 'Конкуренция в популярных нишах']
+  }
+];
+
+function esc(s) {
+  return String(s || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function badgeFor(p) {
+  if (p.inFeed) return 'В потоке ленты';
+  return 'Справочно · переход';
+}
+
+function render() {
+  const grid = document.getElementById('sources-grid');
+  if (!grid) return;
+  grid.innerHTML = PLATFORMS.map((p, idx) => {
+    const d = (idx % 4) + 1;
+    return `
+    <article class="source-card glass ${p.inFeed ? 'is-live' : ''} reveal reveal-delay-${d}">
+      <div class="source-card-top">
+        <h2 class="source-card-title">${esc(p.name)}</h2>
+        <span class="source-badge">${esc(badgeFor(p))}</span>
+      </div>
+      <p class="source-card-blurb">${esc(p.blurb)}</p>
+      <div class="source-lists">
+        <div>
+          <h3 class="source-mini">Плюсы</h3>
+          <ul class="source-pros-list">${p.pros.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <h3 class="source-mini source-mini--warn">Минусы</h3>
+          <ul class="source-cons-list">${p.cons.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <a class="btn btn-neon source-go" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Перейти на площадку</a>
+    </article>`;
+  }).join('');
+  window.initRevealScroll?.();
+}
+
+render();

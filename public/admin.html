@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — админ-панель</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="bg-blur"></div>
+    <div class="bg-grid"></div>
+
+    <header class="site-header glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="menu">
+        <a href="/feed">Лента</a>
+        <a href="/dashboard">Кабинет</a>
+        <a href="/admin" class="active">Админка</a>
+        <a href="/auth" class="btn btn-outline btn-small">Вход</a>
+      </nav>
+    </header>
+
+    <main class="page-content section">
+      <h1 class="reveal">Панель администратора</h1>
+      <p class="muted reveal reveal-delay-1" style="margin-bottom: 18px">Меняй тексты и блоки главной страницы (JSON). После сохранения обнови главную.</p>
+
+      <div class="stats-grid reveal reveal-delay-2">
+        <article class="glass reveal reveal-delay-1"><h3>Пользователи</h3><p id="users-stat">-</p></article>
+        <article class="glass reveal reveal-delay-2"><h3>Всего заказов</h3><p id="offers-stat">-</p></article>
+        <article class="glass reveal reveal-delay-3"><h3>Новых сегодня</h3><p id="today-stat">-</p></article>
+      </div>
+      <p id="admin-mode" class="admin-msg reveal reveal-delay-3"></p>
+
+      <section class="glass admin-editor reveal reveal-delay-1" style="padding: 18px; border-radius: 18px; margin-top: 12px">
+        <div class="admin-toolbar">
+          <button type="button" class="btn btn-neon" id="load-site-btn">Загрузить из файла</button>
+          <button type="button" class="btn btn-outline" id="save-site-btn">Сохранить на сервер</button>
+          <span class="admin-msg" id="site-editor-msg"></span>
+        </div>
+        <label class="muted" for="site-json" style="display: block; margin: 10px 0 6px">data/siteContent.json</label>
+        <textarea id="site-json" spellcheck="false" placeholder='{ "brandLine": "..." }'></textarea>
+        <p class="muted" style="font-size: 0.88rem; margin-top: 8px">
+          Подсказка: не удаляй кавычки и запятые. Ошибка JSON — сервер вернёт 500 и не перезапишет файл.
+        </p>
+      </section>
+
+      <section class="glass admin-editor reveal reveal-delay-2" style="padding: 18px; border-radius: 18px; margin-top: 16px">
+        <h2 style="margin-bottom: 10px">Тикеты поддержки</h2>
+        <p class="muted" style="margin-bottom: 12px">Ответ сохраняется в файле на сервере. Статус: new / in_progress / closed.</p>
+        <button type="button" class="btn btn-outline" id="reload-tickets">Обновить список</button>
+        <div id="admin-tickets" class="admin-tickets" style="margin-top: 14px"></div>
+      </section>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/admin.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

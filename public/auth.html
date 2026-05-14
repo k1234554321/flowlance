@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — вход и регистрация</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="theme-hub">
+    <header class="navbar glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/" class="nav-pill">Главная</a>
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/about" class="nav-pill muted-link">О сервисе</a>
+      </nav>
+    </header>
+
+    <main class="section hub-section">
+      <div class="auth-hero">
+        <span class="section-kicker hero-load-1">Аккаунт</span>
+        <h1 class="section-title-hub hero-load-2">Вход и регистрация</h1>
+      </div>
+
+      <section class="auth-layout">
+        <div class="card glass reveal reveal-delay-1">
+          <h2>Вход</h2>
+          <form id="login-form" class="form-stack">
+            <input type="email" id="login-email" placeholder="Email" required />
+            <input type="password" id="login-password" placeholder="Пароль" required />
+            <button class="btn btn-search" type="submit">Войти</button>
+          </form>
+        </div>
+        <div class="card glass reveal reveal-delay-2">
+          <h2>Регистрация</h2>
+          <form id="register-form" class="form-stack">
+            <input type="text" id="register-name" placeholder="Имя" required />
+            <input type="email" id="register-email" placeholder="Email" required />
+            <input type="password" id="register-password" placeholder="Пароль" required />
+            <button class="btn btn-search" type="submit">Создать аккаунт</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

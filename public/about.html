@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — о сервисе и поддержка</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="page-about theme-hub">
+    <header class="navbar glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/" class="nav-pill">Главная</a>
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/sources" class="nav-pill">Биржи</a>
+        <a href="/about" class="nav-pill active-pill">О сервисе</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/auth" class="btn btn-outline btn-small">Войти</a>
+      </div>
+    </header>
+
+    <main class="about-main">
+      <section class="about-hero-block">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="about-hero-inner">
+          <span class="section-kicker hero-load-1">О сервисе</span>
+          <h1 class="section-title-hub hero-load-2">Зачем нужен FlowLance</h1>
+          <p class="hero-sub hub-sub-center hero-load-3">
+            Это агрегатор объявлений о фрилансе и удалёнке: одна лента, общие фильтры и быстрый переход к оригиналу задачи на площадке-источнике.
+            Мы не «продаём бренд» — делаем удобный инструмент, чтобы меньше времени уходило на рутинный поиск и сравнение условий.
+          </p>
+        </div>
+      </section>
+
+      <section class="about-split about-split-tight reveal">
+        <div class="card glass about-block reveal reveal-delay-1">
+          <h2>Что ты получаешь</h2>
+          <ul class="about-list">
+            <li>Единый экран с источником, бюджетом, сроком и сутью задачи.</li>
+            <li>Фильтры по бирже, категории, периоду публикации и поиску по тексту.</li>
+            <li>Поддержка по почте, телефону и тикетам — если что-то отображается не так.</li>
+          </ul>
+        </div>
+        <div class="card glass about-block reveal reveal-delay-2">
+          <h2>Как устроен сервис</h2>
+          <p class="about-p">
+            Карточки подтягиваются и обновляются на сервере; часть источников уже отдаёт задачи в ленту автоматически, остальные площадки доступны
+            как справочник с переходом по кнопке. Договор и оплата по-прежнему на стороне выбранной биржи.
+          </p>
+        </div>
+      </section>
+
+      <section class="card glass about-block about-support reveal" id="support">
+        <h2>Поддержка</h2>
+        <p class="about-p">Напиши или позвони — для нетривиальных случаев открой тикет: администратор увидит обращение и ответит в переписке.</p>
+        <div class="support-line">
+          <div>
+            <span class="support-label">Телефон</span>
+            <a class="support-val" href="tel:+74951200077">+7 (495) 120-00-77</a>
+          </div>
+          <div>
+            <span class="support-label">Почта</span>
+            <a class="support-val" href="mailto:care@flowlance.io">care@flowlance.io</a>
+          </div>
+        </div>
+
+        <h3 class="about-h3">Тикет в поддержку</h3>
+        <div class="ticket-form-shell">
+          <form id="ticket-form" class="ticket-form">
+            <input type="email" id="ticket-email" required placeholder="Email для ответа" />
+            <input type="text" id="ticket-name" placeholder="Имя" />
+            <input type="text" id="ticket-subject" required placeholder="Тема" />
+            <textarea id="ticket-body" required rows="4" placeholder="Опиши ситуацию: раздел сайта, что ожидал и что произошло"></textarea>
+            <button type="submit" class="btn btn-hub-solid">Отправить обращение</button>
+          </form>
+        </div>
+        <p class="ticket-msg" id="ticket-msg"></p>
+      </section>
+
+      <section class="card glass about-block reveal" id="faq">
+        <h2>Вопросы</h2>
+        <div class="faq-stack">
+          <details open>
+            <summary>Чем FlowLance отличается от одной биржи?</summary>
+            <div class="faq-a"><div class="faq-a-inner">Мы не заменяем площадку договора и оплаты — мы ускоряем поиск и сравнение задач из разных источников в одной ленте.</div></div>
+          </details>
+          <details>
+            <summary>Как быстрее найти подходящий заказ?</summary>
+            <div class="faq-a"><div class="faq-a-inner">Задай источник, категорию, бюджет и период публикации в ленте, затем сузь поиск по ключевым словам в описании.</div></div>
+          </details>
+          <details>
+            <summary>Куда писать, если не открывается карточка?</summary>
+            <div class="faq-a"><div class="faq-a-inner">Сообщи через форму тикета ссылку на задачу в FlowLance и время — проверим редирект на стороне источника.</div></div>
+          </details>
+        </div>
+      </section>
+
+      <div class="about-cta reveal">
+        <a class="btn btn-hub-solid btn-lg" href="/feed">Перейти в ленту</a>
+        <a class="btn btn-outline btn-lg" href="/">На главную</a>
+      </div>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/about.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

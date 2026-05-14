@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowLance — поиск удалённой работы и фриланса</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-home theme-hub">
+  <div class="custom-cursor" aria-hidden="true"></div>
+  <div class="bg-blur"></div>
+  <div class="bg-grid"></div>
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <header class="navbar glass nav-hero-anim">
+    <a class="logo" href="/">FLOW<span>LANCE</span></a>
+    <nav class="nav-menu nav-mega">
+      <a href="/feed" class="nav-pill">Лента</a>
+      <a href="/sources" class="nav-pill">Биржи</a>
+      <a href="/about" class="nav-pill muted-link">О сервисе</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="/auth" class="btn btn-outline btn-glow" id="nav-auth">Войти</a>
+      <a href="/dashboard" class="btn btn-neon btn-glow hidden" id="nav-dash">Кабинет</a>
+    </div>
+  </header>
+
+  <section class="hero-hub">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
+
+    <div class="hero-hub-inner">
+      <p class="hero-tag hero-load-1" id="home-hero-tag">— активных предложений</p>
+
+      <h1 class="hero-hub-title hero-load-2" id="home-hero-title">…</h1>
+      <p class="hero-hub-sub hero-load-3" id="home-hero-sub">…</p>
+
+      <form class="search-panel hero-load-4" id="home-search-form">
+        <div class="search-filters" id="home-filters">
+          <select class="filter-select" id="home-source">
+            <option value="">Все биржи</option>
+          </select>
+          <select class="filter-select" id="home-category">
+            <option value="">Все категории</option>
+          </select>
+          <select class="filter-select" id="home-price">
+            <option value="">Любая цена</option>
+          </select>
+          <select class="filter-select" id="home-period">
+            <option value="">Период</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-search" id="home-show-btn">
+          Показать предложения <span class="count-badge" id="offers-count">—</span>
+        </button>
+      </form>
+
+      <div class="stats hub-stats hero-load-5" id="stats-grid"></div>
+
+      <div class="hero-cta-row hero-load-6">
+        <a href="/feed" class="btn btn-outline btn-lg" id="home-primary-cta">Открыть ленту</a>
+        <a href="/auth" class="btn btn-login btn-lg">Войти / Регистрация</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="section-head">
+      <h2>Биржи и площадки</h2>
+      <p class="hero-sub">Одним списком — переходи к оригиналу объявления из ленты</p>
+    </div>
+    <div class="exchange-marquee" id="exchange-marquee">
+      <div class="exchange-track-inner" id="exchange-tags"></div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="section-head">
+      <h2>Категории</h2>
+      <p class="hero-sub">Выбери направление — дальше настроишь фильтры в ленте</p>
+    </div>
+    <div class="category-grid" id="category-grid"></div>
+  </section>
+
+  <section class="section reveal">
+    <div class="section-head">
+      <h2>Бюджет и срок</h2>
+    </div>
+    <div class="filter-strip glass">
+      <div>
+        <p class="filter-label">Цена</p>
+        <div class="chip-row" id="price-chips"></div>
+      </div>
+      <div>
+        <p class="filter-label">Период публикации</p>
+        <div class="chip-row" id="period-chips"></div>
+      </div>
+    </div>
+    <p class="filter-hint hub-filter-hint">Фильтры на главной — быстрый старт. Полная настройка в <a href="/feed">ленте</a>.</p>
+  </section>
+
+  <section class="section hub-section reveal" id="journal-faq">
+    <div class="journal-faq-grid">
+      <div class="reveal reveal-delay-1">
+        <span class="section-kicker">Журнал</span>
+        <h2 class="section-title-hub">Материалы и заметки</h2>
+        <div class="news-stack" id="journal-news"></div>
+        <a class="btn-all-hub" href="/about">Читать дальше →</a>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <span class="section-kicker">База знаний</span>
+        <h2 class="section-title-hub">Помощь и советы</h2>
+        <div class="faq-stack" id="faq-stack"></div>
+        <a class="btn-wiki-hub" href="/about#faq">Все ответы →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hub-section reveal" id="reviews-hub">
+    <span class="section-kicker reveal reveal-delay-1" style="text-align: center; display: block">Отзывы</span>
+    <h2 class="section-title-hub reveal reveal-delay-2" style="text-align: center; margin-bottom: 8px">Что говорят пользователи</h2>
+    <p class="hero-sub hub-sub-center reveal reveal-delay-3">Реальные отзывы людей, которые экономят время на поиске задач.</p>
+    <div class="reviews-hub-grid" id="reviews-hub-grid"></div>
+  </section>
+
+  <footer class="footer-minimal glass reveal">
+    <div class="footer-minimal-row">
+      <a href="/feed">Лента</a>
+      <span class="footer-dot">·</span>
+      <a href="/sources">Биржи</a>
+      <span class="footer-dot">·</span>
+      <a href="/about">О сервисе</a>
+      <span class="footer-dot">·</span>
+      <a href="/auth">Войти</a>
+    </div>
+    <p class="footer-minimal-copy">© FlowLance</p>
+  </footer>
+
+  <script src="/js/page-enter.js"></script>
+  <script src="/js/reveal-scroll.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/home.js"></script>
+  <script src="/js/ai-widget.js"></script>
+</body>
+</html>
