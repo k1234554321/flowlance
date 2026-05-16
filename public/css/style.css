@@ -2516,25 +2516,89 @@ body.theme-hub .auth-layout .btn.btn-search {
   margin-left: auto;
   margin-right: auto;
 }
-/* Допиши это в самый конец файла /css/style.css */
+
+/* ——— ПЛАВНАЯ КРАСИВАЯ ЗАГРУЗКА ВСЕГО САЙТА (МЯГКОЕ ПРОЯВЛЕНИЕ) ——— */
+@keyframes siteLoadIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+body {
+  animation: siteLoadIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Элементы, проявляющиеся при скролле (как в пример.html) */
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
-.reveal.active {
+
+.reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
-.hero-load-1 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.1s; opacity: 0; }
-.hero-load-2 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.25s; opacity: 0; }
-.hero-load-3 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.4s; opacity: 0; }
-.hero-load-4 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.55s; opacity: 0; }
-.hero-load-5 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.7s; opacity: 0; }
-.hero-load-6 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.85s; opacity: 0; }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Задержки для постепенного, каскадного появления */
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ——— КРАСИВЫЕ КНОПКИ СОЦ СЕТЕЙ (ПОД ХАБ-СТИЛЬ С ПОДСВЕТКОЙ) ——— */
+.hub-social-grid {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.btn-social-hub {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 28px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #f5f5f0;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-social-hub:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.btn-social-tg:hover {
+  border-color: #0088cc;
+  box-shadow: 0 0 20px rgba(0, 136, 204, 0.25);
+}
+
+.btn-social-vk:hover {
+  border-color: #0077ff;
+  box-shadow: 0 0 20px rgba(0, 119, 255, 0.25);
+}
+
+/* Иконки внутри кнопок */
+.btn-social-hub svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }

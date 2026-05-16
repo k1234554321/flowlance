@@ -14,6 +14,7 @@
     <div class="bg-grid"></div>
     <div class="bg-orbs" aria-hidden="true"></div>
     <div class="noise-overlay" aria-hidden="true"></div>
+
     <header class="navbar glass nav-hero-anim">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
       <nav class="nav-menu nav-mega">
@@ -28,108 +29,74 @@
       </div>
     </header>
 
-    <main class="about-main">
-      <section class="about-hero-block">
-        <div class="hero-bg" aria-hidden="true"></div>
-        <div class="hero-grid" aria-hidden="true"></div>
-        <div class="about-hero-inner">
-          <span class="section-kicker hero-load-1">О сервисе</span>
-          <h1 class="section-title-hub hero-load-2">Зачем нужен FlowLance</h1>
-          <p class="hero-sub hub-sub-center hero-load-3">
-            Это агрегатор объявлений о фрилансе и удалёнке: одна лента, общие фильтры и быстрый переход к оригиналу задачи на площадке-источнике.
-            Мы не «продаём бренд» — делаем удобный инструмент, чтобы меньше времени уходило на рутинный поиск и сравнение условий.
-          </p>
-        </div>
+    <main class="about-layout" style="width: min(1200px, 94%); margin: 40px auto;">
+      
+      <section class="about-hero text-center reveal reveal-delay-1" style="text-align: center; margin-bottom: 50px; position: relative; padding: 20px 0;">
+        <span class="section-kicker">FlowLance Hub</span>
+        <h1 class="section-title-hub" style="font-size: clamp(32px, 5vw, 48px); font-weight: 800; margin-bottom: 16px;">
+          Единый пульт управления фрилансом
+        </h1>
+        <p class="hero-sub about-support-lead">
+          Мы собираем горячие заказы со всего интернета (Freelancer, RemoteOK и др.) в один умный поток. Больше не нужно держать открытыми 20 вкладок.
+        </p>
       </section>
 
-      <section class="about-split about-split-tight reveal">
-        <div class="card glass about-block reveal reveal-delay-1">
-          <h2>Что ты получаешь</h2>
-          <ul class="about-list">
-            <li>Единый экран с источником, бюджетом, сроком и сутью задачи.</li>
-            <li>Фильтры по бирже, категории, периоду публикации и поиску по тексту.</li>
-            <li>Поддержка по почте, телефону и тикетам — если что-то отображается не так.</li>
-          </ul>
-        </div>
-        <div class="card glass about-block reveal reveal-delay-2">
-          <h2>Как устроен сервис</h2>
-          <p class="about-p">
-            Карточки подтягиваются и обновляются на сервере; часть источников уже отдаёт задачи в ленту автоматически, остальные площадки доступны
-            как справочник с переходом по кнопке. Договор и оплата по-прежнему на стороне выбранной биржи.
+      <div class="about-support-outer reveal reveal-delay-2">
+        <section class="about-support glass" style="padding: 32px; border-radius: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);">
+          <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; text-align: center;">Техническая поддержка</h2>
+          <p class="muted text-center" style="text-align: center; margin-bottom: 24px; color: #888880;">
+            Нашли баг или есть предложение? Напишите тикет — наша команда разберётся.
           </p>
-        </div>
-      </section>
-
-      <div class="about-support-outer reveal" style="display: flex; justify-content: center; width: 100%;">
-        <section class="card glass about-block about-support" id="support" style="max-width: 650px; width: 100%;">
-          <h2>Поддержка</h2>
-          <p class="about-p about-support-lead">
-            Напиши или позвони — для нетривиальных случаев открой тикет: администратор увидит обращение и ответит в переписке.
-          </p>
-          <div class="support-line support-line--center">
-            <div>
-              <span class="support-label">Телефон</span>
-              <a class="support-val" href="tel:+74951200077">+7 (495) 120-00-77</a>
+          
+          <form id=\"ticket-form\" class="form-stack" style="display: flex; flex-direction: column; gap: 16px; max-width: 500px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <input type="text" id="ticket-name" placeholder="Ваше имя" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff;" />
+              <input type="email" id="ticket-email" placeholder="Email для ответа" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff;" />
             </div>
-            <div>
-              <span class="support-label">Почта</span>
-              <a class="support-val" href="mailto:care@flowlance.io">care@flowlance.io</a>
-            </div>
-          </div>
-
-          <h3 class="about-h3">Тикет в поддержку</h3>
-          <div class="about-ticket-panel">
-            <div class="ticket-form-shell">
-              <form id="ticket-form" class="ticket-form">
-                <input type="email" id="ticket-email" required placeholder="Email для ответа" />
-                <input type="text" id="ticket-name" placeholder="Имя" />
-                <input type="text" id="ticket-subject" required placeholder="Тема" />
-                <textarea id="ticket-body" required rows="4" placeholder="Опиши ситуацию: раздел сайта, что ожидал и что произошло"></textarea>
-                <button type="submit" class="btn btn-hub-solid">Отправить обращение</button>
-              </form>
-            </div>
-          </div>
-          <p class="ticket-msg" id="ticket-msg"></p>
+            <input type="text" id="ticket-subject" placeholder="Тема обращения" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff;" />
+            <textarea id="ticket-body" placeholder="Опишите проблему максимально подробно..." rows="5" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff; font-family: inherit; resize: vertical;"></textarea>
+            <button class="btn btn-neon btn-glow" type="submit" style="padding: 14px; font-weight: 600; cursor: pointer;">Отправить обращение</button>
+          </form>
         </section>
       </div>
 
-      <section class="card glass about-block reveal" id="faq">
-        <h2>Вопросы</h2>
-        <div class="faq-stack">
-          <details open>
-            <summary>Чем FlowLance отличается от одной биржи?</summary>
-            <div class="faq-a"><div class="faq-a-inner">Мы не заменяем площадку договора и оплаты — мы ускоряем поиск и сравнение задач из разных источников в одной ленте.</div></div>
+      <section id="faq" class="reveal reveal-delay-3" style="margin-top: 60px;">
+        <h2 class="text-center" style="text-align: center; font-size: 28px; margin-bottom: 24px;">Часто задаваемые вопросы</h2>
+        <div class="faq-stack" style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;">
+          <details style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; cursor: pointer;">
+            <summary style="font-weight: 600; outline: none;">Как часто обновляется лента заказов?</summary>
+            <div class="faq-a" style="margin-top: 10px; color: #d0d0c8; line-height: 1.6;">
+              Заказы обновляются автоматически в реальном времени. Новые задачи прилетают каждые 15 секунд с помощью веб-сокетов без перезагрузки страницы.
+            </div>
           </details>
-          <details>
-            <summary>Как быстрее найти подходящий заказ?</summary>
-            <div class="faq-a"><div class="faq-a-inner">Задай источник, категорию, бюджет и период публикации в ленте, затем сузь поиск по ключевым словам в описании.</div></div>
-          </details>
-          <details>
-            <summary>Куда писать, если не открывается карточка?</summary>
-            <div class="faq-a"><div class="faq-a-inner">Сообщи через форму тикета ссылку на задачу в FlowLance и время — проверим редирект на стороне источника.</div></div>
+          <details style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; cursor: pointer;">
+            <summary style="font-weight: 600; outline: none;">Куда писать, если не открывается карточка биржи?</summary>
+            <div class="faq-a" style="margin-top: 10px; color: #d0d0c8; line-height: 1.6;">
+              Сообщите через форму тикета выше, указав ссылку на задачу — мы оперативно проверим редирект на источнике.
+            </div>
           </details>
         </div>
       </section>
 
-      <div class="about-cta reveal">
-        <a class="btn btn-hub-solid btn-lg" href="/feed">Перейти в ленту</a>
-        <a class="btn btn-outline btn-lg" href="/">На главную</a>
-      </div>
-
-      <footer class="hub-contacts-block glass reveal" style="margin: 48px auto 56px; padding: 24px; text-align: center;">
-        <span class="hub-contacts-label" style="display: block; margin-bottom: 12px;">Контакты</span>
-        <div class="hub-contacts-row" style="display: flex; justify-content: center; gap: 16px;">
-          <a class="btn btn-outline btn-glow" href="https://vk.com" target="_blank" rel="noopener noreferrer" style="padding: 10px 24px;">VK</a>
-          <a class="btn btn-neon btn-glow" href="https://t.me" target="_blank" rel="noopener noreferrer" style="padding: 10px 24px;">Telegram</a>
+      <footer class="reveal reveal-delay-4" style="margin-top: 80px; text-align: center; padding-bottom: 40px;">
+        <span class="hub-contacts-label" style="text-transform: uppercase; letter-spacing: 2px; color: #888880; font-size: 13px;">Наши контакты и сообщество</span>
+        
+        <div class="hub-social-grid">
+          <a class="btn-social-hub btn-social-tg" href="https://t.me" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.62.15-.15 2.7-2.48 2.75-2.7.01-.03.01-.14-.06-.2-.07-.06-.17-.04-.25-.02-.11.02-1.83 1.16-5.16 3.42-.49.34-.93.51-1.33.5-.44-.01-1.3-.25-1.93-.46-.78-.25-1.4-.39-1.35-.83.03-.23.35-.46.96-.71 3.76-1.63 6.27-2.71 7.54-3.23 3.58-1.48 4.32-1.74 4.81-1.75.11 0 .35.03.5.16.13.1.17.24.19.34.02.07.03.21.02.3z"/></svg>
+            Telegram-канал
+          </a>
+          <a class="btn-social-hub btn-social-vk" href="https://vk.com" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24"><path d="M15.02 2H8.98C4.02 2 2 4.02 2 8.98v6.04C2 19.98 4.02 22 8.98 22h6.04c4.96 0 6.98-2.02 6.98-6.98V8.98C22 4.02 19.98 2 15.02 2zm3.32 12.21c-.08.19-.28.38-.54.49-.49.2-1.39.06-2.54-.42-1.57-.66-2.92-1.8-4.13-3.41-.66-.88-1.13-1.84-1.42-2.88-.06-.23 0-.44.17-.58.16-.13.4-.19.67-.19h1.18c.28 0 .5.14.62.39.24.51.53 1.03.87 1.53.51.75.98 1.34 1.41 1.74.19.18.35.25.48.21.17-.05.25-.26.25-.63V9.08c0-.44-.11-.7-.34-.81-.15-.08-.12-.17.06-.23.36-.12 1.05-.18 1.83-.18.73 0 1.25.05 1.48.16.32.16.47.48.47.98v2.46c0 .32.06.52.17.62.1.09.24.1.41.02.39-.19.82-.56 1.27-1.1.43-.52.76-1.12.98-1.78.08-.24.28-.39.57-.39h1.26c.36 0 .54.11.54.34 0 .1-.04.24-.11.41-.33.78-.81 1.54-1.43 2.24-.54.61-1.01 1.04-1.4 1.29z"/></svg>
+            Группа ВКонтакте
+          </a>
         </div>
-      </footer>git add .
+        <p style="margin-top: 30px; color: #444440; font-size: 14px;">© FlowLance. Все права защищены.</p>
+      </footer>
     </main>
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
     <script src="/js/nav-session.js"></script>
-    <script src="/js/common.js"></script>
-    <script src="/js/about.js"></script>
-    <script src="/js/ai-widget.js"></script>
   </body>
 </html>

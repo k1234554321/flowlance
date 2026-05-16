@@ -4,50 +4,40 @@
   function revealAll() {
     document.querySelectorAll('.reveal').forEach((el) => {
       el.classList.add('visible');
-      el.classList.add('is-visible');
     });
   }
 
-
-  function ioOptions() {
-    return { threshold: 0.12, rootMargin: '0px 0px -8% 0px' };
-  }
-
   window.initRevealScroll = function initRevealScroll() {
-    // Если у пользователя отключены анимации в системе — не ебём ему мозг
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      revealAll();
-      return;
-    }
     if (observer) {
       observer.disconnect();
       observer = null;
     }
-    const opts = ioOptions();
+    
+    // Берем настройки плавности из примера
     observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add('visible');
-            e.target.classList.add('is-visible');
-            observer.unobserve(e.target);
+            observer.unobserve(e.target); // Сработало один раз и зафиксировалось
           }
         });
       },
-      opts
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     );
+
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.querySelectorAll('.reveal').forEach((el) => {
-          if (!el.classList.contains('visible')) observer.observe(el);
-        });
+      document.querySelectorAll('.reveal').forEach((el) => {
+        if (!el.classList.contains('visible')) {
+          observer.observe(el);
+        }
       });
     });
   };
 
-  function boot() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.initRevealScroll);
+  } else {
     window.initRevealScroll();
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
 })();
