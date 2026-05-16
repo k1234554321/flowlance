@@ -2611,7 +2611,19 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Кнопка-круг (FAB) */
+/* ==========================================
+   ИСПРАВЛЕННЫЙ ВИДЖЕТ НЕЙРОСЕТИ (ФИКСИРОВАННЫЙ)
+   ========================================== */
+
+/* Главный контейнер, который скрипт вешает в body */
+.fl-ai-root {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 999999 !important; /* Чтобы гарантированно быть поверх футера и стеклянных панелей */
+}
+
+/* Кнопка-круг (FAB) теперь жестко привязана к фиксированному родителю */
 .fl-ai-fab {
   width: 56px;
   height: 56px;
@@ -2627,6 +2639,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative; /* Чтобы z-index работал внутри root */
 }
 
 .fl-ai-fab:hover {
@@ -2634,11 +2647,11 @@ body {
   box-shadow: 0 12px 32px rgba(255, 255, 255, 0.2);
 }
 
-/* Сама панель чата, которая открывается по клику */
+/* Панель чата — теперь позиционируется абсолютно внутри фиксированного .fl-ai-root */
 .fl-ai-panel {
-  position: absolute;
-  bottom: 72px; /* Чуть выше кнопки */
-  right: 0;
+  position: absolute !important;
+  bottom: 72px !important; /* Встает ровно над кнопкой */
+  right: 0 !important;
   width: 360px;
   height: 480px;
   background: #0a0a0a;
