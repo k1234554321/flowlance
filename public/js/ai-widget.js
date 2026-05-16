@@ -9,8 +9,16 @@
       .replaceAll('"', '&quot;');
   }
 
+  // Создаём главный контейнер виджета
   const root = document.createElement('div');
   root.className = 'fl-ai-root';
+  
+  // НАМЕРТВО КЛЕИМ КОНТЕЙНЕР К ЭКРАНУ ЧЕРЕЗ JS (ИГНОРИРУЯ ЛЮБОЙ CSS)
+  root.style.setProperty('position', 'fixed', 'important');
+  root.style.setProperty('bottom', '24px', 'important');
+  root.style.setProperty('right', '24px', 'important');
+  root.style.setProperty('z-index', '999999', 'important');
+
   root.innerHTML = `
     <button type="button" class="fl-ai-fab" id="fl-ai-fab" aria-label="Помощник FlowLance">?</button>
     <div class="fl-ai-panel hidden" id="fl-ai-panel" role="dialog" aria-label="Чат помощника">
@@ -22,9 +30,11 @@
       <div class="fl-ai-chat" id="fl-ai-chat"></div>
       <form class="fl-ai-form" id="fl-ai-form">
         <input type="text" id="fl-ai-input" maxlength="2000" placeholder="Спроси про ленту, отклик или фильтры…" autocomplete="off" />
-        <button type="submit" class="fl-ai-send">→</button>
+        <button type="submit" class="fl-ai-submit">></button>
       </form>
-    </div>`;
+    </div>
+  `;
+
   document.body.appendChild(root);
 
   const fab = document.getElementById('fl-ai-fab');
@@ -34,79 +44,83 @@
   const input = document.getElementById('fl-ai-input');
   const chat = document.getElementById('fl-ai-chat');
 
-  function bubble(role, text) {
-    const div = document.createElement('div');
-    div.className = `fl-ai-bubble fl-ai-bubble--${role === 'Ты' ? 'user' : 'bot'}`;
-    div.innerHTML = `<strong>${esc(role)}</strong><span>${esc(text)}</span>`;
-    chat.appendChild(div);
+  // ЖЁСТКИЕ СТИЛИ ДЛЯ КНОПКИ-КРУГА
+  fab.style.setProperty('position', 'relative', 'important');
+  fab.style.setProperty('width', '56px', 'important');
+  fab.style.setProperty('height', '56px', 'important');
+  fab.style.setProperty('border-radius', '50%', 'important');
+  fab.style.setProperty('background', '#ffffff', 'important');
+  fab.style.setProperty('color', '#000000', 'important');
+  fab.style.setProperty('border', 'none', 'important');
+  fab.style.setProperty('cursor', 'pointer', 'important');
+  fab.style.setProperty('font-size', '24px', 'important');
+  fab.style.setProperty('font-weight', 'bold', 'important');
+  fab.style.setProperty('box-shadow', '0 8px 24px rgba(0, 0, 0, 0.4)', 'important');
+  fab.style.setProperty('display', 'flex', 'important');
+  fab.style.setProperty('align-items', 'center', 'important');
+  fab.style.setProperty('justify-content', 'center', 'important');
+
+  // ЖЁСТКИЕ СТИЛИ ДЛЯ ОКНА ЧАТА
+  panel.style.setProperty('position', 'absolute', 'important');
+  panel.style.setProperty('bottom', '72px', 'important');
+  panel.style.setProperty('right', '0', 'important');
+  panel.style.setProperty('width', '360px', 'important');
+  panel.style.setProperty('height', '480px', 'important');
+  panel.style.setProperty('background', '#0a0a0a', 'important');
+  panel.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.1)', 'important');
+  panel.style.setProperty('border-radius', '16px', 'important');
+  panel.style.setProperty('box-shadow', '0 12px 40px rgba(0, 0, 0, 0.6)', 'important');
+  panel.style.setProperty('flex-direction', 'column', 'important');
+  panel.style.setProperty('overflow', 'hidden', 'important');
+  
+  // Управляем отображением панели изначально
+  if (panel.classList.contains('hidden')) {
+    panel.style.setProperty('display', 'none', 'important');
+  } else {
+    panel.style.setProperty('display', 'flex', 'important');
+  }
+
+  function addMessage(sender, text) {
+    const d = document.createElement('div');
+    d.className = 'fl-ai-msg ' + (sender === 'user' ? 'fl-ai-msg-user' : 'fl-ai-msg-ai');
+    d.innerHTML = `<b>${sender === 'user' ? 'Вы' : 'ИИ'}:</b> ${esc(text)}`;
+    chat.appendChild(d);
     chat.scrollTop = chat.scrollHeight;
   }
 
-  fab.addEventListener('click', () => panel.classList.toggle('hidden'));
-  closeBtn.addEventListener('click', () => panel.classList.add('hidden'));
+  fab.addEventListener('click', function () {
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+      panel.style.setProperty('display', 'flex', 'important');
+      input.focus();
+    } else {
+      panel.style.setProperty('display', 'none', 'important');
+    }
+  });
 
-  form.addEventListener('submit', async (e) => {
+  closeBtn.addEventListener('click', function () {
+    panel.classList.add('hidden');
+    panel.style.setProperty('display', 'none', 'important');
+  });
+
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     const prompt = input.value.trim();
     if (!prompt) return;
-    bubble('Ты', prompt);
+
+    addMessage('user', prompt);
     input.value = '';
+
     try {
-      const r = await fetch('/api/ai/chat', {
+      const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt: prompt })
       });
-      const data = await r.json().catch(() => ({}));
-      bubble('Помощник', data.reply || data.error || 'Нет ответа');
+      const data = await res.json();
+      addMessage('ai', data.reply || 'Ошибка ответа.');
     } catch {
-      bubble('Помощник', 'Ошибка сети. Попробуй ещё раз.');
+      addMessage('ai', 'Ошибка сети.');
     }
   });
 })();
-// Находим или создаем контейнер виджета
-const aiRoot = document.querySelector('.fl-ai-root') || document.createElement('div');
-aiRoot.className = 'fl-ai-root';
-
-// Намертво прибиваем контейнер к экрану через JS стили
-aiRoot.style.position = 'fixed';
-aiRoot.style.bottom = '24px';
-aiRoot.style.right = '24px';
-aiRoot.style.zIndex = '999999';
-
-// Находим кнопку и фиксируем её внутреннее поведение
-const aiFab = aiRoot.querySelector('.fl-ai-fab');
-if (aiFab) {
-  aiFab.style.width = '56px';
-  aiFab.style.height = '56px';
-  aiFab.style.borderRadius = '50%';
-  aiFab.style.background = '#ffffff';
-  aiFab.style.color = '#000000';
-  aiFab.style.border = 'none';
-  aiFab.style.cursor = 'pointer';
-  aiFab.style.fontSize = '24px';
-  aiFab.style.fontWeight = 'bold';
-  aiFab.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
-  aiFab.style.display = 'flex';
-  aiFab.style.alignItems = 'center';
-  aiFab.style.justifyContent = 'center';
-  aiFab.style.position = 'relative';
-}
-
-// Находим панель чата и вешаем абсолют внутри фиксированного рута
-const aiPanel = aiRoot.querySelector('.fl-ai-panel');
-if (aiPanel) {
-  aiPanel.style.position = 'absolute';
-  aiPanel.style.bottom = '72px';
-  aiPanel.style.right = '0';
-  aiPanel.style.width = '360px';
-  aiPanel.style.height = '480px';
-  aiPanel.style.background = '#0a0a0a';
-  aiPanel.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-  aiPanel.style.borderRadius = '16px';
-  aiPanel.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.6)';
-  aiPanel.style.display = aiPanel.classList.contains('hidden') ? 'none' : 'flex';
-  aiPanel.style.flexDirection = 'column';
-  aiPanel.style.overflow = 'hidden';
-}
