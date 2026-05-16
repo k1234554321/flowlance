@@ -65,3 +65,48 @@
     }
   });
 })();
+// Находим или создаем контейнер виджета
+const aiRoot = document.querySelector('.fl-ai-root') || document.createElement('div');
+aiRoot.className = 'fl-ai-root';
+
+// Намертво прибиваем контейнер к экрану через JS стили
+aiRoot.style.position = 'fixed';
+aiRoot.style.bottom = '24px';
+aiRoot.style.right = '24px';
+aiRoot.style.zIndex = '999999';
+
+// Находим кнопку и фиксируем её внутреннее поведение
+const aiFab = aiRoot.querySelector('.fl-ai-fab');
+if (aiFab) {
+  aiFab.style.width = '56px';
+  aiFab.style.height = '56px';
+  aiFab.style.borderRadius = '50%';
+  aiFab.style.background = '#ffffff';
+  aiFab.style.color = '#000000';
+  aiFab.style.border = 'none';
+  aiFab.style.cursor = 'pointer';
+  aiFab.style.fontSize = '24px';
+  aiFab.style.fontWeight = 'bold';
+  aiFab.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
+  aiFab.style.display = 'flex';
+  aiFab.style.alignItems = 'center';
+  aiFab.style.justifyContent = 'center';
+  aiFab.style.position = 'relative';
+}
+
+// Находим панель чата и вешаем абсолют внутри фиксированного рута
+const aiPanel = aiRoot.querySelector('.fl-ai-panel');
+if (aiPanel) {
+  aiPanel.style.position = 'absolute';
+  aiPanel.style.bottom = '72px';
+  aiPanel.style.right = '0';
+  aiPanel.style.width = '360px';
+  aiPanel.style.height = '480px';
+  aiPanel.style.background = '#0a0a0a';
+  aiPanel.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+  aiPanel.style.borderRadius = '16px';
+  aiPanel.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.6)';
+  aiPanel.style.display = aiPanel.classList.contains('hidden') ? 'none' : 'flex';
+  aiPanel.style.flexDirection = 'column';
+  aiPanel.style.overflow = 'hidden';
+}
