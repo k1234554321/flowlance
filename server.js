@@ -98,6 +98,16 @@ async function writeReviewsPending(list) {
   await fs.writeFile(REVIEWS_PENDING_PATH, JSON.stringify(list, null, 2), 'utf8');
 }
 
+/** Совместимо с MySQL 5.7 / MariaDB (без ADD COLUMN IF NOT EXISTS). */
+async function ensureOffersExternalUrlColumn(pool) {
+  try {
+    await pool.query(`ALTER TABLE offers ADD COLUMN external_url VARCHAR(500) DEFAULT ''`);
+  } catch (error) {
+    if (error.code === 'ER_DUP_FIELDNAME' || error.errno === 1060) return;
+    throw error;
+  }
+}
+
 async function ensureDb() {
   if (!isDbEnabled()) return;
   try {
@@ -128,7 +138,7 @@ async function ensureDb() {
       posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-    await pool.query('ALTER TABLE offers ADD COLUMN IF NOT EXISTS external_url VARCHAR(500) DEFAULT ""');
+    await ensureOffersExternalUrlColumn(pool);
     await pool.query(
       `UPDATE offers SET external_url = '' WHERE external_url LIKE '%google.com%'`
     ).catch(() => {});
@@ -143,15 +153,22 @@ async function ensureDb() {
       );
     }
   } catch (error) {
-    disableDb();
     const denied =
       error.code === 'ER_ACCESS_DENIED_ERROR' ||
       error.errno === 1045 ||
       String(error.message || '').includes('Access denied');
-    const hint = denied
-      ? ' Проверь на ЭТОЙ машине файл .env: DB_USER и DB_PASSWORD должны совпадать с пользователем MySQL (см. GRANT для этой базы).'
-      : '';
-    console.warn('MySQL недоступен — включён режим без БД (данные в памяти). Ошибка:', error.message + hint);
+    const connectionLost = ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'PROTOCOL_CONNECTION_LOST'].includes(
+      error.code
+    );
+    if (denied || connectionLost) {
+      disableDb();
+      const hint = denied
+        ? ' Проверь .env: DB_USER и DB_PASSWORD должны совпадать с пользователем MySQL.'
+        : '';
+      console.warn('MySQL недоступен — режим без БД (данные в памяти). Ошибка:', error.message + hint);
+    } else {
+      console.error('Ошибка миграции/схемы MySQL (сервер продолжит с БД):', error.message);
+    }
   }
 }
 
