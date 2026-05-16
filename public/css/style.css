@@ -2602,3 +2602,56 @@ body {
   height: 20px;
   fill: currentColor;
 }
+/* Фиксируем виджет нейросети в правом нижнем углу */
+.fl-ai-root {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999; /* Чтобы кнопка была поверх всех картинок и блоков */
+  font-family: 'Inter', sans-serif;
+}
+
+/* Кнопка-круг (FAB) */
+.fl-ai-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fl-ai-fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(255, 255, 255, 0.2);
+}
+
+/* Сама панель чата, которая открывается по клику */
+.fl-ai-panel {
+  position: absolute;
+  bottom: 72px; /* Чуть выше кнопки */
+  right: 0;
+  width: 360px;
+  height: 480px;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Если панель скрыта */
+.fl-ai-panel.hidden {
+  display: none !important;
+}
