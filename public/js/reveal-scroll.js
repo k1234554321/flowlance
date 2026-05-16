@@ -8,16 +8,13 @@
     });
   }
 
-  /** На десктопе выше «окно» видимости — иначе пол-экрана сразу получает .visible и анимация пропадает. */
+
   function ioOptions() {
-    const coarse = window.matchMedia('(pointer: coarse)').matches;
-    if (coarse) {
-      return { threshold: 0.08, rootMargin: '0px 0px -56px 0px' };
-    }
-    return { threshold: 0.22, rootMargin: '0px 0px -14% 0px' };
+    return { threshold: 0.12, rootMargin: '0px 0px -8% 0px' };
   }
 
   window.initRevealScroll = function initRevealScroll() {
+    // Если у пользователя отключены анимации в системе — не ебём ему мозг
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       revealAll();
       return;

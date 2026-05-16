@@ -2516,3 +2516,25 @@ body.theme-hub .auth-layout .btn.btn-search {
   margin-left: auto;
   margin-right: auto;
 }
+/* Допиши это в самый конец файла /css/style.css */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  will-change: opacity, transform;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hero-load-1 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.1s; opacity: 0; }
+.hero-load-2 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.25s; opacity: 0; }
+.hero-load-3 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.4s; opacity: 0; }
+.hero-load-4 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.55s; opacity: 0; }
+.hero-load-5 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.7s; opacity: 0; }
+.hero-load-6 { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.85s; opacity: 0; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
