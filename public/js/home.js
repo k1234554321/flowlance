@@ -117,7 +117,8 @@ function renderReviews(c) {
   grid.innerHTML = (c.reviews || [])
     .map(
       (r, i) => `
-      <article class="review-tile reveal reveal-delay-${(i % 4) + 1}">
+      <article class="review-tile hub-hover-card reveal reveal-delay-${(i % 4) + 1}">
+        <div class="review-stars-wrap">${window.FLStars?.renderStars(r.rating || 5) || ''}</div>
         <div class="review-quote">“</div>
         <p class="review-body">${esc(r.text)}</p>
         <div class="review-name">${esc(r.name)}</div>

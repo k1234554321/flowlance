@@ -37,12 +37,37 @@ function renderPortfolio() {
   cabUsername.textContent = user?.name || '—';
 }
 
+function formatProfileSince(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '';
+  }
+}
+
 function renderProfile(u) {
   user = u;
   avatarPreview.src = u.avatar_url || 'https://placehold.co/96x96/0a0a0a/ffffff/png?text=FL';
   profileName.textContent = u.name || 'Без имени';
   profileEmail.textContent = u.email || '';
   profileBio.textContent = u.bio || 'Добавь описание — так проще доверять профилю.';
+  const sinceEl = document.getElementById('profile-since');
+  const since = formatProfileSince(u.created_at);
+  if (sinceEl) {
+    if (since) {
+      sinceEl.textContent = `Профиль создан: ${since}`;
+      sinceEl.hidden = false;
+    } else {
+      sinceEl.hidden = true;
+    }
+  }
   renderPortfolio();
 }
 
@@ -113,11 +138,24 @@ logoutLink?.addEventListener('click', async (e) => {
   window.location.href = '/auth';
 });
 
+function initReviewStars() {
+  const picker = document.getElementById('review-stars-picker');
+  const hidden = document.getElementById('review-rating');
+  if (!picker || !window.FLStars) return;
+  picker.innerHTML = window.FLStars.renderStars(5, { interactive: true, name: 'rating' });
+  window.FLStars.bindStarPicker(picker, (n) => {
+    if (hidden) hidden.value = String(n);
+  });
+}
+
 reviewForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const text = document.getElementById('review-text')?.value?.trim() || '';
+  const rating = Number(
+    document.querySelector('#review-stars-picker input[type="hidden"]')?.value || 5
+  );
   try {
-    await api('/api/reviews', { method: 'POST', body: JSON.stringify({ text }) });
+    await api('/api/reviews', { method: 'POST', body: JSON.stringify({ text, rating }) });
     showToast('Отзыв отправлен на модерацию');
     reviewForm.reset();
   } catch (err) {
@@ -125,4 +163,5 @@ reviewForm?.addEventListener('submit', async (e) => {
   }
 });
 
+initReviewStars();
 loadProfile();

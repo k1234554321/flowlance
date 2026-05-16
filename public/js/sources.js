@@ -33,7 +33,7 @@ const PLATFORMS = [
   },
   {
     name: 'Kwork',
-    inFeed: false,
+    inFeed: true,
     url: 'https://kwork.ru/',
     blurb: 'Маркетплейс услуг и готовых кворков — удобно для типовых пакетов.',
     pros: ['Понятные пакеты «под ключ»', 'Быстрый старт для простых задач', 'Рейтинги и отзывы'],
@@ -41,7 +41,7 @@ const PLATFORMS = [
   },
   {
     name: 'Habr Freelance',
-    inFeed: false,
+    inFeed: true,
     url: 'https://freelance.habr.com/',
     blurb: 'Профильная площадка с упором на разработку, продукт и инженерные задачи.',
     pros: ['Сильное IT-комьюнити', 'Часто адекватные ТЗ', 'Удобно для команд и middle+'],
@@ -49,7 +49,7 @@ const PLATFORMS = [
   },
   {
     name: 'Freelance.ru',
-    inFeed: false,
+    inFeed: true,
     url: 'https://freelance.ru/',
     blurb: 'Универсальная биржа с разными категориями и форматами сотрудничества.',
     pros: ['Разнообразие заказов', 'Знакомый многим формат', 'Можно наращивать репутацию'],
@@ -84,12 +84,10 @@ function render() {
   if (!grid) return;
   grid.innerHTML = PLATFORMS.map((p, idx) => {
     const d = (idx % 4) + 1;
-    const tag = p.inFeed
-      ? '<span class="source-feed-tag is-live">В потоке ленты</span>'
-      : '<span class="source-feed-tag">Справочно</span>';
+    const tag = '<span class="source-feed-tag is-live">В потоке ленты</span>';
     const fav = favHost(p.url);
     return `
-    <article class="source-card glass ${p.inFeed ? 'is-live' : ''} reveal reveal-delay-${d}">
+    <article class="source-card glass is-live hub-hover-card reveal reveal-delay-${d}">
       <div class="source-card-top">
         <div class="source-brand">
           <span class="source-avatar-wrap">
@@ -102,7 +100,10 @@ function render() {
       <p class="source-card-blurb">${esc(p.blurb)}</p>
       <div class="source-lists">
         <div>
-          <h3 class="source-mini source-mini-feed">Плюсы ${tag}</h3>
+          <div class="source-mini-head">
+            <h3 class="source-mini source-mini-pros">Плюсы</h3>
+            ${tag}
+          </div>
           <ul class="source-pros-list">${p.pros.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         </div>
         <div>

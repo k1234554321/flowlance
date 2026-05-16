@@ -1,0 +1,294 @@
+/* ——— Курсор / фон ——— */
+.hub-cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 42%, transparent 70%);
+  filter: blur(2px);
+  transition: transform 0.12s ease-out;
+  mix-blend-mode: screen;
+}
+
+.theme-hub .bg-orbs::before,
+.theme-hub .bg-orbs::after {
+  animation: hubOrbFloat 22s ease-in-out infinite, hubOrbPulse 8s ease-in-out infinite;
+}
+
+@keyframes hubOrbPulse {
+  0%,
+  100% {
+    opacity: 0.14;
+  }
+  50% {
+    opacity: 0.22;
+  }
+}
+
+/* ——— Логотип ——— */
+.logo.logo-interactive {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.35s ease, letter-spacing 0.35s ease;
+}
+.logo.logo-interactive:hover {
+  transform: translateY(-2px) scale(1.02);
+  text-shadow: 0 0 28px rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.02em;
+}
+.logo.logo-interactive span {
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+.logo.logo-interactive:hover span {
+  color: #fff;
+  opacity: 1;
+}
+
+/* ——— Hover карточек ——— */
+.theme-hub .hub-hover-card,
+.theme-hub .glass.card,
+.theme-hub .offer-card,
+.theme-hub .cabinet-card,
+.theme-hub .fav-card,
+.theme-hub .news-row,
+.theme-hub .filter-strip {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    box-shadow 0.45s ease,
+    background 0.35s ease;
+}
+.theme-hub .hub-hover-card:hover,
+.theme-hub .glass.card:hover,
+.theme-hub .offer-card:hover,
+.theme-hub .cabinet-card:hover,
+.theme-hub .fav-card:hover,
+.theme-hub .news-row:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.45);
+}
+
+.theme-hub .source-card {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s ease,
+    box-shadow 0.5s ease;
+}
+.theme-hub .source-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.55);
+}
+
+/* ——— Биржи: плюсы / тег ——— */
+.source-mini-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.source-mini-pros {
+  color: #6ee7a0 !important;
+  font-weight: 700;
+  margin: 0;
+}
+.source-feed-tag.is-live {
+  border-color: rgba(110, 231, 160, 0.45);
+  color: #b8f5d0;
+  background: rgba(110, 231, 160, 0.08);
+}
+
+/* ——— Auth ——— */
+.auth-notice-slot {
+  min-height: 0;
+  margin-bottom: 10px;
+}
+.auth-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.auth-notice-slot.auth-notice-show .auth-notice {
+  opacity: 1;
+  transform: translateY(0);
+}
+.auth-notice--err {
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 120, 120, 0.35);
+  color: #ffc9c9;
+}
+.auth-notice--ok {
+  background: rgba(110, 231, 160, 0.1);
+  border: 1px solid rgba(110, 231, 160, 0.35);
+  color: #c8f5da;
+}
+.auth-notice-icon {
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.pwd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pwd-rules {
+  padding: 0 2px 4px;
+}
+.pwd-rules-title {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.38);
+  margin: 0 0 6px;
+}
+.pwd-rules-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pwd-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.38);
+  transition: color 0.25s ease;
+}
+.pwd-rule-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+.pwd-rule--ok {
+  color: #8ef0b5;
+}
+.pwd-rule--ok .pwd-rule-dot {
+  background: #6ee7a0;
+  box-shadow: 0 0 10px rgba(110, 231, 160, 0.65);
+}
+
+/* ——— Звёзды ——— */
+.fl-stars {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.fl-star {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  line-height: 1;
+}
+.fl-stars--pick .fl-star {
+  cursor: pointer;
+}
+.fl-star-glyph {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.22);
+  text-shadow: none;
+  transition: color 0.3s ease, text-shadow 0.35s ease, transform 0.25s ease;
+}
+.fl-star.is-lit .fl-star-glyph {
+  color: #f5f5f0;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.75);
+  animation: starGlow 1.8s ease-in-out infinite;
+}
+.fl-stars--pick .fl-star:hover .fl-star-glyph {
+  transform: scale(1.12);
+}
+@keyframes starGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
+  }
+  50% {
+    text-shadow: 0 0 18px rgba(255, 255, 255, 0.95);
+  }
+}
+.review-stars-wrap {
+  margin-bottom: 8px;
+}
+.review-rate-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.review-stars-picker {
+  margin-bottom: 8px;
+}
+
+/* ——— Профиль: дата ——— */
+.avatar-block {
+  position: relative;
+  display: inline-block;
+}
+.avatar-since {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%) translateY(6px);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+}
+.avatar-block:hover .avatar-since {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ——— AI панель ——— */
+.fl-ai-panel {
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.42s;
+}
+.fl-ai-panel.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+  pointer-events: auto;
+  display: flex !important;
+}
+.fl-ai-panel.hidden:not(.is-open) {
+  display: none !important;
+}
+
+/* ——— Toast ——— */
+.fl-toast-root {
+  transform: translateX(120%);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+.fl-toast-root.fl-toast-show {
+  transform: translateX(0);
+}

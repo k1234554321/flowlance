@@ -56,6 +56,8 @@
         <h2>Отзыв о FlowLance</h2>
         <p class="cab-sub">После отправки отзыв попадает на модерацию — опубликуем на главной после проверки.</p>
         <form id="review-form" class="form-stack">
+          <label class="review-rate-label">Ваша оценка</label>
+          <div id="review-stars-picker" class="review-stars-picker" data-stars-name="rating"></div>
           <textarea id="review-text" rows="4" maxlength="1200" placeholder="Что понравилось и что улучшить (от 15 символов)" required></textarea>
           <button type="submit" class="btn btn-hub-solid">Отправить на модерацию</button>
         </form>
@@ -75,7 +77,10 @@
         <section class="cabinet-card glass reveal reveal-delay-2">
           <h2>Предпросмотр</h2>
           <p class="cab-sub">Как видят тебя другие</p>
-          <img id="avatar-preview" class="avatar" alt="avatar" />
+          <div class="avatar-block hub-hover-card">
+            <img id="avatar-preview" class="avatar" alt="avatar" />
+            <p class="avatar-since" id="profile-since" hidden></p>
+          </div>
           <p id="profile-name" class="cab-username" style="margin-top: 12px">Имя</p>
           <p id="profile-email" class="muted"></p>
           <p id="profile-bio" class="muted" style="margin-top: 8px; line-height: 1.5"></p>
@@ -93,6 +98,8 @@
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/hub-effects.js"></script>
+    <script src="/js/stars.js"></script>
     <script src="/js/nav-session.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/dashboard.js"></script>

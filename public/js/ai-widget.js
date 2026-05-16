@@ -68,8 +68,32 @@
     const closeBtn = document.getElementById('fl-ai-close');
 
     function setPanelOpen(open) {
-      panel.classList.toggle('hidden', !open);
-      if (open) input.focus();
+      if (open) {
+        panel.classList.remove('hidden');
+        panel.classList.remove('is-closing');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => panel.classList.add('is-open'));
+        });
+        input.focus();
+      } else {
+        panel.classList.remove('is-open');
+        panel.classList.add('is-closing');
+        const onEnd = (ev) => {
+          if (ev.propertyName !== 'opacity' && ev.propertyName !== 'transform') return;
+          panel.removeEventListener('transitionend', onEnd);
+          if (!panel.classList.contains('is-open')) {
+            panel.classList.add('hidden');
+            panel.classList.remove('is-closing');
+          }
+        };
+        panel.addEventListener('transitionend', onEnd);
+        window.setTimeout(() => {
+          if (!panel.classList.contains('is-open')) {
+            panel.classList.add('hidden');
+            panel.classList.remove('is-closing');
+          }
+        }, 450);
+      }
     }
 
     function addMessage(sender, text) {

@@ -160,7 +160,7 @@ function offerCard(offer, idx) {
   const d = (idx % 4) + 1;
   const favOn = favIdSet.has(offer.id) ? ' fav-on' : '';
   return `
-    <article class="card glass offer-card feed-card reveal reveal-delay-${d}">
+    <article class="card glass offer-card feed-card hub-hover-card reveal reveal-delay-${d}">
       <div class="offer-card-top">
         <p class="price accent-price">${esc(offer.budget)}</p>
         <button type="button" class="offer-fav${favOn}" data-fav="${esc(offer.id)}" title="В избранное" aria-label="В избранное">★</button>

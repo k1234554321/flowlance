@@ -35,23 +35,29 @@
       </div>
 
       <section class="auth-layout">
-        <div class="card glass reveal reveal-delay-1">
+        <div class="card glass reveal reveal-delay-1 auth-card" id="login-card">
           <h2>Вход</h2>
-          <p id="login-error" class="auth-inline-error hidden" role="alert"></p>
-          <form id="login-form" class="form-stack">
-            <input type="email" id="login-email" placeholder="Email" required />
-            <input type="password" id="login-password" placeholder="Пароль" required />
+          <div class="auth-notice-slot" id="login-notice" aria-live="polite"></div>
+          <form id="login-form" class="form-stack" novalidate>
+            <input type="email" id="login-email" placeholder="Email" autocomplete="email" />
+            <input type="password" id="login-password" placeholder="Пароль" autocomplete="current-password" />
             <button class="btn btn-search" type="submit">Войти</button>
           </form>
         </div>
-        <div class="card glass reveal reveal-delay-2">
+        <div class="card glass reveal reveal-delay-2 auth-card" id="register-card">
           <h2>Регистрация</h2>
-          <p id="register-error" class="auth-inline-error hidden" role="alert"></p>
-          <form id="register-form" class="form-stack">
-            <input type="text" id="register-name" placeholder="Имя" required />
-            <input type="email" id="register-email" placeholder="Email" required />
-            <input type="password" id="register-password" placeholder="Пароль" required />
-            <button class="btn btn-search" type="submit">Создать аккаунт</button>
+          <div class="auth-notice-slot" id="register-notice" aria-live="polite"></div>
+          <form id="register-form" class="form-stack" novalidate>
+            <input type="text" id="register-name" placeholder="Имя" autocomplete="name" />
+            <input type="email" id="register-email" placeholder="Email" autocomplete="email" />
+            <div class="pwd-field">
+              <input type="password" id="register-password" placeholder="Пароль" autocomplete="new-password" />
+              <div class="pwd-rules" id="pwd-rules" hidden>
+                <p class="pwd-rules-title">Пароль должен содержать:</p>
+                <ul class="pwd-rules-list" id="pwd-rules-list"></ul>
+              </div>
+            </div>
+            <button class="btn btn-search" type="submit" id="register-submit">Создать аккаунт</button>
           </form>
         </div>
       </section>
@@ -59,7 +65,9 @@
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/hub-effects.js"></script>
     <script src="/js/nav-session.js"></script>
+    <script src="/js/validation.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/ai-widget.js"></script>

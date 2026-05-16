@@ -11,6 +11,7 @@ const { Server } = require('socket.io');
 const { isDbEnabled, getPool, disableDb } = require('./db');
 const { getFallbackOffers, fetchExternalOffers, sanitizeExternalUrl } = require('./services/aggregator');
 const { askAi } = require('./services/aiProxy');
+const { validateEmail, validatePassword, validateName } = require('./services/validation');
 const fs = require('fs').promises;
 
 const SITE_CONTENT_PATH = path.join(__dirname, 'data', 'siteContent.json');
@@ -373,45 +374,77 @@ app.get('/auth', (_, res) => res.sendFile(path.join(__dirname, 'public', 'auth.h
 
 app.post('/api/auth/register', async (req, res) => {
   const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Заполни все поля' });
-  }
+  const nameCheck = validateName(name);
+  if (!nameCheck.ok) return res.status(400).json({ error: nameCheck.error });
+  const emailCheck = validateEmail(email);
+  if (!emailCheck.ok) return res.status(400).json({ error: emailCheck.error });
+  const passCheck = validatePassword(password);
+  if (!passCheck.ok) return res.status(400).json({ error: passCheck.error });
+
+  const cleanName = nameCheck.value;
+  const cleanEmail = emailCheck.value;
 
   if (!isDbEnabled()) {
-    req.session.user = { id: 1, name, email, role: 'user', bio: '', avatar_url: '' };
+    req.session.user = {
+      id: 1,
+      name: cleanName,
+      email: cleanEmail,
+      role: 'user',
+      bio: '',
+      avatar_url: '',
+      created_at: new Date().toISOString(),
+    };
     return res.json({ message: 'Аккаунт создан', user: req.session.user });
   }
 
   const pool = getPool();
-  const [exists] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [email]);
+  const [exists] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [cleanEmail]);
   if (exists.length > 0) return res.status(409).json({ error: 'Email уже используется' });
 
   const passwordHash = await bcrypt.hash(password, 10);
   const [result] = await pool.query(
     'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, "user")',
-    [name, email, passwordHash]
+    [cleanName, cleanEmail, passwordHash]
   );
 
-  req.session.user = { id: result.insertId, name, email, role: 'user', bio: '', avatar_url: '' };
+  req.session.user = {
+    id: result.insertId,
+    name: cleanName,
+    email: cleanEmail,
+    role: 'user',
+    bio: '',
+    avatar_url: '',
+    created_at: new Date().toISOString(),
+  };
   res.json({ message: 'Регистрация успешна', user: req.session.user });
 });
 
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Нужны email и пароль' });
+  const emailCheck = validateEmail(email);
+  if (!emailCheck.ok) return res.status(400).json({ error: emailCheck.error });
 
   if (!isDbEnabled()) {
-    const emailLower = String(email).toLowerCase();
+    const emailLower = emailCheck.value;
     const adminEmail = String(process.env.DEFAULT_ADMIN_EMAIL || 'admin@aggregator.local').toLowerCase();
     const role = emailLower === adminEmail ? 'admin' : 'user';
-    const local = String(email).split('@')[0] || 'Пользователь';
+    const local = emailLower.split('@')[0] || 'Пользователь';
     const prettyName = local.replace(/[._+-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-    req.session.user = { id: 1, name: prettyName, email, role, bio: '', avatar_url: '' };
+    req.session.user = {
+      id: 1,
+      name: prettyName,
+      email: emailLower,
+      role,
+      bio: '',
+      avatar_url: '',
+      created_at: new Date().toISOString(),
+    };
     return res.json({ message: 'Вход выполнен', user: req.session.user });
   }
 
   const pool = getPool();
-  const [rows] = await pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
+  const [rows] = await pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [emailCheck.value]);
   if (rows.length === 0) return res.status(401).json({ error: 'Неверный email или пароль' });
 
   const user = rows[0];
@@ -436,9 +469,10 @@ app.post('/api/auth/logout', (req, res) => {
 app.get('/api/profile', requireAuth, async (req, res) => {
   if (!isDbEnabled()) return res.json(req.session.user);
   const pool = getPool();
-  const [rows] = await pool.query('SELECT id, name, email, role, bio, avatar_url FROM users WHERE id = ? LIMIT 1', [
-    req.session.user.id
-  ]);
+  const [rows] = await pool.query(
+    'SELECT id, name, email, role, bio, avatar_url, created_at FROM users WHERE id = ? LIMIT 1',
+    [req.session.user.id]
+  );
   if (rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
   req.session.user = rows[0];
   res.json(rows[0]);
@@ -503,6 +537,9 @@ app.post('/api/reviews', requireAuth, async (req, res) => {
   const text = String(req.body?.text || '').trim();
   if (text.length < 15) return res.status(400).json({ error: 'Минимум 15 символов в отзыве' });
   if (text.length > 1200) return res.status(400).json({ error: 'Слишком длинный текст' });
+  let rating = Number(req.body?.rating);
+  if (!Number.isFinite(rating) || rating < 1 || rating > 5) rating = 5;
+  rating = Math.round(rating);
   const u = req.session.user;
   const list = await readReviewsPending();
   const row = {
@@ -511,6 +548,7 @@ app.post('/api/reviews', requireAuth, async (req, res) => {
     name: String(u.name || 'Пользователь').slice(0, 80),
     email: String(u.email || '').slice(0, 120),
     text: text.slice(0, 1200),
+    rating,
     createdAt: new Date().toISOString()
   };
   list.unshift(row);
@@ -553,6 +591,7 @@ app.post('/api/admin/reviews/:id/approve', requireAdmin, async (req, res) => {
     text: item.text,
     name: item.name,
     role: 'Пользователь',
+    rating: item.rating || 5,
     publishedFromQueueId: item.id,
     publishedAt: new Date().toISOString()
   });

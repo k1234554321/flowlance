@@ -1,3 +1,5 @@
+@import url('hub-extras.css');
+
 :root {
   --cyan: #00f2ff;
   --violet: #7b61ff;
@@ -1999,7 +2001,7 @@ body.theme-hub .auth-layout .btn.btn-search {
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
 }
-.fl-ai-panel.hidden {
+.fl-ai-panel.hidden:not(.is-open) {
   display: none;
 }
 .fl-ai-head {
