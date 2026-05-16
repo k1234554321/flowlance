@@ -9,11 +9,11 @@
       .replaceAll('"', '&quot;');
   }
 
-  // Создаём главный контейнер виджета
+  // 1. Создаём главный контейнер виджета
   const root = document.createElement('div');
   root.className = 'fl-ai-root';
   
-  // НАМЕРТВО КЛЕИМ КОНТЕЙНЕР К ЭКРАНУ ЧЕРЕЗ JS (ИГНОРИРУЯ ЛЮБОЙ CSS)
+  // 2. СРАЗУ НАМЕРТВО КЛЕИМ КОНТЕЙНЕР К ЭКРАНУ (ИГНОРИРУЯ ЛЮБОЙ CSS НА САЙТЕ)
   root.style.setProperty('position', 'fixed', 'important');
   root.style.setProperty('bottom', '24px', 'important');
   root.style.setProperty('right', '24px', 'important');
@@ -35,6 +35,7 @@
     </div>
   `;
 
+  // 3. Только теперь пихаем его в body, когда он уже фиксированный
   document.body.appendChild(root);
 
   const fab = document.getElementById('fl-ai-fab');
@@ -73,7 +74,6 @@
   panel.style.setProperty('flex-direction', 'column', 'important');
   panel.style.setProperty('overflow', 'hidden', 'important');
   
-  // Управляем отображением панели изначально
   if (panel.classList.contains('hidden')) {
     panel.style.setProperty('display', 'none', 'important');
   } else {
