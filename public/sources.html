@@ -12,15 +12,19 @@
   <body class="page-sources theme-hub">
     <div class="bg-blur"></div>
     <div class="bg-grid"></div>
+    <div class="bg-orbs" aria-hidden="true"></div>
+    <div class="noise-overlay" aria-hidden="true"></div>
     <header class="navbar glass nav-hero-anim">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
       <nav class="nav-menu nav-mega">
+        <a href="/" class="nav-pill">Главная</a>
         <a href="/feed" class="nav-pill">Лента</a>
         <a href="/sources" class="nav-pill active-pill">Биржи</a>
         <a href="/about" class="nav-pill muted-link">О сервисе</a>
       </nav>
       <div class="nav-actions">
-        <a href="/auth" class="btn btn-outline btn-small">Войти</a>
+        <a href="/auth" class="btn btn-outline btn-small" id="nav-auth">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small hidden" id="nav-dash">Кабинет</a>
       </div>
     </header>
 
@@ -44,6 +48,7 @@
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/nav-session.js"></script>
     <script src="/js/sources.js"></script>
     <script src="/js/ai-widget.js"></script>
   </body>

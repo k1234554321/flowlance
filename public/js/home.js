@@ -6,6 +6,15 @@ function esc(s = '') {
     .replaceAll('"', '&quot;');
 }
 
+function faviconForHref(href) {
+  try {
+    const u = new URL(String(href));
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(u.hostname)}&sz=32`;
+  } catch {
+    return '';
+  }
+}
+
 function formatOffersCount(n) {
   const x = Number(n) || 0;
   return new Intl.NumberFormat('ru-RU').format(x);
@@ -16,17 +25,6 @@ async function fetchJson(url) {
   const data = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(data.error || `Ошибка ${r.status}`);
   return data;
-}
-
-function setupNavSession() {
-  fetch('/api/profile', { credentials: 'include' })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((user) => {
-      if (!user) return;
-      document.getElementById('nav-auth')?.classList.add('hidden');
-      document.getElementById('nav-dash')?.classList.remove('hidden');
-    })
-    .catch(() => null);
 }
 
 function parsePriceRange(label) {
@@ -283,10 +281,13 @@ async function loadHome() {
     }
 
     const chips = (c.exchanges || [])
-      .map(
-        (x) =>
-          `<a class="exchange-chip glass chip-animate" href="${esc(x.href)}" target="_blank" rel="noopener noreferrer">${esc(x.name)}</a>`
-      )
+      .map((x) => {
+        const ico = faviconForHref(x.href);
+        const img = ico
+          ? `<img class="exchange-chip-ico" src="${esc(ico)}" alt="" width="20" height="20" loading="lazy" decoding="async" />`
+          : '';
+        return `<a class="exchange-chip glass chip-animate" href="${esc(x.href)}" target="_blank" rel="noopener noreferrer">${img}<span>${esc(x.name)}</span></a>`;
+      })
       .join('');
     if (exWrap) exWrap.innerHTML = chips + chips;
 
@@ -340,7 +341,6 @@ async function loadHome() {
     renderReviews(c);
   } finally {
     window.initRevealScroll?.();
-    setupNavSession();
   }
 }
 
@@ -372,5 +372,4 @@ loadHome().catch((err) => {
     el.classList.add('is-visible');
   });
   window.initRevealScroll?.();
-  setupNavSession();
 });

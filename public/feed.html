@@ -9,6 +9,8 @@
   <body class="page-feed theme-hub">
     <div class="bg-blur"></div>
     <div class="bg-grid"></div>
+    <div class="bg-orbs" aria-hidden="true"></div>
+    <div class="noise-overlay" aria-hidden="true"></div>
 
     <header class="navbar glass feed-nav nav-hero-anim">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
@@ -19,8 +21,8 @@
         <a href="/about" class="nav-pill muted-link">О сервисе</a>
       </nav>
       <div class="nav-actions">
-        <a href="/auth" class="btn btn-outline btn-glow btn-small">Войти</a>
-        <a href="/dashboard" class="btn btn-neon btn-glow btn-small">Кабинет</a>
+        <a href="/auth" class="btn btn-outline btn-glow btn-small" id="nav-auth">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small hidden" id="nav-dash">Кабинет</a>
       </div>
     </header>
 
@@ -111,6 +113,7 @@
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/nav-session.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/feed.js"></script>
     <script src="/js/ai-widget.js"></script>

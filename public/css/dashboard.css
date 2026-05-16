@@ -54,45 +54,6 @@ body.page-dashboard.theme-hub .progress-fill {
   color: rgba(255, 255, 255, 0.72);
 }
 
-.footer-social {
-  width: min(1100px, 94%);
-  margin: 0 auto 48px;
-  padding: 22px 24px;
-  border-radius: 18px;
-  text-align: center;
-}
-
-.footer-social-label {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 10px;
-}
-
-.footer-social-row {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.soc-link {
-  color: #fff;
-  font-weight: 700;
-  text-decoration: none;
-  padding: 10px 20px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
-}
-
-.soc-link:hover {
-  border-color: #fff;
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.06);
-}
-
 body.page-admin .admin-toolbar .btn-hub-solid {
   min-width: auto;
 }

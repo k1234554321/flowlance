@@ -12,6 +12,8 @@
   <body class="page-about theme-hub">
     <div class="bg-blur"></div>
     <div class="bg-grid"></div>
+    <div class="bg-orbs" aria-hidden="true"></div>
+    <div class="noise-overlay" aria-hidden="true"></div>
     <header class="navbar glass nav-hero-anim">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
       <nav class="nav-menu nav-mega">
@@ -21,7 +23,8 @@
         <a href="/about" class="nav-pill active-pill">О сервисе</a>
       </nav>
       <div class="nav-actions">
-        <a href="/auth" class="btn btn-outline btn-small">Войти</a>
+        <a href="/auth" class="btn btn-outline btn-small" id="nav-auth">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small hidden" id="nav-dash">Кабинет</a>
       </div>
     </header>
 
@@ -57,34 +60,38 @@
         </div>
       </section>
 
-      <section class="card glass about-block about-support reveal" id="support">
-        <h2>Поддержка</h2>
-        <p class="about-p">Напиши или позвони — для нетривиальных случаев открой тикет: администратор увидит обращение и ответит в переписке.</p>
-        <div class="support-line">
-          <div>
-            <span class="support-label">Телефон</span>
-            <a class="support-val" href="tel:+74951200077">+7 (495) 120-00-77</a>
+      <div class="about-support-outer reveal">
+        <section class="card glass about-block about-support" id="support">
+          <h2>Поддержка</h2>
+          <p class="about-p about-support-lead">
+            Напиши или позвони — для нетривиальных случаев открой тикет: администратор увидит обращение и ответит в переписке.
+          </p>
+          <div class="support-line support-line--center">
+            <div>
+              <span class="support-label">Телефон</span>
+              <a class="support-val" href="tel:+74951200077">+7 (495) 120-00-77</a>
+            </div>
+            <div>
+              <span class="support-label">Почта</span>
+              <a class="support-val" href="mailto:care@flowlance.io">care@flowlance.io</a>
+            </div>
           </div>
-          <div>
-            <span class="support-label">Почта</span>
-            <a class="support-val" href="mailto:care@flowlance.io">care@flowlance.io</a>
-          </div>
-        </div>
 
-        <h3 class="about-h3">Тикет в поддержку</h3>
-        <div class="about-ticket-panel">
-          <div class="ticket-form-shell">
-            <form id="ticket-form" class="ticket-form">
-              <input type="email" id="ticket-email" required placeholder="Email для ответа" />
-              <input type="text" id="ticket-name" placeholder="Имя" />
-              <input type="text" id="ticket-subject" required placeholder="Тема" />
-              <textarea id="ticket-body" required rows="4" placeholder="Опиши ситуацию: раздел сайта, что ожидал и что произошло"></textarea>
-              <button type="submit" class="btn btn-hub-solid">Отправить обращение</button>
-            </form>
+          <h3 class="about-h3">Тикет в поддержку</h3>
+          <div class="about-ticket-panel">
+            <div class="ticket-form-shell">
+              <form id="ticket-form" class="ticket-form">
+                <input type="email" id="ticket-email" required placeholder="Email для ответа" />
+                <input type="text" id="ticket-name" placeholder="Имя" />
+                <input type="text" id="ticket-subject" required placeholder="Тема" />
+                <textarea id="ticket-body" required rows="4" placeholder="Опиши ситуацию: раздел сайта, что ожидал и что произошло"></textarea>
+                <button type="submit" class="btn btn-hub-solid">Отправить обращение</button>
+              </form>
+            </div>
           </div>
-        </div>
-        <p class="ticket-msg" id="ticket-msg"></p>
-      </section>
+          <p class="ticket-msg" id="ticket-msg"></p>
+        </section>
+      </div>
 
       <section class="card glass about-block reveal" id="faq">
         <h2>Вопросы</h2>
@@ -109,17 +116,18 @@
         <a class="btn btn-outline btn-lg" href="/">На главную</a>
       </div>
 
-      <footer class="footer-social glass reveal" style="width: min(1100px, 94%); margin: 40px auto 0">
-        <p class="footer-social-label">Мы на связи</p>
-        <div class="footer-social-row">
-          <a class="soc-link" href="https://vk.com" target="_blank" rel="noopener noreferrer">VK</a>
-          <a class="soc-link" href="https://t.me" target="_blank" rel="noopener noreferrer">Telegram</a>
+      <footer class="hub-contacts-block glass reveal" style="margin: 48px auto 56px">
+        <span class="hub-contacts-label">Контакты</span>
+        <div class="hub-contacts-row">
+          <a class="hub-sq-btn" href="https://vk.com" target="_blank" rel="noopener noreferrer">VK</a>
+          <a class="hub-sq-btn" href="https://t.me" target="_blank" rel="noopener noreferrer">Telegram</a>
         </div>
       </footer>
     </main>
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/nav-session.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/about.js"></script>
     <script src="/js/ai-widget.js"></script>

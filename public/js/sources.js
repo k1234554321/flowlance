@@ -57,6 +57,15 @@ function esc(s) {
     .replaceAll('"', '&quot;');
 }
 
+function favHost(url) {
+  try {
+    const u = new URL(String(url));
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(u.hostname)}&sz=64`;
+  } catch {
+    return '';
+  }
+}
+
 function initials(name) {
   const s = String(name || '').trim();
   return (s[0] || '?').toUpperCase();
@@ -70,11 +79,15 @@ function render() {
     const tag = p.inFeed
       ? '<span class="source-feed-tag is-live">В потоке ленты</span>'
       : '<span class="source-feed-tag">Справочно</span>';
+    const fav = favHost(p.url);
     return `
     <article class="source-card glass ${p.inFeed ? 'is-live' : ''} reveal reveal-delay-${d}">
       <div class="source-card-top">
         <div class="source-brand">
-          <span class="source-letter" aria-hidden="true">${esc(initials(p.name))}</span>
+          <span class="source-avatar-wrap">
+            <span class="source-letter" aria-hidden="true">${esc(initials(p.name))}</span>
+            <img class="source-fav" src="${esc(fav)}" alt="" width="44" height="44" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+          </span>
           <h2 class="source-card-title">${esc(p.name)}</h2>
         </div>
       </div>

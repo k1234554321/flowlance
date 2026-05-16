@@ -7,6 +7,17 @@
   --glass: rgba(255, 255, 255, 0.04);
 }
 
+@keyframes hubPageSoftIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ——— Hub theme (из index (2).html, но под FlowLance) ——— */
 .theme-hub {
   --hub-black: #0a0a0a;
@@ -24,6 +35,12 @@ body.theme-hub {
   background: var(--hub-black);
   color: var(--hub-white);
   font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body.theme-hub {
+    animation: hubPageSoftIn 0.68s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 }
 
 body.theme-hub::before {
@@ -555,8 +572,10 @@ body {
 
 .reveal {
   opacity: 0;
-  transform: translateY(32px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(40px);
+  transition:
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 .reveal.visible,
@@ -565,16 +584,16 @@ body {
   transform: translateY(0);
 }
 .reveal-delay-1 {
-  transition-delay: 0.1s;
+  transition-delay: 0.12s;
 }
 .reveal-delay-2 {
-  transition-delay: 0.2s;
+  transition-delay: 0.24s;
 }
 .reveal-delay-3 {
-  transition-delay: 0.3s;
+  transition-delay: 0.36s;
 }
 .reveal-delay-4 {
-  transition-delay: 0.4s;
+  transition-delay: 0.48s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -591,27 +610,27 @@ body {
 }
 .hero-load-1 {
   opacity: 0;
-  animation: fadeUp 0.85s 0.12s ease both;
+  animation: fadeUp 0.95s 0.14s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-load-2 {
   opacity: 0;
-  animation: fadeUp 0.85s 0.22s ease both;
+  animation: fadeUp 0.95s 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-load-3 {
   opacity: 0;
-  animation: fadeUp 0.85s 0.32s ease both;
+  animation: fadeUp 0.95s 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-load-4 {
   opacity: 0;
-  animation: fadeUp 0.85s 0.42s ease both;
+  animation: fadeUp 0.95s 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-load-5 {
   opacity: 0;
-  animation: fadeUp 0.85s 0.52s ease both;
+  animation: fadeUp 0.95s 0.54s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hero-load-6 {
   opacity: 0;
-  animation: fadeUp 0.85s 0.6s ease both;
+  animation: fadeUp 0.95s 0.64s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .nav-hero-anim,
@@ -763,6 +782,9 @@ body {
 }
 /* Marquee не останавливаем при hover — так удобнее читать ленту площадок */
 .exchange-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 16px;
   border-radius: 999px;
   text-decoration: none;
@@ -772,8 +794,24 @@ body {
   border: 1px solid var(--stroke);
   transition: transform 0.2s, border-color 0.2s, box-shadow 0.3s;
 }
+body.theme-hub .exchange-chip {
+  color: #f2f2f2;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+body.theme-hub .exchange-chip:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.38);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+.exchange-chip-ico {
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
 .exchange-chip:hover {
   transform: translateY(-3px);
+}
+body:not(.theme-hub) .exchange-chip:hover {
   border-color: rgba(0, 242, 255, 0.45);
   box-shadow: 0 8px 24px rgba(0, 100, 200, 0.2);
 }
@@ -1901,24 +1939,6 @@ body.theme-hub .auth-layout .btn.btn-search {
   font-size: 12px;
   color: var(--hub-gray-600);
 }
-.footer-soc-inline {
-  margin-top: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  justify-content: center;
-  align-items: center;
-  font-size: 13px;
-}
-.footer-soc-inline a {
-  color: var(--hub-gray-400);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s ease;
-}
-.footer-soc-inline a:hover {
-  color: var(--hub-white);
-}
 
 /* ——— FlowLance AI widget (B/W) ——— */
 .fl-ai-root {
@@ -2106,7 +2126,15 @@ body.theme-hub .auth-layout .btn.btn-search {
   align-items: center;
   gap: 12px;
 }
+.source-avatar-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
 .source-letter {
+  position: absolute;
+  inset: 0;
   width: 44px;
   height: 44px;
   border-radius: 14px;
@@ -2118,7 +2146,16 @@ body.theme-hub .auth-layout .btn.btn-search {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--hub-border);
   color: var(--hub-white);
-  flex-shrink: 0;
+}
+.source-fav {
+  position: absolute;
+  inset: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  object-fit: contain;
+  background: rgba(6, 6, 6, 0.85);
+  border: 1px solid var(--hub-border);
 }
 .source-badge {
   font-size: 11px;
@@ -2356,4 +2393,126 @@ body.theme-hub .auth-layout .btn.btn-search {
 .fl-toast-root.fl-toast--err {
   border-color: rgba(255, 120, 120, 0.45);
   color: #ffd6d6;
+}
+
+/* ——— Фон: мягкие «орбы» (как в референсе — не пустой фон) ——— */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bg-orbs::before,
+.bg-orbs::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.18;
+  animation: hubOrbFloat 28s ease-in-out infinite;
+}
+.bg-orbs::before {
+  width: min(52vw, 420px);
+  height: min(52vw, 420px);
+  background: rgba(255, 255, 255, 0.12);
+  top: -8%;
+  left: -6%;
+}
+.bg-orbs::after {
+  width: min(48vw, 380px);
+  height: min(48vw, 380px);
+  background: rgba(200, 210, 255, 0.08);
+  bottom: -12%;
+  right: -8%;
+  animation-delay: -14s;
+}
+@keyframes hubOrbFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(3%, 5%) scale(1.06);
+  }
+}
+
+/* ——— Контакты: крупные кнопки (референс) ——— */
+.hub-contacts-block,
+.footer-minimal .footer-soc-hub {
+  text-align: center;
+  padding: 28px 22px 32px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+.hub-contacts-block {
+  width: min(520px, 94%);
+  margin: 32px auto 0;
+}
+.footer-minimal .footer-soc-hub {
+  margin: 22px auto 0;
+  width: min(520px, 100%);
+}
+.hub-contacts-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+.hub-contacts-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.hub-sq-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 148px;
+  padding: 14px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  font-family: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
+  text-decoration: none;
+  background: rgba(6, 6, 6, 0.55);
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.4s ease;
+}
+.hub-sq-btn:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5);
+}
+
+/* ——— О сервисе: поддержка по центру колонкой ——— */
+.about-support-outer {
+  width: min(720px, 94%);
+  margin: 0 auto 28px;
+}
+.about-support-outer .about-support {
+  width: 100%;
+}
+.support-line--center {
+  justify-content: center;
+  text-align: center;
+  gap: 40px;
+}
+.about-support-lead {
+  text-align: center;
+  max-width: 52ch;
+  margin-left: auto;
+  margin-right: auto;
 }
