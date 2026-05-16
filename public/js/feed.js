@@ -146,8 +146,17 @@ function buildFiltered() {
   });
 }
 
+function offerListingUrl(offer) {
+  const u = String(offer?.external_url || '').trim();
+  if (!u || !/^https?:\/\//i.test(u) || /google\.com/i.test(u)) return '';
+  return u;
+}
+
 function offerCard(offer, idx) {
-  const url = offer.external_url ? `href="${esc(offer.external_url)}"` : '';
+  const link = offerListingUrl(offer);
+  const action = link
+    ? `<a class="btn btn-outline" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Открыть объявление</a>`
+    : `<span class="btn btn-outline offer-link-missing" aria-disabled="true">Ссылка недоступна</span>`;
   const d = (idx % 4) + 1;
   const favOn = favIdSet.has(offer.id) ? ' fav-on' : '';
   return `
@@ -161,7 +170,7 @@ function offerCard(offer, idx) {
       <p class="offer-snippet">${esc(offer.description)}</p>
       <small class="meta">Опубликовано: ${formatDate(offer.posted_at)}</small>
       <div class="offer-card-actions">
-        <a class="btn btn-outline" target="_blank" rel="noopener noreferrer" ${url}>На биржу</a>
+        ${action}
       </div>
     </article>
   `;

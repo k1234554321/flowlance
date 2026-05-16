@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 const { Server } = require('socket.io');
 
 const { isDbEnabled, getPool, disableDb } = require('./db');
-const { getFallbackOffers, createLiveOffer, fetchExternalOffers } = require('./services/aggregator');
+const { getFallbackOffers, fetchExternalOffers, sanitizeExternalUrl } = require('./services/aggregator');
 const { askAi } = require('./services/aiProxy');
 const fs = require('fs').promises;
 
@@ -42,7 +42,7 @@ function formatOffer(offer) {
   return {
     ...offer,
     budget: `${offer.budget_min} - ${offer.budget_max} ${offer.currency}`,
-    external_url: offer.external_url || ''
+    external_url: sanitizeExternalUrl(offer.external_url, offer.source),
   };
 }
 
@@ -129,6 +129,9 @@ async function ensureDb() {
     )
   `);
     await pool.query('ALTER TABLE offers ADD COLUMN IF NOT EXISTS external_url VARCHAR(500) DEFAULT ""');
+    await pool.query(
+      `UPDATE offers SET external_url = '' WHERE external_url LIKE '%google.com%'`
+    ).catch(() => {});
 
     const [users] = await pool.query('SELECT id FROM users WHERE role = "admin" LIMIT 1');
     if (users.length === 0) {
@@ -620,6 +623,9 @@ io.on('connection', (socket) => {
 });
 
 async function saveOffer(offer) {
+  const externalUrl = sanitizeExternalUrl(offer.external_url, offer.source);
+  if (!externalUrl) return false;
+
   if (isDbEnabled()) {
     try {
       const pool = getPool();
@@ -636,7 +642,7 @@ async function saveOffer(offer) {
           offer.budget_min,
           offer.budget_max,
           offer.currency,
-          offer.external_url || '',
+          externalUrl,
           offer.posted_at
         ]
       );
@@ -652,7 +658,7 @@ async function saveOffer(offer) {
     }
   }
   if (inMemoryOffers.has(offer.id)) return false;
-  inMemoryOffers.set(offer.id, offer);
+  inMemoryOffers.set(offer.id, { ...offer, external_url: externalUrl });
   if (inMemoryOffers.size > 500) {
     const sorted = [...inMemoryOffers.values()].sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime()).slice(0, 300);
     inMemoryOffers.clear();
@@ -663,7 +669,7 @@ async function saveOffer(offer) {
 
 async function syncExternalOffers() {
   try {
-    const pulled = await fetchExternalOffers(12);
+    const pulled = await fetchExternalOffers(20);
     for (const offer of pulled) {
       const inserted = await saveOffer(offer);
       if (inserted) io.emit('offer:new', formatOffer(offer));
@@ -675,10 +681,7 @@ async function syncExternalOffers() {
 
 setInterval(async () => {
   await syncExternalOffers();
-  const generated = createLiveOffer();
-  const inserted = await saveOffer(generated).catch(() => false);
-  if (inserted) io.emit('offer:new', formatOffer(generated));
-}, 15000);
+}, 60000);
 
 server.listen(PORT, async () => {
   try {

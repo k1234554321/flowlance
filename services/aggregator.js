@@ -1,53 +1,24 @@
-const { randomUUID, createHash } = require('crypto');
+const { createHash } = require('crypto');
 const axios = require('axios');
 const { XMLParser } = require('fast-xml-parser');
 
-const SOURCES = ['Upwork', 'Freelancehunt', 'Kwork', 'FL.ru', 'Habr Freelance'];
-const CATEGORIES = ['Frontend', 'Backend', 'Design', 'Mobile', 'DevOps', 'AI'];
-const SOURCE_URLS = {
+/** Только реальные площадки с URL объявления (не заглушки). */
+const SOURCE_HOME = {
   Freelancer: 'https://www.freelancer.com/jobs/',
   RemoteOK: 'https://remoteok.com/',
-  'FL.ru': 'https://www.fl.ru/',
-  'Freelance.ru': 'https://freelance.ru/',
-  Kwork: 'https://kwork.ru/',
-  'Habr Freelance': 'https://freelance.habr.com/'
+  Freelancehunt: 'https://freelancehunt.com/projects',
+  'FL.ru': 'https://www.fl.ru/projects/',
+  'Habr Freelance': 'https://freelance.habr.com/tasks',
+  Kwork: 'https://kwork.ru/projects',
+  Upwork: 'https://www.upwork.com/nx/search/jobs/',
 };
 
-const seedOffers = [
-  {
-    id: randomUUID(),
-    title: 'Разработка React dashboard для SaaS',
-    budget_min: 500,
-    budget_max: 1200,
-    currency: 'USD',
-    source: 'Upwork',
-    category: 'Frontend',
-    description: 'Нужен современный адаптивный dashboard с графиками и авторизацией.',
-    posted_at: new Date().toISOString()
-  },
-  {
-    id: randomUUID(),
-    title: 'Node.js API + платежная интеграция',
-    budget_min: 45000,
-    budget_max: 90000,
-    currency: 'RUB',
-    source: 'FL.ru',
-    category: 'Backend',
-    description: 'REST API на Express + интеграция ЮKassa, валидации и логирование.',
-    posted_at: new Date().toISOString()
-  },
-  {
-    id: randomUUID(),
-    title: 'UI/UX дизайн лендинга в Figma',
-    budget_min: 350,
-    budget_max: 700,
-    currency: 'USD',
-    source: 'Freelancehunt',
-    category: 'Design',
-    description: 'Требуется стильный интерфейс в dark-тематике с современными анимациями.',
-    posted_at: new Date().toISOString()
-  }
+const RSS_FEEDS = [
+  { source: 'Freelancehunt', url: 'https://freelancehunt.com/projects.rss' },
+  { source: 'FL.ru', url: 'https://www.fl.ru/rss/all.xml' },
 ];
+
+const xmlParser = new XMLParser({ ignoreAttributes: false });
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -77,94 +48,163 @@ function toOfferId(source, link, title) {
   return createHash('sha1').update(`${source}|${link}|${title}`).digest('hex').slice(0, 40);
 }
 
-function createLiveOffer() {
-  const category = CATEGORIES[randomInt(0, CATEGORIES.length - 1)];
-  const source = SOURCES[randomInt(0, SOURCES.length - 1)];
-  const amount = randomInt(300, 2500);
-  const isRub = Math.random() > 0.6;
-  return {
-    id: randomUUID(),
-    title: `${category}: проект #${randomInt(1000, 9999)}`,
-    budget_min: isRub ? amount * 100 : amount,
-    budget_max: isRub ? amount * 170 : amount + randomInt(150, 900),
-    currency: isRub ? 'RUB' : 'USD',
-    source,
-    category,
-    description: 'Свежий заказ из агрегированной ленты. Отклик желательно в течение 15 минут.',
-    external_url: SOURCE_URLS[source] || 'https://www.google.com',
-    posted_at: new Date().toISOString()
-  };
+/** Убираем битые ссылки (в т.ч. старый fallback на google.com). */
+function sanitizeExternalUrl(url, source) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!/^https?:\/\//i.test(trimmed)) return '';
+  if (/google\.com/i.test(trimmed)) return '';
+  try {
+    const u = new URL(trimmed);
+    if (!u.hostname || u.hostname === 'localhost') return '';
+    return u.href;
+  } catch {
+    return SOURCE_HOME[source] || '';
+  }
 }
 
-async function getFallbackOffers(limit = 24) {
-  const dynamic = Array.from({ length: Math.max(0, limit - seedOffers.length) }, createLiveOffer);
-  return [...seedOffers, ...dynamic]
-    .sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime())
-    .slice(0, limit);
+function stripHtml(html = '') {
+  return String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function pickRssLink(item) {
+  const raw =
+    item.link ||
+    item.guid?.['#text'] ||
+    item.guid ||
+    item['atom:link']?.['@_href'] ||
+    '';
+  if (typeof raw === 'object' && raw !== null) {
+    return raw['#text'] || raw.href || '';
+  }
+  return String(raw || '').trim();
+}
+
+function currencyForSource(source) {
+  if (['FL.ru', 'Freelancehunt', 'Kwork', 'Habr Freelance'].includes(source)) return 'RUB';
+  return 'USD';
+}
+
+async function fetchRssOffers(source, feedUrl, limit = 15) {
+  try {
+    const { data } = await axios.get(feedUrl, {
+      timeout: 14000,
+      headers: {
+        'User-Agent': 'FlowLance/1.0 (+https://flowlance.io)',
+        Accept: 'application/rss+xml, application/xml, text/xml, */*',
+      },
+      maxRedirects: 5,
+    });
+    const json = xmlParser.parse(data);
+    const channel = json?.rss?.channel || json?.feed;
+    let items = channel?.item || channel?.entry || [];
+    if (!items) return [];
+    if (!Array.isArray(items)) items = [items];
+
+    const out = [];
+    for (const item of items) {
+      if (out.length >= limit) break;
+      const title = (item.title?.['#text'] ?? item.title ?? '').toString().trim() || `${source} project`;
+      const description = stripHtml(item.description || item.summary || item['content:encoded'] || '');
+      let link = pickRssLink(item);
+      if (link && !/^https?:/i.test(link)) {
+        try {
+          link = new URL(link, SOURCE_HOME[source] || feedUrl).href;
+        } catch {
+          link = '';
+        }
+      }
+      link = sanitizeExternalUrl(link, source);
+      if (!link) continue;
+
+      const budget = parseBudget(`${title} ${description}`, currencyForSource(source));
+      out.push({
+        id: toOfferId(source, link, title),
+        title,
+        description: description.slice(0, 290) || `Новый проект с ${source}.`,
+        source,
+        category: detectCategory(title, description),
+        external_url: link,
+        ...budget,
+        posted_at: item.pubDate
+          ? new Date(item.pubDate).toISOString()
+          : item.published
+            ? new Date(item.published).toISOString()
+            : item.updated
+              ? new Date(item.updated).toISOString()
+              : new Date().toISOString(),
+      });
+    }
+    return out;
+  } catch (err) {
+    console.warn(`RSS ${source}:`, err.message);
+    return [];
+  }
 }
 
 async function fetchFreelancerOffers(limit = 20) {
-  try {
-    const { data } = await axios.get('https://www.freelancer.com/jobs/rss', { timeout: 12000 });
-    const parser = new XMLParser({ ignoreAttributes: false });
-    const json = parser.parse(data);
-    const items = json?.rss?.channel?.item || [];
-    const list = Array.isArray(items) ? items : [items];
-
-    return list.slice(0, limit).map((item) => {
-      const title = item.title || 'Freelancer project';
-      const description = String(item.description || '').replace(/<[^>]+>/g, ' ').trim();
-      const link = item.link || '';
-      const budget = parseBudget(`${title} ${description}`, 'USD');
-      return {
-        id: toOfferId('Freelancer', link, title),
-        title,
-        description: description.slice(0, 290) || 'Новый проект с биржи Freelancer.',
-        source: 'Freelancer',
-        category: detectCategory(title, description),
-        external_url: link || SOURCE_URLS.Freelancer,
-        ...budget,
-        posted_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString()
-      };
-    });
-  } catch {
-    return [];
-  }
+  return fetchRssOffers('Freelancer', 'https://www.freelancer.com/jobs/rss', limit);
 }
 
 async function fetchRemoteOkOffers(limit = 20) {
   try {
     const { data } = await axios.get('https://remoteok.com/api', {
       timeout: 12000,
-      headers: { 'User-Agent': 'FlowLance/1.0' }
+      headers: { 'User-Agent': 'FlowLance/1.0' },
     });
     if (!Array.isArray(data)) return [];
     const rows = data.filter((item) => item && item.position && item.url).slice(0, limit);
 
-    return rows.map((item) => {
-      const description = `${item.company || ''} ${Array.isArray(item.tags) ? item.tags.join(', ') : ''}`.trim();
-      return {
-        id: toOfferId('RemoteOK', item.url, item.position),
-        title: item.position,
-        description: description || 'Удаленный проект с RemoteOK.',
-        source: 'RemoteOK',
-        category: detectCategory(item.position, description),
-        external_url: item.url || SOURCE_URLS.RemoteOK,
-        budget_min: 200,
-        budget_max: 2000,
-        currency: 'USD',
-        posted_at: item.date ? new Date(item.date).toISOString() : new Date().toISOString()
-      };
-    });
-  } catch {
+    return rows
+      .map((item) => {
+        const description = `${item.company || ''} ${Array.isArray(item.tags) ? item.tags.join(', ') : ''}`.trim();
+        const link = sanitizeExternalUrl(item.url, 'RemoteOK');
+        if (!link) return null;
+        return {
+          id: toOfferId('RemoteOK', link, item.position),
+          title: item.position,
+          description: description || 'Удаленный проект с RemoteOK.',
+          source: 'RemoteOK',
+          category: detectCategory(item.position, description),
+          external_url: link,
+          budget_min: 200,
+          budget_max: 2000,
+          currency: 'USD',
+          posted_at: item.date ? new Date(item.date).toISOString() : new Date().toISOString(),
+        };
+      })
+      .filter(Boolean);
+  } catch (err) {
+    console.warn('RemoteOK:', err.message);
     return [];
   }
 }
 
-async function fetchExternalOffers(limitPerSource = 20) {
-  const [freelancer, remoteOk] = await Promise.all([fetchFreelancerOffers(limitPerSource), fetchRemoteOkOffers(limitPerSource)]);
-  return [...freelancer, ...remoteOk]
-    .sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime());
+async function fetchExternalOffers(limitPerSource = 12) {
+  const perFeed = Math.max(4, Math.ceil(limitPerSource / 2));
+  const tasks = [
+    fetchFreelancerOffers(perFeed),
+    fetchRemoteOkOffers(perFeed),
+    ...RSS_FEEDS.filter((f) => f.source !== 'Freelancer').map((f) => fetchRssOffers(f.source, f.url, perFeed)),
+  ];
+  const chunks = await Promise.all(tasks);
+  const merged = chunks.flat();
+  const byId = new Map();
+  for (const offer of merged) {
+    if (!offer.external_url) continue;
+    byId.set(offer.id, offer);
+  }
+  return [...byId.values()].sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime());
 }
 
-module.exports = { getFallbackOffers, createLiveOffer, fetchExternalOffers };
+async function getFallbackOffers(limit = 24) {
+  const external = await fetchExternalOffers(limit);
+  return external.slice(0, limit);
+}
+
+module.exports = {
+  getFallbackOffers,
+  fetchExternalOffers,
+  sanitizeExternalUrl,
+  SOURCE_HOME,
+};

@@ -63,7 +63,11 @@ async function loadFavorites() {
         <p class="fav-meta">${esc(o.source)} · ${esc(o.category)}</p>
         <h3 class="fav-title">${esc(o.title)}</h3>
         <p class="fav-budget">${esc(o.budget)}</p>
-        <a class="btn btn-outline btn-small" href="${esc(o.external_url || '/feed')}" target="_blank" rel="noopener noreferrer">На биржу</a>
+        ${
+          o.external_url && /^https?:\/\//i.test(o.external_url) && !/google\.com/i.test(o.external_url)
+            ? `<a class="btn btn-outline btn-small" href="${esc(o.external_url)}" target="_blank" rel="noopener noreferrer">Открыть объявление</a>`
+            : ''
+        }
       </article>`
       )
       .join('');
