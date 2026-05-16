@@ -10,11 +10,9 @@
 @keyframes hubPageSoftIn {
   from {
     opacity: 0;
-    transform: translateY(14px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -1943,26 +1941,39 @@ body.theme-hub .auth-layout .btn.btn-search {
   color: var(--hub-gray-600);
 }
 
-/* ——— FlowLance AI widget (B/W) ——— */
+/* ——— FlowLance AI widget: всегда поверх экрана (не скроллится) ——— */
 .fl-ai-root {
-  position: fixed;
-  right: 22px;
-  bottom: 22px;
-  z-index: 5000;
+  position: fixed !important;
+  right: max(16px, env(safe-area-inset-right, 0px)) !important;
+  bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+  left: auto !important;
+  top: auto !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 2147483646 !important;
+  pointer-events: none;
   font-family: Inter, Segoe UI, Arial, sans-serif;
 }
+.fl-ai-root > * {
+  pointer-events: auto;
+}
 .fl-ai-fab {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: #0a0a0a;
-  color: #fff;
-  font-size: 22px;
-  font-weight: 700;
+  border: none;
+  background: #fff;
+  color: #0a0a0a;
+  font-size: 24px;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  transition: transform 0.25s ease, border-color 0.2s ease;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .fl-ai-fab:hover {
   transform: scale(1.05);
@@ -2060,7 +2071,8 @@ body.theme-hub .auth-layout .btn.btn-search {
   padding: 10px 12px;
   font-size: 13px;
 }
-.fl-ai-send {
+.fl-ai-send,
+.fl-ai-submit {
   width: 44px;
   border-radius: 10px;
   border: none;
@@ -2068,6 +2080,24 @@ body.theme-hub .auth-layout .btn.btn-search {
   color: #0a0a0a;
   font-weight: 800;
   cursor: pointer;
+  flex-shrink: 0;
+}
+.fl-ai-msg {
+  font-size: 13px;
+  line-height: 1.45;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.fl-ai-msg-user {
+  align-self: flex-end;
+  background: rgba(255, 255, 255, 0.12);
+}
+.fl-ai-msg b {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 4px;
+  opacity: 0.65;
 }
 
 /* ——— Sources page ——— */
@@ -2604,70 +2634,4 @@ body {
   width: 20px;
   height: 20px;
   fill: currentColor;
-}
-/* Фиксируем виджет нейросети в правом нижнем углу */
-.fl-ai-root {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999; /* Чтобы кнопка была поверх всех картинок и блоков */
-  font-family: 'Inter', sans-serif;
-}
-
-/* ==========================================
-   ИСПРАВЛЕННЫЙ ВИДЖЕТ НЕЙРОСЕТИ (ФИКСИРОВАННЫЙ)
-   ========================================== */
-
-/* Главный контейнер, который скрипт вешает в body */
-.fl-ai-root {
-  position: fixed !important;
-  bottom: 24px !important;
-  right: 24px !important;
-  z-index: 999999 !important; /* Чтобы гарантированно быть поверх футера и стеклянных панелей */
-}
-
-/* Кнопка-круг (FAB) теперь жестко привязана к фиксированному родителю */
-.fl-ai-fab {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #fff;
-  color: #000;
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  font-weight: bold;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative; /* Чтобы z-index работал внутри root */
-}
-
-.fl-ai-fab:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 32px rgba(255, 255, 255, 0.2);
-}
-
-/* Панель чата — теперь позиционируется абсолютно внутри фиксированного .fl-ai-root */
-.fl-ai-panel {
-  position: absolute !important;
-  bottom: 72px !important; /* Встает ровно над кнопкой */
-  right: 0 !important;
-  width: 360px;
-  height: 480px;
-  background: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-/* Если панель скрыта */
-.fl-ai-panel.hidden {
-  display: none !important;
 }
