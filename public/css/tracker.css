@@ -1,0 +1,598 @@
+/* ============================================================
+   FlowLance Tracker — стили
+   ============================================================ */
+
+/* ——— Pixel font helper ——— */
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: #888880;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ——— Active nav pill ——— */
+.active-pill {
+  color: #f5f5f0 !important;
+  border-color: rgba(255,255,255,0.2) !important;
+  background: rgba(255,255,255,0.06) !important;
+}
+
+/* ============================================================
+   GATE (гостевая заглушка)
+   ============================================================ */
+.tracker-gate {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tracker-gate::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(255,255,255,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(123,97,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tracker-gate-pixel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tracker-gate-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 600px;
+}
+
+.tracker-gate-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(20px, 4vw, 32px);
+  color: #f5f5f0;
+  margin: 12px 0 16px;
+  line-height: 1.4;
+  text-shadow: 0 0 40px rgba(255,255,255,0.15);
+}
+
+.tracker-gate-sub {
+  color: #888880;
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.tracker-gate-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 0 auto 8px;
+  max-width: 420px;
+}
+
+.tgf-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  font-size: 0.88rem;
+  color: #d0d0c8;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.tgf-item:hover {
+  border-color: rgba(255,255,255,0.16);
+  transform: translateY(-2px);
+}
+.tgf-icon { font-size: 18px; flex-shrink: 0; }
+
+.tracker-coming-soon {
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: #888880;
+  font-style: italic;
+}
+
+/* ============================================================
+   APP LAYOUT
+   ============================================================ */
+
+/* Верхняя панель */
+.tracker-topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tracker-level-badge,
+.tracker-coins-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+}
+
+.tracker-level-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: #f5f5f0;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+.tracker-coins-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: #f5c842;
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(245,200,66,0.4);
+}
+
+.tracker-xp-wrap {
+  flex: 1;
+  min-width: 180px;
+}
+
+.tracker-xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #888880;
+  margin-bottom: 6px;
+}
+
+.tracker-xp-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+.tracker-xp-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f5c842, #ff8c42);
+  transition: width 0.7s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 0 12px rgba(245,200,66,0.5);
+}
+
+/* Основная сетка */
+.tracker-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 240px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .tracker-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .tracker-char-col { grid-column: 1 / -1; }
+}
+
+@media (max-width: 640px) {
+  .tracker-grid { grid-template-columns: 1fr; }
+}
+
+/* ——— Карточка персонажа ——— */
+.tracker-char-card {
+  border-radius: 20px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.char-name-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.char-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f5f5f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.char-canvas-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  position: relative;
+}
+
+#pixel-char {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 96px;
+  height: 96px;
+  filter: drop-shadow(0 0 16px rgba(255,255,255,0.15));
+  transition: filter 0.3s;
+}
+
+.char-anim-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #f5c842;
+  min-height: 14px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(245,200,66,0.6);
+  animation: labelPop 0.4s ease;
+}
+
+@keyframes labelPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.char-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.char-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.cs-label { color: #888880; }
+.cs-val   { color: #f5f5f0; font-weight: 700; }
+
+.daily-bonus-wrap { display: flex; flex-direction: column; gap: 6px; }
+.daily-hint { font-size: 0.78rem; color: #888880; text-align: center; min-height: 16px; }
+
+/* ——— Карточка заданий ——— */
+.tracker-tasks-card {
+  border-radius: 20px;
+  padding: 22px 20px;
+}
+
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tasks-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f5f5f0;
+  margin-top: 4px;
+}
+
+/* Форма добавления */
+.task-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  animation: fadeUp 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+.task-add-form input,
+.task-add-form textarea,
+.task-add-form select {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #f5f5f0;
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: border-color 0.25s;
+}
+
+.task-add-form input:focus,
+.task-add-form textarea:focus,
+.task-add-form select:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.25);
+}
+
+.task-add-form textarea { resize: vertical; }
+
+.task-form-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.task-form-row select { flex: 1; min-width: 140px; }
+
+/* Список заданий */
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: border-color 0.3s, transform 0.3s, opacity 0.3s;
+  animation: fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+.task-item:hover { border-color: rgba(255,255,255,0.14); transform: translateX(3px); }
+
+.task-item.is-done {
+  opacity: 0.5;
+  border-color: rgba(110,231,160,0.2);
+}
+
+.task-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.25s, background 0.25s;
+  margin-top: 1px;
+  color: transparent;
+  font-size: 13px;
+}
+
+.task-check:hover { border-color: rgba(110,231,160,0.6); }
+
+.task-item.is-done .task-check {
+  background: rgba(110,231,160,0.2);
+  border-color: rgba(110,231,160,0.6);
+  color: #6ee7a0;
+}
+
+.task-body { flex: 1; min-width: 0; }
+
+.task-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f5f5f0;
+  margin-bottom: 3px;
+  word-break: break-word;
+}
+
+.task-item.is-done .task-title {
+  text-decoration: line-through;
+  color: #888880;
+}
+
+.task-desc {
+  font-size: 0.82rem;
+  color: #888880;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.task-xp-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(245,200,66,0.12);
+  border: 1px solid rgba(245,200,66,0.25);
+  color: #f5c842;
+}
+
+.task-del {
+  background: none;
+  border: none;
+  color: #444440;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.task-del:hover { color: #ff6b6b; background: rgba(255,107,107,0.1); }
+
+.tasks-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 0;
+  color: #888880;
+  font-size: 0.92rem;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ——— Достижения ——— */
+.tracker-achieve-card,
+.tracker-log-card {
+  border-radius: 18px;
+  padding: 18px 16px;
+}
+
+.achieve-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.achieve-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.85rem;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.achieve-item.unlocked {
+  border-color: rgba(245,200,66,0.3);
+  background: rgba(245,200,66,0.05);
+}
+
+.achieve-item:hover { transform: translateX(3px); }
+
+.achieve-icon { font-size: 20px; flex-shrink: 0; }
+
+.achieve-info { flex: 1; min-width: 0; }
+.achieve-name { font-weight: 600; color: #f5f5f0; font-size: 0.85rem; }
+.achieve-desc { color: #888880; font-size: 0.78rem; margin-top: 1px; }
+
+.achieve-lock { color: #444440; font-size: 14px; }
+
+/* ——— Журнал событий ——— */
+.event-log {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.log-entry {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  line-height: 1.4;
+  animation: fadeUp 0.3s ease both;
+}
+
+.log-info  { background: rgba(255,255,255,0.03); color: #888880; }
+.log-xp    { background: rgba(245,200,66,0.08);  color: #f5c842; border: 1px solid rgba(245,200,66,0.15); }
+.log-level { background: rgba(123,97,255,0.1);   color: #c4b5fd; border: 1px solid rgba(123,97,255,0.25); }
+.log-bonus { background: rgba(110,231,160,0.08); color: #6ee7a0; border: 1px solid rgba(110,231,160,0.2); }
+
+/* ——— XP popup ——— */
+.xp-popup {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: #f5c842;
+  text-shadow: 0 0 16px rgba(245,200,66,0.8);
+  animation: xpFloat 1.4s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+@keyframes xpFloat {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  60%  { opacity: 1; transform: translateY(-40px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-70px) scale(0.9); }
+}
+
+/* ——— Level-up overlay ——— */
+.levelup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  animation: overlayIn 0.4s ease both;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.levelup-box {
+  text-align: center;
+  padding: 40px 48px;
+  border-radius: 24px;
+  background: rgba(10,10,10,0.95);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 80px rgba(123,97,255,0.3);
+  animation: boxPop 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes boxPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.levelup-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(16px, 3vw, 24px);
+  color: #f5c842;
+  text-shadow: 0 0 30px rgba(245,200,66,0.6);
+  margin-bottom: 12px;
+}
+
+.levelup-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(40px, 8vw, 72px);
+  color: #fff;
+  text-shadow: 0 0 40px rgba(255,255,255,0.4);
+  display: block;
+  margin: 8px 0 16px;
+}
+
+.levelup-sub {
+  color: #888880;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}

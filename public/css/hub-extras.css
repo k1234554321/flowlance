@@ -1,17 +1,21 @@
-/* ——— Курсор / фон ——— */
+/* ——— Курсор-glow ——— */
 .hub-cursor-glow {
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
-  height: 280px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 42%, transparent 70%);
-  filter: blur(2px);
-  transition: transform 0.12s ease-out;
-  mix-blend-mode: screen;
+  z-index: 2147483647;
+  transition: none !important;
+  animation: none !important;
+  background: radial-gradient(circle at center,
+    rgba(255,255,255,0.13) 0%,
+    rgba(255,255,255,0.05) 35%,
+    rgba(255,255,255,0.01) 60%,
+    transparent 75%
+  );
 }
 
 .theme-hub .bg-orbs::before,
@@ -52,7 +56,6 @@
 .theme-hub .offer-card,
 .theme-hub .cabinet-card,
 .theme-hub .fav-card,
-.theme-hub .news-row,
 .theme-hub .filter-strip {
   transition:
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
@@ -64,8 +67,7 @@
 .theme-hub .glass.card:hover,
 .theme-hub .offer-card:hover,
 .theme-hub .cabinet-card:hover,
-.theme-hub .fav-card:hover,
-.theme-hub .news-row:hover {
+.theme-hub .fav-card:hover {
   transform: translateY(-6px);
   border-color: rgba(255, 255, 255, 0.22);
   box-shadow: 0 22px 56px rgba(0, 0, 0, 0.45);

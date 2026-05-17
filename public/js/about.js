@@ -1,17 +1,32 @@
-const form = document.getElementById('ticket-form');
+// ——— FAQ: плавное раскрытие через grid-template-rows ———
+document.querySelectorAll('[data-faq]').forEach((item) => {
+  const trigger = item.querySelector('.faq-trigger');
+  if (!trigger) return;
 
-document.querySelectorAll('#faq .faq-stack details').forEach((det) => {
-  det.addEventListener('toggle', () => {
-    if (!det.open) return;
-    document.querySelectorAll('#faq .faq-stack details').forEach((o) => {
-      if (o !== det) o.open = false;
+  trigger.addEventListener('click', () => {
+    const isOpen = item.classList.contains('is-open');
+
+    // Закрываем все остальные
+    document.querySelectorAll('[data-faq].is-open').forEach((other) => {
+      if (other !== item) {
+        other.classList.remove('is-open');
+        other.querySelector('.faq-trigger')?.setAttribute('aria-expanded', 'false');
+      }
     });
+
+    // Переключаем текущий
+    item.classList.toggle('is-open', !isOpen);
+    trigger.setAttribute('aria-expanded', String(!isOpen));
   });
 });
 
+// ——— Форма тикета ———
+const form = document.getElementById('ticket-form');
+
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const payload = {    email: document.getElementById('ticket-email').value.trim(),
+  const payload = {
+    email: document.getElementById('ticket-email').value.trim(),
     name: document.getElementById('ticket-name').value.trim(),
     subject: document.getElementById('ticket-subject').value.trim(),
     body: document.getElementById('ticket-body').value.trim()

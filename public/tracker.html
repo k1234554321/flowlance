@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — Трекер целей</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/tracker.css" />
+  </head>
+  <body class="page-tracker theme-hub">
+
+    <header class="navbar glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/" class="nav-pill">Главная</a>
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/sources" class="nav-pill">Биржи</a>
+        <a href="/about" class="nav-pill">О сервисе</a>
+        <a href="/tracker" class="nav-pill active-pill">Трекер</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/auth" class="btn btn-outline btn-small" id="nav-auth">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small hidden" id="nav-dash">Кабинет</a>
+      </div>
+    </header>
+
+    <!-- Гость: заглушка -->
+    <div id="tracker-guest" class="hidden">
+      <div class="tracker-gate">
+        <div class="tracker-gate-pixel" id="gate-pixel-canvas"></div>
+        <div class="tracker-gate-content reveal reveal-delay-2">
+          <span class="pixel-label">TRACKER v1.0</span>
+          <h1 class="tracker-gate-title">Путь к цели</h1>
+          <p class="tracker-gate-sub">
+            Ставь цели, выполняй задания и прокачивай своего персонажа.<br>
+            Войди или зарегистрируйся — это бесплатно.
+          </p>
+          <div class="tracker-gate-features">
+            <div class="tgf-item"><span class="tgf-icon">🎮</span><span>RPG-система прогресса</span></div>
+            <div class="tgf-item"><span class="tgf-icon">🏆</span><span>Уровни и опыт</span></div>
+            <div class="tgf-item"><span class="tgf-icon">📋</span><span>Свои задания</span></div>
+            <div class="tgf-item"><span class="tgf-icon">🎁</span><span>Ежедневный бонус</span></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px;">
+            <a href="/auth" class="btn btn-neon btn-glow btn-lg">Войти в аккаунт</a>
+            <a href="/auth" class="btn btn-outline btn-lg">Зарегистрироваться</a>
+          </div>
+          <p class="tracker-coming-soon">🔥 Много обновлений впереди — оставайтесь с нами!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Авторизован: игра -->
+    <div id="tracker-app" class="hidden">
+      <div class="tracker-layout" style="width:min(1200px,96%);margin:0 auto;padding:24px 0 60px;">
+
+        <!-- Верхняя панель: уровень + опыт -->
+        <div class="tracker-topbar reveal reveal-delay-1">
+          <div class="tracker-level-badge">
+            <span class="pixel-label" style="font-size:9px;">УРОВЕНЬ</span>
+            <span class="tracker-level-num" id="trk-level">1</span>
+          </div>
+          <div class="tracker-xp-wrap">
+            <div class="tracker-xp-label">
+              <span>Опыт</span>
+              <span id="trk-xp-text">0 / 100 XP</span>
+            </div>
+            <div class="tracker-xp-bar">
+              <div class="tracker-xp-fill" id="trk-xp-fill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="tracker-coins-badge">
+            <span class="pixel-label" style="font-size:9px;">МОНЕТЫ</span>
+            <span class="tracker-coins-num" id="trk-coins">0 🪙</span>
+          </div>
+        </div>
+
+        <!-- Основная сетка -->
+        <div class="tracker-grid reveal reveal-delay-2">
+
+          <!-- Левая колонка: персонаж -->
+          <div class="tracker-char-col">
+            <div class="tracker-char-card glass">
+              <div class="char-name-row">
+                <span class="pixel-label">ПЕРСОНАЖ</span>
+                <span class="char-name" id="trk-char-name">Фрилансер</span>
+              </div>
+              <div class="char-canvas-wrap">
+                <canvas id="pixel-char" width="96" height="96" aria-label="Пиксельный персонаж"></canvas>
+                <div class="char-anim-label" id="char-anim-label"></div>
+              </div>
+              <div class="char-stats">
+                <div class="char-stat"><span class="cs-label">Задач выполнено</span><span class="cs-val" id="trk-done-count">0</span></div>
+                <div class="char-stat"><span class="cs-label">Серия дней</span><span class="cs-val" id="trk-streak">0 🔥</span></div>
+              </div>
+
+              <!-- Ежедневный бонус -->
+              <div class="daily-bonus-wrap">
+                <button class="btn btn-neon btn-glow btn-block" id="trk-daily-btn" style="font-size:0.85rem;padding:10px;">
+                  🎁 Забрать дневной бонус
+                </button>
+                <p class="daily-hint" id="trk-daily-hint"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Центральная колонка: задания -->
+          <div class="tracker-tasks-col">
+            <div class="tracker-tasks-card glass">
+              <div class="tasks-header">
+                <div>
+                  <span class="pixel-label">ЗАДАНИЯ</span>
+                  <h2 class="tasks-title">Мои цели</h2>
+                </div>
+                <button class="btn btn-outline btn-small" id="trk-add-btn">+ Добавить</button>
+              </div>
+
+              <!-- Форма добавления задания -->
+              <div class="task-add-form hidden" id="task-add-form">
+                <input type="text" id="task-title-input" placeholder="Название задания..." maxlength="80" />
+                <textarea id="task-desc-input" placeholder="Описание (необязательно)..." rows="2" maxlength="300"></textarea>
+                <div class="task-form-row">
+                  <select id="task-xp-select">
+                    <option value="20">Лёгкое (+20 XP)</option>
+                    <option value="50" selected>Среднее (+50 XP)</option>
+                    <option value="100">Сложное (+100 XP)</option>
+                    <option value="200">Эпическое (+200 XP)</option>
+                  </select>
+                  <button class="btn btn-neon btn-glow" id="task-save-btn" style="padding:10px 18px;">Сохранить</button>
+                  <button class="btn btn-outline" id="task-cancel-btn" style="padding:10px 14px;">✕</button>
+                </div>
+              </div>
+
+              <div class="tasks-list" id="tasks-list">
+                <!-- задания рендерятся JS-ом -->
+              </div>
+              <div class="tasks-empty hidden" id="tasks-empty">
+                <span style="font-size:32px;">📋</span>
+                <p>Пока нет заданий.<br>Добавь первое — нажми «+ Добавить»</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Правая колонка: достижения / лог -->
+          <div class="tracker-side-col">
+            <div class="tracker-achieve-card glass">
+              <span class="pixel-label">ДОСТИЖЕНИЯ</span>
+              <div class="achieve-list" id="achieve-list">
+                <!-- рендерится JS-ом -->
+              </div>
+            </div>
+
+            <div class="tracker-log-card glass" style="margin-top:14px;">
+              <span class="pixel-label">ЖУРНАЛ</span>
+              <ul class="event-log" id="event-log">
+                <li class="log-entry log-info">Добро пожаловать в Трекер!</li>
+              </ul>
+            </div>
+          </div>
+
+        </div><!-- /tracker-grid -->
+      </div>
+    </div><!-- /tracker-app -->
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/hub-effects.js"></script>
+    <script src="/js/nav-session.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/tracker.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>

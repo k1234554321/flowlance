@@ -371,6 +371,7 @@ app.get('/feed', (_, res) => res.sendFile(path.join(__dirname, 'public', 'feed.h
 app.get('/dashboard', (_, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/admin', (_, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/auth', (_, res) => res.sendFile(path.join(__dirname, 'public', 'auth.html')));
+app.get('/tracker', (_, res) => res.sendFile(path.join(__dirname, 'public', 'tracker.html')));
 
 app.post('/api/auth/register', async (req, res) => {
   const { name, email, password } = req.body;

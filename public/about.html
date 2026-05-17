@@ -8,13 +8,180 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      /* ——— Why-cards ——— */
+      .why-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+      .why-card {
+        border-radius: 20px;
+        padding: 24px 22px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.35s, box-shadow 0.4s;
+        position: relative;
+        overflow: hidden;
+      }
+      .why-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.04) 0%, transparent 60%);
+        pointer-events: none;
+      }
+      .why-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255,255,255,0.18);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      }
+      .why-icon {
+        font-size: 32px;
+        margin-bottom: 14px;
+        display: block;
+        filter: drop-shadow(0 0 12px rgba(255,255,255,0.25));
+      }
+      .why-card h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #f5f5f0;
+        margin-bottom: 8px;
+      }
+      .why-card p {
+        color: #888880;
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+      .why-badge {
+        display: inline-block;
+        margin-top: 12px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #f5f5f0;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 4px 10px;
+        border-radius: 999px;
+      }
+
+      /* ——— FAQ плавное раскрытие ——— */
+      .faq-item {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: border-color 0.3s;
+      }
+      .faq-item.is-open {
+        border-color: rgba(255,255,255,0.14);
+      }
+      .faq-trigger {
+        width: 100%;
+        background: none;
+        border: none;
+        color: #f5f5f0;
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: left;
+        padding: 18px 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        transition: color 0.2s;
+      }
+      .faq-trigger:hover { color: #fff; }
+      .faq-arrow {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), background 0.3s;
+        font-size: 12px;
+        color: #888880;
+      }
+      .faq-item.is-open .faq-arrow {
+        transform: rotate(180deg);
+        background: rgba(255,255,255,0.08);
+        color: #f5f5f0;
+      }
+      .faq-body {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.42s cubic-bezier(0.22,1,0.36,1);
+      }
+      .faq-item.is-open .faq-body {
+        grid-template-rows: 1fr;
+      }
+      .faq-body-inner {
+        overflow: hidden;
+      }
+      .faq-body-text {
+        padding: 0 20px 18px;
+        color: #d0d0c8;
+        font-size: 0.95rem;
+        line-height: 1.65;
+      }
+
+      /* ——— Section kicker ——— */
+      .section-kicker {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #888880;
+        margin-bottom: 10px;
+      }
+      .section-title-hub {
+        font-size: clamp(26px, 4vw, 40px);
+        font-weight: 800;
+        color: #f5f5f0;
+        margin-bottom: 12px;
+      }
+
+      /* ——— Hub social ——— */
+      .hub-social-grid {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .btn-social-hub {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+        color: #f5f5f0;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.92rem;
+        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s, box-shadow 0.3s;
+      }
+      .btn-social-hub svg { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
+      .btn-social-hub:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.25); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+      .btn-social-tg:hover { color: #29b6f6; border-color: rgba(41,182,246,0.4); }
+      .btn-social-vk:hover { color: #5c8de8; border-color: rgba(92,141,232,0.4); }
+
+      /* ——— active nav pill ——— */
+      .active-pill { color: #f5f5f0 !important; border-color: rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.06) !important; }
+    </style>
   </head>
   <body class="page-about theme-hub">
-    <div class="bg-blur"></div>
-    <div class="bg-grid"></div>
-    <div class="bg-orbs" aria-hidden="true"></div>
-    <div class="noise-overlay" aria-hidden="true"></div>
-
     <header class="navbar glass nav-hero-anim">
       <a class="logo" href="/">FLOW<span>LANCE</span></a>
       <nav class="nav-menu nav-mega">
@@ -22,6 +189,7 @@
         <a href="/feed" class="nav-pill">Лента</a>
         <a href="/sources" class="nav-pill">Биржи</a>
         <a href="/about" class="nav-pill active-pill">О сервисе</a>
+        <a href="/tracker" class="nav-pill">Трекер</a>
       </nav>
       <div class="nav-actions">
         <a href="/auth" class="btn btn-outline btn-small" id="nav-auth">Войти</a>
@@ -29,58 +197,144 @@
       </div>
     </header>
 
-    <main class="about-layout" style="width: min(1200px, 94%); margin: 40px auto;">
-      
-      <section class="about-hero text-center reveal reveal-delay-1" style="text-align: center; margin-bottom: 50px; position: relative; padding: 20px 0;">
+    <main style="width: min(1100px, 94%); margin: 40px auto;">
+
+      <!-- Hero -->
+      <section class="reveal reveal-delay-1" style="text-align: center; margin-bottom: 64px; padding: 20px 0;">
         <span class="section-kicker">FlowLance Hub</span>
-        <h1 class="section-title-hub" style="font-size: clamp(32px, 5vw, 48px); font-weight: 800; margin-bottom: 16px;">
+        <h1 class="section-title-hub" style="font-size: clamp(32px, 5vw, 52px);">
           Единый пульт управления фрилансом
         </h1>
-        <p class="hero-sub about-support-lead">
-          Мы собираем горячие заказы со всего интернета (Freelancer, RemoteOK и др.) в один умный поток. Больше не нужно держать открытыми 20 вкладок.
+        <p style="color: #888880; max-width: 600px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6;">
+          Мы собираем горячие заказы со всего интернета в один умный поток. Больше не нужно держать открытыми 20 вкладок.
         </p>
       </section>
 
-      <div class="about-support-outer reveal reveal-delay-2">
-        <section class="about-support glass" style="padding: 32px; border-radius: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);">
-          <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; text-align: center;">Техническая поддержка</h2>
-          <p class="muted text-center" style="text-align: center; margin-bottom: 24px; color: #888880;">
-            Нашли баг или есть предложение? Напишите тикет — наша команда разберётся.
-          </p>
-          
-          <form id=\"ticket-form\" class="form-stack" style="display: flex; flex-direction: column; gap: 16px; max-width: 500px; margin: 0 auto;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-              <input type="text" id="ticket-name" placeholder="Ваше имя" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff;" />
-              <input type="email" id="ticket-email" placeholder="Email для ответа" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff;" />
-            </div>
-            <input type="text" id="ticket-subject" placeholder="Тема обращения" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff;" />
-            <textarea id="ticket-body" placeholder="Опишите проблему максимально подробно..." rows="5" required style="padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff; font-family: inherit; resize: vertical;"></textarea>
-            <button class="btn btn-neon btn-glow" type="submit" style="padding: 14px; font-weight: 600; cursor: pointer;">Отправить обращение</button>
-          </form>
-        </section>
-      </div>
+      <!-- Почему выбирают нас -->
+      <section class="reveal reveal-delay-2" style="margin-bottom: 72px;">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <span class="section-kicker">Наши преимущества</span>
+        </div>
+        <h2 class="section-title-hub" style="text-align: center;">Почему выбирают FlowLance</h2>
+        <p style="text-align: center; color: #888880; max-width: 520px; margin: 0 auto 8px; font-size: 0.95rem; line-height: 1.6;">
+          Мы не просто агрегатор — это инструмент, который реально экономит время и помогает зарабатывать больше.
+        </p>
 
-      <section id="faq" class="reveal reveal-delay-3" style="margin-top: 60px;">
-        <h2 class="text-center" style="text-align: center; font-size: 28px; margin-bottom: 24px;">Часто задаваемые вопросы</h2>
-        <div class="faq-stack" style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px;">
-          <details style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; cursor: pointer;">
-            <summary style="font-weight: 600; outline: none;">Как часто обновляется лента заказов?</summary>
-            <div class="faq-a" style="margin-top: 10px; color: #d0d0c8; line-height: 1.6;">
-              Заказы обновляются автоматически в реальном времени. Новые задачи прилетают каждые 15 секунд с помощью веб-сокетов без перезагрузки страницы.
-            </div>
-          </details>
-          <details style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; cursor: pointer;">
-            <summary style="font-weight: 600; outline: none;">Куда писать, если не открывается карточка биржи?</summary>
-            <div class="faq-a" style="margin-top: 10px; color: #d0d0c8; line-height: 1.6;">
-              Сообщите через форму тикета выше, указав ссылку на задачу — мы оперативно проверим редирект на источнике.
-            </div>
-          </details>
+        <div class="why-grid">
+          <div class="why-card">
+            <span class="why-icon">⚡</span>
+            <h3>Всё в одном месте</h3>
+            <p>Freelancer, RemoteOK, Habr и другие площадки — в одной ленте. Никаких лишних вкладок и ручного мониторинга.</p>
+            <span class="why-badge">10+ источников</span>
+          </div>
+          <div class="why-card">
+            <span class="why-icon">🔴</span>
+            <h3>Обновления в реальном времени</h3>
+            <p>Новые заказы появляются каждые 15 секунд через WebSocket. Ты видишь их раньше конкурентов — это критично для первого отклика.</p>
+            <span class="why-badge">Live-лента</span>
+          </div>
+          <div class="why-card">
+            <span class="why-icon">🤖</span>
+            <h3>AI-ассистент внутри</h3>
+            <p>Встроенный AI помогает составить отклик, оценить бюджет и разобраться в требованиях заказчика — прямо в интерфейсе.</p>
+            <span class="why-badge">GPT-powered</span>
+          </div>
+          <div class="why-card">
+            <span class="why-icon">🎯</span>
+            <h3>Умные фильтры</h3>
+            <p>Фильтруй по категории, бюджету и источнику. Сохраняй избранное и возвращайся к нужным заказам в любой момент.</p>
+            <span class="why-badge">Персонализация</span>
+          </div>
+          <div class="why-card">
+            <span class="why-icon">🏆</span>
+            <h3>Трекер целей</h3>
+            <p>Ставь цели, выполняй задания и прокачивай своего персонажа. Геймификация помогает не терять мотивацию в долгосрочной перспективе.</p>
+            <span class="why-badge">RPG-система</span>
+          </div>
+          <div class="why-card">
+            <span class="why-icon">🔒</span>
+            <h3>Безопасно и бесплатно</h3>
+            <p>Никаких скрытых платежей. Мы не продаём твои данные и не требуем карту. Просто регистрируйся и работай.</p>
+            <span class="why-badge">0 ₽ навсегда</span>
+          </div>
         </div>
       </section>
 
-      <footer class="reveal reveal-delay-4" style="margin-top: 80px; text-align: center; padding-bottom: 40px;">
-        <span class="hub-contacts-label" style="text-transform: uppercase; letter-spacing: 2px; color: #888880; font-size: 13px;">Наши контакты и сообщество</span>
-        
+      <!-- Поддержка -->
+      <section class="reveal reveal-delay-3" style="margin-bottom: 72px;">
+        <div class="glass" style="padding: 36px; border-radius: 24px;">
+          <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px; text-align: center;">Техническая поддержка</h2>
+          <p style="text-align: center; margin-bottom: 28px; color: #888880;">
+            Нашли баг или есть предложение? Напишите тикет — наша команда разберётся.
+          </p>
+          <form id="ticket-form" class="form-stack" style="max-width: 500px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <input type="text" id="ticket-name" placeholder="Ваше имя" required />
+              <input type="email" id="ticket-email" placeholder="Email для ответа" required />
+            </div>
+            <input type="text" id="ticket-subject" placeholder="Тема обращения" required />
+            <textarea id="ticket-body" placeholder="Опишите проблему максимально подробно..." rows="5" required style="resize: vertical;"></textarea>
+            <button class="btn btn-neon btn-glow" type="submit" style="padding: 14px; font-weight: 600; cursor: pointer;">Отправить обращение</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" class="reveal reveal-delay-4" style="margin-bottom: 72px;">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <span class="section-kicker">Вопросы и ответы</span>
+        </div>
+        <h2 class="section-title-hub" style="text-align: center; margin-bottom: 28px;">Часто задаваемые вопросы</h2>
+        <div class="faq-stack" style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;">
+
+          <div class="faq-item" data-faq>
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Как часто обновляется лента заказов?</span>
+              <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-body" role="region">
+              <div class="faq-body-inner">
+                <div class="faq-body-text">
+                  Заказы обновляются автоматически в реальном времени. Новые задачи прилетают каждые 15 секунд с помощью веб-сокетов без перезагрузки страницы — ты всегда видишь актуальную картину.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-faq>
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Куда писать, если не открывается карточка биржи?</span>
+              <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-body" role="region">
+              <div class="faq-body-inner">
+                <div class="faq-body-text">
+                  Сообщите через форму тикета выше, указав ссылку на задачу — мы оперативно проверим редирект на источнике. Обычно это решается в течение нескольких часов.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-faq>
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Что такое Трекер целей и как им пользоваться?</span>
+              <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-body" role="region">
+              <div class="faq-body-inner">
+                <div class="faq-body-text">
+                  Трекер — это встроенная RPG-система для фрилансеров. Ставишь цели, выполняешь задания, получаешь опыт и прокачиваешь персонажа. Доступен после регистрации или входа в кабинет. Переходи в раздел <a href="/tracker" style="color: #f5f5f0; font-weight: 600; text-decoration: underline;">Трекер</a> и начинай прямо сейчас.
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="reveal reveal-delay-4" style="margin-top: 20px; text-align: center; padding-bottom: 48px;">
+        <span style="text-transform: uppercase; letter-spacing: 2px; color: #888880; font-size: 13px;">Наши контакты и сообщество</span>
         <div class="hub-social-grid">
           <a class="btn-social-hub btn-social-tg" href="https://t.me" target="_blank" rel="noopener noreferrer">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.62.15-.15 2.7-2.48 2.75-2.7.01-.03.01-.14-.06-.2-.07-.06-.17-.04-.25-.02-.11.02-1.83 1.16-5.16 3.42-.49.34-.93.51-1.33.5-.44-.01-1.3-.25-1.93-.46-.78-.25-1.4-.39-1.35-.83.03-.23.35-.46.96-.71 3.76-1.63 6.27-2.71 7.54-3.23 3.58-1.48 4.32-1.74 4.81-1.75.11 0 .35.03.5.16.13.1.17.24.19.34.02.07.03.21.02.3z"/></svg>
@@ -91,7 +345,7 @@
             Группа ВКонтакте
           </a>
         </div>
-        <p style="margin-top: 30px; color: #444440; font-size: 14px;">© FlowLance. Все права защищены.</p>
+        <p style="margin-top: 28px; color: #444440; font-size: 14px;">© FlowLance. Все права защищены.</p>
       </footer>
     </main>
 
