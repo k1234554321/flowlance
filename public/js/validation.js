@@ -12,7 +12,7 @@
   function validateEmail(email) {
     const e = String(email || '').trim();
     if (!e) return { ok: false, error: 'Укажи email' };
-    if (!EMAIL_RE.test(e)) return { ok: false, error: 'Некорректный email — нужен формат name@domain.com' };
+    if (!EMAIL_RE.test(e)) return { ok: false, error: 'Некорректный email — используй формат: name@gmail.com, name@mail.ru, name@bk.ru, name@yandex.ru и т.д.' };
     const domain = e.split('@')[1] || '';
     if (!domain.includes('.') || domain.length < 4) {
       return { ok: false, error: 'У домена должен быть символ точки (например .com)' };
