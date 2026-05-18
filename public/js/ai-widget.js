@@ -35,8 +35,7 @@
 
     const hint = document.createElement('p');
     hint.className = 'fl-ai-hint';
-    hint.textContent =
-      'Фриланс, удалёнка и сервис FlowLance — для пользователей из любых стран.';
+    hint.textContent = 'Чем могу помочь? Задайте любой вопрос о фрилансе или сервисе.';
 
     const chat = document.createElement('div');
     chat.className = 'fl-ai-chat';
@@ -50,7 +49,7 @@
     input.type = 'text';
     input.id = 'fl-ai-input';
     input.maxLength = 2000;
-    input.placeholder = 'Спроси про ленту, отклик или фильтры…';
+    input.placeholder = 'Задайте свой вопрос…';
     input.autocomplete = 'off';
 
     const submit = document.createElement('button');

@@ -1497,16 +1497,19 @@ body:not(.theme-hub) .exchange-chip:hover {
 body.theme-hub .filter-strip .chip,
 body.theme-hub .filter-strip .chip-glow,
 body.theme-hub .filter-strip .filter-chip {
-  background: #f5f5f0;
-  color: #0a0a0a;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  color: #e8e8e3;
+  border: 1px solid rgba(255,255,255,0.14);
+  font-weight: 500;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 body.theme-hub .filter-strip .chip:hover,
 body.theme-hub .filter-strip .filter-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
-  border-color: rgba(0, 0, 0, 0.22);
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.35);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 12px rgba(255,255,255,0.08);
 }
 
 body.theme-hub .chip-row-lg .chip-popular {
@@ -1555,6 +1558,32 @@ body.theme-hub .hero-hub-sub {
   color: var(--hub-gray-600);
   font-weight: 600;
   margin-bottom: 14px;
+}
+
+/* Светящийся kicker для Журнала и Отзывов */
+.section-kicker-glow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #f5f5f0;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.9),
+    0 0 20px rgba(255,255,255,0.5),
+    0 0 40px rgba(255,255,255,0.2);
+  animation: kickerPulse 2.5s ease-in-out infinite;
+}
+@keyframes kickerPulse {
+  0%, 100% {
+    text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.2);
+    opacity: 1;
+  }
+  50% {
+    text-shadow: 0 0 4px rgba(255,255,255,0.6), 0 0 12px rgba(255,255,255,0.3), 0 0 24px rgba(255,255,255,0.1);
+    opacity: 0.8;
+  }
 }
 .section-title-hub {
   font-size: clamp(26px, 3.4vw, 44px);
@@ -2246,6 +2275,14 @@ body.theme-hub .auth-layout .btn.btn-search {
 .source-feed-tag.is-live {
   border-color: rgba(255, 255, 255, 0.35);
   color: var(--hub-white);
+  background: rgba(255,255,255,0.06);
+  text-shadow: 0 0 10px rgba(255,255,255,0.4);
+  animation: liveTagPulse 2s ease-in-out infinite;
+}
+@keyframes liveTagPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+  50% { box-shadow: 0 0 0 4px rgba(255,255,255,0); }
+}
 }
 
 .source-mini {
@@ -2642,4 +2679,129 @@ body {
   width: 20px;
   height: 20px;
   fill: currentColor;
+}
+
+/* ============================================================
+   Красивые select / выпадающие списки под тему сайта
+   ============================================================ */
+body.theme-hub select,
+body.theme-hub .filter-select,
+body.theme-hub .feed-field select,
+body.theme-hub .task-add-form select {
+  background: rgba(15, 15, 20, 0.85) !important;
+  color: #e8e8e3 !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 10px;
+  padding: 10px 36px 10px 14px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888880' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+  cursor: pointer;
+}
+body.theme-hub select:hover,
+body.theme-hub .filter-select:hover,
+body.theme-hub .feed-field select:hover {
+  border-color: rgba(255,255,255,0.28) !important;
+  background: rgba(20, 20, 28, 0.92) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+body.theme-hub select:focus,
+body.theme-hub .filter-select:focus,
+body.theme-hub .feed-field select:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.4) !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+}
+/* Опции внутри select */
+body.theme-hub select option {
+  background: #111118 !important;
+  color: #e8e8e3 !important;
+  padding: 8px 12px;
+}
+
+/* ============================================================
+   Фикс анимации блока "Грядут обновления" — плавно без кадров
+   ============================================================ */
+.aub-glow {
+  animation: aubGlowPulse 3s ease-in-out infinite !important;
+  will-change: opacity;
+}
+@keyframes aubGlowPulse {
+  0%   { opacity: 0.5; }
+  50%  { opacity: 1;   }
+  100% { opacity: 0.5; }
+}
+.aub-dots span {
+  animation: aubDot 1.4s ease-in-out infinite !important;
+  will-change: transform, opacity;
+}
+.aub-dots span:nth-child(2) { animation-delay: 0.2s !important; }
+.aub-dots span:nth-child(3) { animation-delay: 0.4s !important; }
+@keyframes aubDot {
+  0%,80%,100% { transform: scale(1);   opacity: 0.3; }
+  40%          { transform: scale(1.5); opacity: 1;   }
+}
+
+/* ============================================================
+   hub-contacts-label как section-kicker-glow
+   ============================================================ */
+.hub-contacts-label.section-kicker-glow {
+  letter-spacing: 0.32em;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ============================================================
+   Убираем синий цвет в категориях и чипах — только белый/серый
+   ============================================================ */
+body.theme-hub .category-card ul li,
+body.theme-hub .category-card ul {
+  color: #888880 !important;
+}
+body.theme-hub .chip-glow:hover {
+  border-color: rgba(255,255,255,0.4) !important;
+  box-shadow: 0 0 16px rgba(255,255,255,0.1) !important;
+  color: #f5f5f0 !important;
+}
+body.theme-hub .filter-hint a,
+body.theme-hub .hub-filter-hint a {
+  color: #d0d0c8 !important;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   Категории — hover как у отзывов (подъём + свечение)
+   ============================================================ */
+body.theme-hub .category-card {
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.35s, box-shadow 0.4s, background 0.35s !important;
+}
+body.theme-hub .category-card:hover {
+  transform: translateY(-8px) !important;
+  border-color: rgba(255,255,255,0.22) !important;
+  box-shadow: 0 24px 56px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.04) !important;
+}
+
+/* ============================================================
+   Select — убираем синий outline браузера, красивый стиль
+   ============================================================ */
+body.theme-hub select,
+body.theme-hub select:focus,
+body.theme-hub select:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Цвет выделенного option в некоторых браузерах */
+body.theme-hub select option:checked,
+body.theme-hub select option:hover {
+  background: rgba(255,255,255,0.12) !important;
+  color: #ffffff !important;
 }
