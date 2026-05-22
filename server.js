@@ -25,6 +25,9 @@ const io = new Server(server, { cors: { origin: '*' } });
 const PORT = Number(process.env.PORT || 3000);
 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret-change-me';
 const inMemoryOffers = new Map();
+// In-memory хранилище пользователей для демо-режима (без MySQL)
+const inMemoryUsers = new Map(); // key: email, value: { id, name, email, password_hash, role, bio, avatar_url, created_at }
+let inMemoryUserIdSeq = 2; // 1 зарезервирован под admin
 
 app.use(cors());
 app.use(express.json());
@@ -110,6 +113,22 @@ async function ensureOffersExternalUrlColumn(pool) {
 }
 
 async function ensureDb() {
+  // Всегда создаём admin в in-memory хранилище (нужен и при MySQL, и без него)
+  const adminEmail = String(process.env.DEFAULT_ADMIN_EMAIL || 'admin@aggregator.local').toLowerCase();
+  if (!inMemoryUsers.has(adminEmail)) {
+    const passwordHash = await bcrypt.hash(process.env.DEFAULT_ADMIN_PASSWORD || 'admin12345', 10);
+    inMemoryUsers.set(adminEmail, {
+      id: 1,
+      name: 'Administrator',
+      email: adminEmail,
+      password_hash: passwordHash,
+      role: 'admin',
+      bio: 'Главный администратор платформы',
+      avatar_url: '',
+      created_at: new Date().toISOString(),
+    });
+  }
+
   if (!isDbEnabled()) return;
   try {
     const pool = getPool();
