@@ -111,7 +111,7 @@
   const elAnimLabel  = $('char-anim-label');
   const canvas       = $('pixel-char');
   const canvasWrap   = canvas ? canvas.closest('.char-canvas-wrap') : null;
-  const shopCanvas   = $('shop-preview-canvas');
+  const shopCanvas   = null; // превью убрано
 
   /* ============================================================
      ПИКСЕЛЬНЫЙ ПЕРСОНАЖ
@@ -268,13 +268,7 @@
   }
   if (C) gameLoop();
 
-  // Превью в магазине (статичный)
-  function drawShopPreview() {
-    if (!shopCanvas) return;
-    const ctx = shopCanvas.getContext('2d');
-    ctx.clearRect(0, 0, 96, 96);
-    drawCharFull(ctx, SC, 0, 0, 0);
-  }
+  // Превью убрано — персонаж виден на основном канвасе
 
   /* ============================================================
      РЕНДЕР
@@ -452,7 +446,7 @@
     shopOverlay.classList.remove('hidden');
     shopOverlay.classList.add('shop-visible');
     renderShop();
-    drawShopPreview();
+    
     document.body.style.overflow = 'hidden';
   }
 
@@ -581,7 +575,7 @@
     saveState();
     render();
     renderShop();
-    drawShopPreview();
+    
   }
 
   function equipItem(item) {
