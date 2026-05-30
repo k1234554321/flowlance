@@ -554,14 +554,14 @@
     setTimeout(() => { t.classList.remove('shop-toast-show'); setTimeout(() => t.remove(), 400); }, 2500);
   }
 
-  // Один обработчик на каждый грид
-  shopTabClothes?.addEventListener('click', e => {
+  // Один обработчик на весь блок магазина — не зависит от hidden вкладок
+  const shopSection = $('shop-section');
+  shopSection?.addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');
-    if (btn) shopAction(btn.dataset.id, btn.dataset.action);
-  });
-  shopTabAura?.addEventListener('click', e => {
-    const btn = e.target.closest('[data-action]');
-    if (btn) shopAction(btn.dataset.id, btn.dataset.action);
+    if (!btn) return;
+    // Не реагируем на клики по вкладкам
+    if (btn.classList.contains('shop-tab')) return;
+    shopAction(btn.dataset.id, btn.dataset.action);
   });
 
   /* ============================================================

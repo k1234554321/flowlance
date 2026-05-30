@@ -78,10 +78,29 @@
           <p class="cab-sub">Имя, аватар, описание</p>
           <form id="profile-form" class="form-stack">
             <input id="name" type="text" placeholder="Имя" />
-            <input id="avatar_url" type="url" placeholder="Ссылка на аватар" />
+            <input id="avatar_url" type="url" placeholder="Ссылка на аватар (или выбери ниже)" />
             <textarea id="bio" placeholder="Стек, опыт, ссылки на работы"></textarea>
             <button class="btn btn-hub-solid" type="submit">Сохранить</button>
           </form>
+          <!-- Анимированные аватарки -->
+          <div id="animated-avatars-section">
+            <p class="cab-sub" style="margin-top:16px;margin-bottom:10px;">
+              Анимированные аватарки
+              <span id="animated-lock" style="font-size:0.78rem;color:#888880;"> — доступны с подпиской <a href="/pricing" style="color:#9f7aea;">Pro+</a></span>
+            </p>
+            <div id="animated-avatars-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;opacity:0.4;pointer-events:none;" id="animated-avatars-grid">
+              <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/xT9IgG50Lg7russbD6/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/l46Cy1rHbQ92uuLXa/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/xT9IgDECMFdLMGnKTC/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+              <img src="https://media.giphy.com/media/3oEjHWpiVIOGXT5l9u/giphy.gif" class="anim-avatar-pick" title="Выбрать" style="width:100%;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;" />
+            </div>
+          </div>
         </section>
         <section class="cabinet-card glass reveal reveal-delay-2">
           <h2>Предпросмотр</h2>

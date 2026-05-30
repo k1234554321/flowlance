@@ -180,4 +180,24 @@ reviewForm?.addEventListener('submit', async (e) => {
 });
 
 initReviewStars();
-loadProfile();
+loadProfile().then(() => initAnimatedAvatars());
+
+function initAnimatedAvatars() {
+  const grid = document.getElementById('animated-avatars-grid');
+  const lock = document.getElementById('animated-lock');
+  const sub = String(user?.subscription || 'basic').toLowerCase();
+  if (sub === 'proplus') {
+    if (grid) { grid.style.opacity = '1'; grid.style.pointerEvents = 'auto'; }
+    if (lock) lock.style.display = 'none';
+    grid?.querySelectorAll('.anim-avatar-pick').forEach(img => {
+      img.addEventListener('click', () => {
+        grid.querySelectorAll('.anim-avatar-pick').forEach(i => i.style.borderColor = 'transparent');
+        img.style.borderColor = '#9f7aea';
+        const avatarInput = document.getElementById('avatar_url');
+        if (avatarInput) avatarInput.value = img.src;
+        const avatarPreviewEl = document.getElementById('avatar-preview');
+        if (avatarPreviewEl) avatarPreviewEl.src = img.src;
+      });
+    });
+  }
+}

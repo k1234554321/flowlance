@@ -537,6 +537,7 @@ app.post('/api/auth/login', async (req, res) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    subscription: user.subscription || 'basic',
     bio: user.bio || '',
     avatar_url: user.avatar_url || ''
   };
@@ -551,7 +552,7 @@ app.get('/api/profile', requireAuth, async (req, res) => {
   if (!isDbEnabled()) return res.json(req.session.user);
   const pool = getPool();
   const [rows] = await pool.query(
-    'SELECT id, name, email, role, bio, avatar_url, created_at FROM users WHERE id = ? LIMIT 1',
+    'SELECT id, name, email, role, subscription, bio, avatar_url, created_at FROM users WHERE id = ? LIMIT 1',
     [req.session.user.id]
   );
   if (rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
