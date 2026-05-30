@@ -841,8 +841,12 @@ app.get('/api/leaderboard', async (req, res) => {
   try {
     const pool = getPool();
     const [rows] = await pool.query(
-      'SELECT id, name, avatar_url, role, subscription, COALESCE(tracker_xp,0) as tracker_xp, COALESCE(tracker_level,1) as tracker_level FROM users ORDER BY tracker_xp DESC LIMIT 50'
-    );
+      'SELECT id, name, avatar_url, subscription, COALESCE(tracker_xp,0) as tracker_xp, COALESCE(tracker_level,1) as tracker_level FROM users ORDER BY tracker_xp DESC LIMIT 50'
+    ).catch(async () => {
+      // Если колонок tracker нет — возвращаем без них
+      const [r] = await pool.query('SELECT id, name, avatar_url, subscription FROM users ORDER BY id ASC LIMIT 50');
+      return [r.map(u => ({ ...u, tracker_xp: 0, tracker_level: 1 }))];
+    });
     res.json({ users: rows });
   } catch (error) {
     res.json({ users: [] });

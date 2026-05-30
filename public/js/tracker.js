@@ -46,7 +46,7 @@
     { id: 'aura_black',  name: 'Чёрная аура',      icon: '🖤', price: 500, color: '#1a1a2e', size: 40,  desc: 'Тёмная сила' },
   ];
 
-  const STORE_KEY = 'fl_tracker_v1';
+  let STORE_KEY = 'fl_tracker_v1'; // будет обновлён в init() под конкретного пользователя
 
   function defaultState() {
     return {
@@ -644,6 +644,9 @@
     }
     window._flUser = user;
     window._flSub  = String(user.subscription || 'basic').toLowerCase();
+    // Ключ localStorage привязан к ID пользователя — у каждого свои данные
+    STORE_KEY = `fl_tracker_v1_${user.id}`;
+    state = loadState();
     guestEl?.classList.add('hidden');
     appEl?.classList.remove('hidden');
     updateStreak();

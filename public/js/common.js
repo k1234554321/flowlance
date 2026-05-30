@@ -1,8 +1,9 @@
 async function api(path, options = {}) {
+  const { headers: extraHeaders, ...restOptions } = options;
   const response = await fetch(path, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...extraHeaders },
     credentials: 'include',
-    ...options
+    ...restOptions
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || 'Request failed');
@@ -35,4 +36,4 @@ function showError(error) {
 function formatDate(date) {
   return new Date(date).toLocaleString('ru-RU');
 }
-
+
