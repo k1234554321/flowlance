@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — Оформление подписки</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      /* ——— Payment page styles ——— */
+      .payment-wrap {
+        max-width: 560px;
+        margin: 60px auto 80px;
+        padding: 0 16px;
+      }
+
+      .payment-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #888880;
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        margin-bottom: 28px;
+        transition: color 0.2s;
+      }
+      .payment-back:hover { color: #f5f5f0; }
+      .payment-back svg { width: 16px; height: 16px; fill: currentColor; }
+
+      .payment-title {
+        font-size: clamp(22px, 4vw, 32px);
+        font-weight: 800;
+        color: #f5f5f0;
+        margin-bottom: 6px;
+      }
+      .payment-subtitle {
+        color: #888880;
+        font-size: 0.95rem;
+        margin-bottom: 32px;
+      }
+
+      .payment-card {
+        border-radius: 20px;
+        padding: 28px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        margin-bottom: 20px;
+        transition: border-color 0.3s;
+      }
+
+      .payment-plan-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .payment-plan-name {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #f5f5f0;
+      }
+      .payment-plan-name.plan-pro { color: #b39dff; }
+      .payment-plan-name.plan-proplus { color: #00f2ff; }
+      .payment-plan-price {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #f5f5f0;
+        line-height: 1;
+      }
+      .payment-plan-price span {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #888880;
+      }
+
+      /* QR placeholder */
+      .payment-qr-placeholder {
+        border: 2px dashed rgba(255,255,255,0.15);
+        border-radius: 16px;
+        padding: 48px 24px;
+        text-align: center;
+        color: #555550;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        background: rgba(255,255,255,0.01);
+        transition: border-color 0.3s;
+      }
+      .payment-qr-placeholder:hover { border-color: rgba(255,255,255,0.25); }
+      .payment-qr-icon {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+
+      /* Features list */
+      .payment-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .payment-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 0.88rem;
+        color: #c8c8c0;
+        line-height: 1.5;
+      }
+      .payment-features li .check { color: #48bb78; flex-shrink: 0; }
+
+      /* Note card */
+      .payment-note-card {
+        border-radius: 16px;
+        padding: 20px 22px;
+        background: rgba(0,242,255,0.04);
+        border: 1px solid rgba(0,242,255,0.15);
+        font-size: 0.88rem;
+        color: #c8c8c0;
+        line-height: 1.7;
+        margin-bottom: 20px;
+      }
+      .payment-note-card strong { color: #f5f5f0; }
+      .payment-note-card a { color: #00f2ff; text-decoration: none; }
+      .payment-note-card a:hover { text-decoration: underline; }
+
+      .payment-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.07);
+        margin: 20px 0;
+      }
+
+      .payment-section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #555550;
+        margin-bottom: 14px;
+      }
+
+      /* active nav pill */
+      .active-pill { color: #f5f5f0 !important; border-color: rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.06) !important; }
+    </style>
+  </head>
+  <body class="page-payment theme-hub">
+    <header class="navbar glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/" class="nav-pill">Главная</a>
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/sources" class="nav-pill">Биржи</a>
+        <a href="/about" class="nav-pill">О сервисе</a>
+        <a href="/tracker" class="nav-pill">Мои достижения</a>
+        <a href="/pricing" class="nav-pill">Тарифы</a>
+        <a href="/leaderboard" class="nav-pill">Лидерборд</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/auth" class="btn btn-outline btn-small" id="nav-auth">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small hidden" id="nav-dash">Кабинет</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="payment-wrap">
+
+        <!-- Back link -->
+        <a href="/pricing" class="payment-back reveal reveal-delay-1">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Назад к тарифам
+        </a>
+
+        <!-- Title -->
+        <h1 class="payment-title reveal reveal-delay-1">Оформление подписки</h1>
+        <p class="payment-subtitle reveal reveal-delay-1" id="payment-subtitle">Выбранный план: загрузка...</p>
+
+        <!-- Plan summary card -->
+        <div class="payment-card reveal reveal-delay-2">
+          <div class="payment-plan-header">
+            <div>
+              <div class="payment-section-label">Выбранный план</div>
+              <div class="payment-plan-name" id="plan-name-display">—</div>
+            </div>
+            <div class="payment-plan-price" id="plan-price-display">— <span>₽/мес</span></div>
+          </div>
+
+          <div class="payment-divider"></div>
+
+          <div class="payment-section-label">Что входит</div>
+          <ul class="payment-features" id="plan-features-list">
+            <li><span class="check">✓</span> Загрузка...</li>
+          </ul>
+        </div>
+
+        <!-- QR / payment link placeholder -->
+        <div class="payment-card reveal reveal-delay-2">
+          <div class="payment-section-label">Способ оплаты</div>
+          <div class="payment-qr-placeholder" id="payment-qr-placeholder">
+            <span class="payment-qr-icon">📲</span>
+            QR-код или ссылка на оплату появится здесь
+          </div>
+        </div>
+
+        <!-- Instruction note -->
+        <div class="payment-note-card reveal reveal-delay-3">
+          <strong>Как активировать подписку:</strong><br />
+          После оплаты отправьте скриншот на email:
+          <a href="mailto:vika1301bik@bk.ru">vika1301bik@bk.ru</a>
+          с темой <strong>«FlowLance подписка [ваш email]»</strong>.<br />
+          Подписка будет активирована в течение нескольких часов.
+        </div>
+
+      </div>
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/hub-effects.js"></script>
+    <script src="/js/nav-session.js"></script>
+    <script src="/js/ai-widget.js"></script>
+    <script>
+      (function initPaymentPage() {
+        const params = new URLSearchParams(window.location.search);
+        const plan = params.get('plan') || '';
+        const price = params.get('price') || '';
+
+        const planNameEl = document.getElementById('plan-name-display');
+        const planPriceEl = document.getElementById('plan-price-display');
+        const planFeaturesEl = document.getElementById('plan-features-list');
+        const subtitleEl = document.getElementById('payment-subtitle');
+
+        const plans = {
+          pro: {
+            label: 'Pro',
+            colorClass: 'plan-pro',
+            price: price || '299',
+            features: [
+              'Все предложения в ленте без ограничений',
+              'Расширенные фильтры (бюджет, период, валюта, текстовый поиск)',
+              'Трекер: создание своих заданий с XP',
+              'Дневной бонус: +20 монет, +60 XP (x2)',
+              'Монеты за уровень: +20',
+              'Тег [PRO] зелёного цвета в профиле',
+              'Приоритетная поддержка',
+            ],
+          },
+          proplus: {
+            label: 'Pro+',
+            colorClass: 'plan-proplus',
+            price: price || '499',
+            features: [
+              'Всё из Pro',
+              'Все предложения включая самые дорогие/редкие',
+              'Дневной бонус: +40 монет, +120 XP (x4)',
+              'Монеты за уровень: +40',
+              'Анимированный аватар в кабинете',
+              'Тег [PRO+] фиолетового цвета в профиле',
+              'Максимальный приоритет поддержки',
+            ],
+          },
+        };
+
+        const selected = plans[plan.toLowerCase()];
+
+        if (!selected) {
+          subtitleEl.textContent = 'Неизвестный план. Вернитесь к тарифам.';
+          planNameEl.textContent = '—';
+          planPriceEl.innerHTML = '— <span>₽/мес</span>';
+          planFeaturesEl.innerHTML = '';
+          return;
+        }
+
+        planNameEl.textContent = selected.label;
+        planNameEl.className = 'payment-plan-name ' + selected.colorClass;
+        planPriceEl.innerHTML = `${selected.price} <span>₽/мес</span>`;
+        subtitleEl.textContent = `Выбранный план: ${selected.label} — ${selected.price} ₽/мес`;
+
+        planFeaturesEl.innerHTML = selected.features
+          .map(f => `<li><span class="check">✓</span> ${f}</li>`)
+          .join('');
+      })();
+    </script>
+  </body>
+</html>

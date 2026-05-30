@@ -436,6 +436,9 @@ app.get('/dashboard', (_, res) => res.sendFile(path.join(__dirname, 'public', 'd
 app.get('/admin', (_, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/auth', (_, res) => res.sendFile(path.join(__dirname, 'public', 'auth.html')));
 app.get('/tracker', (_, res) => res.sendFile(path.join(__dirname, 'public', 'tracker.html')));
+app.get('/pricing', (_, res) => res.sendFile(path.join(__dirname, 'public', 'pricing.html')));
+app.get('/leaderboard', (_, res) => res.sendFile(path.join(__dirname, 'public', 'leaderboard.html')));
+app.get('/payment', (_, res) => res.sendFile(path.join(__dirname, 'public', 'payment.html')));
 
 app.post('/api/auth/register', async (req, res) => {
   const { name, email, password } = req.body;
@@ -737,6 +740,21 @@ app.post('/api/ai/chat', async (req, res) => {
   if (!prompt.trim()) return res.status(400).json({ error: 'Введи вопрос для AI' });
   const reply = await askAi(prompt);
   res.json({ reply });
+});
+
+app.get('/api/leaderboard', async (req, res) => {
+  if (!isDbEnabled()) {
+    return res.json({ users: [] });
+  }
+  try {
+    const pool = getPool();
+    const [rows] = await pool.query(
+      'SELECT id, name, avatar_url, role FROM users ORDER BY id ASC LIMIT 50'
+    );
+    res.json({ users: rows });
+  } catch (error) {
+    res.json({ users: [] });
+  }
 });
 
 io.on('connection', (socket) => {

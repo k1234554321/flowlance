@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowLance — Тарифы и подписки</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      /* ——— Pricing page styles ——— */
+      .pricing-hero {
+        text-align: center;
+        padding: 60px 0 48px;
+      }
+      .pricing-kicker {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #888880;
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 4px 14px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+      }
+      .pricing-title {
+        font-size: clamp(28px, 5vw, 48px);
+        font-weight: 800;
+        color: #f5f5f0;
+        margin-bottom: 14px;
+      }
+      .pricing-subtitle {
+        color: #888880;
+        font-size: 1.05rem;
+        max-width: 520px;
+        margin: 0 auto;
+        line-height: 1.65;
+      }
+
+      /* ——— Cards grid ——— */
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        align-items: start;
+        margin-top: 48px;
+      }
+      @media (max-width: 860px) {
+        .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
+      }
+
+      .plan-card {
+        border-radius: 24px;
+        padding: 32px 28px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        position: relative;
+        transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s, border-color 0.35s;
+        overflow: hidden;
+      }
+      .plan-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 65%);
+        pointer-events: none;
+      }
+      .plan-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      }
+
+      /* Pro card — featured */
+      .plan-card.plan-pro {
+        border-color: rgba(123,97,255,0.45);
+        background: rgba(123,97,255,0.06);
+        box-shadow: 0 0 40px rgba(123,97,255,0.15), 0 0 0 1px rgba(123,97,255,0.3);
+        transform: translateY(-8px);
+      }
+      .plan-card.plan-pro:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 32px 80px rgba(123,97,255,0.25), 0 0 0 1px rgba(123,97,255,0.5);
+      }
+      .plan-card.plan-pro::before {
+        background: radial-gradient(circle at 50% 0%, rgba(123,97,255,0.12) 0%, transparent 65%);
+      }
+
+      /* Pro+ card — gradient border */
+      .plan-card.plan-proplus {
+        border-color: transparent;
+        background: rgba(255,255,255,0.025);
+        position: relative;
+      }
+      .plan-card.plan-proplus::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 24px;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(0,242,255,0.4), rgba(123,97,255,0.4), rgba(0,242,255,0.2));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+      .plan-card.plan-proplus:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 60px rgba(0,242,255,0.1);
+      }
+
+      /* Badge */
+      .plan-badge {
+        position: absolute;
+        top: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #7b61ff, #9f7aea);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 5px 18px;
+        border-radius: 0 0 12px 12px;
+        white-space: nowrap;
+      }
+
+      .plan-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #f5f5f0;
+        margin-bottom: 6px;
+        margin-top: 8px;
+      }
+      .plan-price {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #f5f5f0;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .plan-price span {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #888880;
+      }
+      .plan-price-note {
+        font-size: 0.82rem;
+        color: #666660;
+        margin-bottom: 24px;
+      }
+
+      .plan-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.07);
+        margin: 20px 0;
+      }
+
+      .plan-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .plan-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: #c8c8c0;
+        line-height: 1.5;
+      }
+      .plan-features li .check {
+        color: #48bb78;
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* Buttons */
+      .btn-plan {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, opacity 0.2s;
+      }
+      .btn-plan:hover { transform: translateY(-2px); }
+      .btn-plan-disabled {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #666660;
+        cursor: not-allowed;
+      }
+      .btn-plan-disabled:hover { transform: none; }
+      .btn-plan-pro {
+        background: linear-gradient(135deg, #7b61ff, #9f7aea);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(123,97,255,0.35);
+      }
+      .btn-plan-pro:hover { box-shadow: 0 12px 32px rgba(123,97,255,0.5); }
+      .btn-plan-proplus {
+        background: linear-gradient(135deg, #00f2ff, #7b61ff);
+        color: #0a0a0a;
+        box-shadow: 0 8px 24px rgba(0,242,255,0.25);
+      }
+      .btn-plan-proplus:hover { box-shadow: 0 12px 32px rgba(0,242,255,0.4); }
+
+      /* active nav pill */
+      .active-pill { color: #f5f5f0 !important; border-color: rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.06) !important; }
+
+      /* FAQ note */
+      .pricing-note {
+        text-align: center;
+        margin-top: 48px;
+        color: #666660;
+        font-size: 0.88rem;
+        line-height: 1.7;
+      }
+      .pricing-note a { color: #888880; text-decoration: underline; }
+    </style>
+  </head>
+  <body class="page-pricing theme-hub">
+    <header class="navbar glass nav-hero-anim">
+      <a class="logo" href="/">FLOW<span>LANCE</span></a>
+      <nav class="nav-menu nav-mega">
+        <a href="/" class="nav-pill">Главная</a>
+        <a href="/feed" class="nav-pill">Лента</a>
+        <a href="/sources" class="nav-pill">Биржи</a>
+        <a href="/about" class="nav-pill">О сервисе</a>
+        <a href="/tracker" class="nav-pill">Мои достижения</a>
+        <a href="/pricing" class="nav-pill active-pill">Тарифы</a>
+        <a href="/leaderboard" class="nav-pill">Лидерборд</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="/auth" class="btn btn-outline btn-small" id="nav-auth">Войти</a>
+        <a href="/dashboard" class="btn btn-neon btn-glow btn-small hidden" id="nav-dash">Кабинет</a>
+      </div>
+    </header>
+
+    <main style="width: min(1100px, 94%); margin: 0 auto; padding-bottom: 80px;">
+
+      <!-- Hero -->
+      <section class="pricing-hero reveal reveal-delay-1">
+        <span class="pricing-kicker">Подписки</span>
+        <h1 class="pricing-title">Выберите свой план</h1>
+        <p class="pricing-subtitle">Начните бесплатно и переходите на Pro, когда будете готовы. Никаких скрытых платежей.</p>
+      </section>
+
+      <!-- Cards -->
+      <section class="reveal reveal-delay-2">
+        <div class="pricing-grid">
+
+          <!-- Базовая -->
+          <div class="plan-card plan-basic">
+            <div class="plan-name">Базовая</div>
+            <div class="plan-price">0 <span>₽</span></div>
+            <div class="plan-price-note">автоматически у всех</div>
+            <div class="plan-divider"></div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> Доступ к ленте (ограниченное количество предложений)</li>
+              <li><span class="check">✓</span> Базовые фильтры (источник, категория)</li>
+              <li><span class="check">✓</span> Трекер: только предустановленные задания (нельзя создавать свои)</li>
+              <li><span class="check">✓</span> Дневной бонус: +10 монет, +30 XP</li>
+              <li><span class="check">✓</span> Монеты за уровень: +10</li>
+              <li><span class="check">✓</span> Поддержка через тикеты</li>
+            </ul>
+            <button class="btn-plan btn-plan-disabled" disabled>Текущий план</button>
+          </div>
+
+          <!-- Pro (featured) -->
+          <div class="plan-card plan-pro">
+            <div class="plan-badge">⭐ Популярный</div>
+            <div class="plan-name" style="color: #b39dff;">Pro</div>
+            <div class="plan-price" style="color: #b39dff;">299 <span>₽/мес</span></div>
+            <div class="plan-price-note">отменить можно в любой момент</div>
+            <div class="plan-divider" style="background: rgba(123,97,255,0.2);"></div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> Все предложения в ленте без ограничений</li>
+              <li><span class="check">✓</span> Расширенные фильтры (бюджет, период, валюта, текстовый поиск)</li>
+              <li><span class="check">✓</span> Трекер: создание своих заданий с XP</li>
+              <li><span class="check">✓</span> Дневной бонус: +20 монет, +60 XP <em style="color:#7b61ff;">(x2)</em></li>
+              <li><span class="check">✓</span> Монеты за уровень: +20</li>
+              <li><span class="check">✓</span> Тег <span style="color:#48bb78; font-weight:700;">[PRO]</span> в профиле</li>
+              <li><span class="check">✓</span> Приоритетная поддержка</li>
+            </ul>
+            <a href="/payment?plan=pro&price=299" class="btn-plan btn-plan-pro">Выбрать Pro</a>
+          </div>
+
+          <!-- Pro+ -->
+          <div class="plan-card plan-proplus">
+            <div class="plan-name" style="color: #00f2ff;">Pro+</div>
+            <div class="plan-price" style="color: #00f2ff;">499 <span>₽/мес</span></div>
+            <div class="plan-price-note">максимальные возможности</div>
+            <div class="plan-divider"></div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> Всё из Pro</li>
+              <li><span class="check">✓</span> Все предложения включая самые дорогие/редкие</li>
+              <li><span class="check">✓</span> Дневной бонус: +40 монет, +120 XP <em style="color:#00f2ff;">(x4)</em></li>
+              <li><span class="check">✓</span> Монеты за уровень: +40</li>
+              <li><span class="check">✓</span> Анимированный аватар в кабинете</li>
+              <li><span class="check">✓</span> Тег <span style="color:#9f7aea; font-weight:700;">[PRO+]</span> в профиле</li>
+              <li><span class="check">✓</span> Максимальный приоритет поддержки</li>
+            </ul>
+            <a href="/payment?plan=proplus&price=499" class="btn-plan btn-plan-proplus">Выбрать Pro+</a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Note -->
+      <p class="pricing-note reveal reveal-delay-3">
+        Есть вопросы по тарифам? <a href="/about#faq">Смотрите FAQ</a> или напишите нам через <a href="/about">форму поддержки</a>.
+      </p>
+
+    </main>
+
+    <script src="/js/page-enter.js"></script>
+    <script src="/js/reveal-scroll.js"></script>
+    <script src="/js/hub-effects.js"></script>
+    <script src="/js/nav-session.js"></script>
+    <script src="/js/ai-widget.js"></script>
+  </body>
+</html>
