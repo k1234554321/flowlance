@@ -811,6 +811,8 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.get('/api/leaderboard', async (req, res) => {
   if (!isDbEnabled()) {
     return res.json({ users: [] });
   }
