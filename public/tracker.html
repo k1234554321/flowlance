@@ -32,7 +32,7 @@
       <div class="tracker-gate">
         <div class="tracker-gate-pixel" id="gate-pixel-canvas"></div>
         <div class="tracker-gate-content reveal reveal-delay-2">
-          <span class="pixel-label">TRACKER v1.0</span>
+          <span class="pixel-label">TRACKER v2.0</span>
           <h1 class="tracker-gate-title">Путь к цели</h1>
           <p class="tracker-gate-sub">
             Ставь цели, выполняй задания и прокачивай своего персонажа.<br>
@@ -104,6 +104,11 @@
                 </button>
                 <p class="daily-hint" id="trk-daily-hint"></p>
               </div>
+
+              <!-- Магазин -->
+              <button class="btn btn-shop btn-block" id="trk-shop-btn">
+                🛍️ Магазин
+              </button>
             </div>
           </div>
 
@@ -164,6 +169,50 @@
         </div><!-- /tracker-grid -->
       </div>
     </div><!-- /tracker-app -->
+
+    <!-- ===== МАГАЗИН ===== -->
+    <div id="shop-overlay" class="shop-overlay hidden" role="dialog" aria-modal="true" aria-label="Магазин">
+      <div class="shop-modal glass">
+        <div class="shop-header">
+          <div>
+            <span class="pixel-label" style="font-size:9px;">МАГАЗИН</span>
+            <h2 class="shop-title">Кастомизация</h2>
+          </div>
+          <div class="shop-header-right">
+            <span class="shop-coins-badge" id="shop-coins-display">0 🪙</span>
+            <button class="shop-close-btn" id="shop-close-btn" aria-label="Закрыть">✕</button>
+          </div>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="shop-tabs">
+          <button class="shop-tab active" data-tab="clothes">👕 Одежда</button>
+          <button class="shop-tab" data-tab="aura">✨ Аура</button>
+        </div>
+
+        <!-- Одежда -->
+        <div class="shop-section" id="shop-tab-clothes">
+          <div class="shop-grid" id="shop-clothes-grid">
+            <!-- рендерится JS -->
+          </div>
+        </div>
+
+        <!-- Ауры -->
+        <div class="shop-section hidden" id="shop-tab-aura">
+          <div class="shop-grid" id="shop-aura-grid">
+            <!-- рендерится JS -->
+          </div>
+        </div>
+
+        <!-- Превью персонажа в магазине -->
+        <div class="shop-preview">
+          <span class="pixel-label" style="font-size:8px;text-align:center;display:block;margin-bottom:8px;">ПРЕВЬЮ</span>
+          <div class="shop-preview-canvas-wrap" id="shop-preview-wrap">
+            <canvas id="shop-preview-canvas" width="96" height="96" aria-label="Превью персонажа"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>

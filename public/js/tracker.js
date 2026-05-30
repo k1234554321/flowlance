@@ -1,11 +1,12 @@
 /* ============================================================
-   FlowLance Tracker — логика
+   FlowLance Tracker v2.0 — логика + магазин
    ============================================================ */
 (function () {
 
   const XP_PER_LEVEL = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200, 4000];
   const DAILY_XP = 30;
   const DAILY_COINS = 10;
+  const LEVEL_UP_COINS = 10; // монеты за каждый новый уровень
 
   const ACHIEVEMENTS = [
     { id: 'first_task',  icon: '🎯', name: 'Первый шаг',    desc: 'Выполни первое задание',      check: (s) => s.doneTasks >= 1 },
@@ -18,18 +19,61 @@
     { id: 'epic_task',   icon: '🏆', name: 'Эпик',           desc: 'Выполни эпическое задание',   check: (s) => s.doneEpic >= 1 },
   ];
 
+  /* ============================================================
+     МАГАЗИН — каталог
+     ============================================================ */
+  const SHOP_CLOTHES = [
+    { id: 'cap_red',    type: 'cap',    name: 'Красная кепка',   icon: '🧢', price: 50,  color: '#e53e3e', desc: 'Классика' },
+    { id: 'cap_blue',   type: 'cap',    name: 'Синяя кепка',     icon: '🧢', price: 60,  color: '#3182ce', desc: 'Стиль' },
+    { id: 'cap_gold',   type: 'cap',    name: 'Золотая кепка',   icon: '🧢', price: 120, color: '#f5c842', desc: 'Редкая' },
+    { id: 'shirt_red',  type: 'shirt',  name: 'Красная майка',   icon: '👕', price: 50,  color: '#e53e3e', desc: 'Огонь' },
+    { id: 'shirt_green',type: 'shirt',  name: 'Зелёная майка',   icon: '👕', price: 50,  color: '#38a169', desc: 'Свежесть' },
+    { id: 'shirt_purple',type:'shirt',  name: 'Фиолетовая майка',icon: '👕', price: 80,  color: '#805ad5', desc: 'Редкая' },
+    { id: 'shirt_gold', type: 'shirt',  name: 'Золотая майка',   icon: '👕', price: 150, color: '#f5c842', desc: 'Легенда' },
+    { id: 'pants_red',  type: 'pants',  name: 'Красные штаны',   icon: '👖', price: 60,  color: '#e53e3e', desc: 'Дерзко' },
+    { id: 'pants_green',type: 'pants',  name: 'Зелёные штаны',   icon: '👖', price: 60,  color: '#38a169', desc: 'Природа' },
+    { id: 'pants_purple',type:'pants',  name: 'Фиолетовые штаны',icon: '👖', price: 90,  color: '#805ad5', desc: 'Редкие' },
+    { id: 'glasses_sun',type: 'glasses',name: 'Солнечные очки',  icon: '🕶️', price: 70,  color: '#1a1a1a', desc: 'Крутяк' },
+    { id: 'glasses_neon',type:'glasses',name: 'Неоновые очки',   icon: '🕶️', price: 130, color: '#00d4ff', desc: 'Киберпанк' },
+    { id: 'glasses_gold',type:'glasses',name: 'Золотые очки',    icon: '🕶️', price: 200, color: '#f5c842', desc: 'Элита' },
+  ];
+
+  const SHOP_AURAS = [
+    { id: 'aura_none',   name: 'Без ауры',        icon: '⬜', price: 0,   color: null,      size: 0,   desc: 'Стандарт' },
+    { id: 'aura_white',  name: 'Белая аура',       icon: '🤍', price: 0,   color: '#ffffff', size: 18,  desc: 'По умолчанию' },
+    { id: 'aura_green',  name: 'Зелёная аура',     icon: '💚', price: 200, color: '#48bb78', size: 24,  desc: 'Природная сила' },
+    { id: 'aura_purple', name: 'Фиолетовая аура',  icon: '💜', price: 400, color: '#9f7aea', size: 32,  desc: 'Мистическая' },
+    { id: 'aura_black',  name: 'Чёрная аура',      icon: '🖤', price: 500, color: '#1a1a2e', size: 40,  desc: 'Тёмная сила' },
+  ];
+
   const STORE_KEY = 'fl_tracker_v1';
 
   function defaultState() {
-    return { xp:0, level:1, coins:0, doneTasks:0, doneEpic:0, streak:0,
-      lastLoginDate:null, lastDailyDate:null, totalDailyClaims:0,
-      unlockedAchievements:[], tasks:[],
-      log:[{text:'Добро пожаловать в Прогресс!', type:'log-info'}] };
+    return {
+      xp: 0, level: 1, coins: 0, doneTasks: 0, doneEpic: 0, streak: 0,
+      lastLoginDate: null, lastDailyDate: null, totalDailyClaims: 0,
+      unlockedAchievements: [], tasks: [],
+      log: [{ text: 'Добро пожаловать в Прогресс!', type: 'log-info' }],
+      // магазин
+      ownedItems: ['aura_white'],   // по умолчанию белая аура
+      equippedCap: null,
+      equippedShirt: null,
+      equippedPants: null,
+      equippedGlasses: null,
+      equippedAura: 'aura_white',
+    };
   }
 
   function loadState() {
-    try { const r = localStorage.getItem(STORE_KEY); return r ? Object.assign(defaultState(), JSON.parse(r)) : defaultState(); }
-    catch { return defaultState(); }
+    try {
+      const r = localStorage.getItem(STORE_KEY);
+      const s = r ? Object.assign(defaultState(), JSON.parse(r)) : defaultState();
+      // миграция: убедимся что поля магазина есть
+      if (!Array.isArray(s.ownedItems)) s.ownedItems = ['aura_white'];
+      if (!s.ownedItems.includes('aura_white')) s.ownedItems.push('aura_white');
+      if (s.equippedAura === undefined) s.equippedAura = 'aura_white';
+      return s;
+    } catch { return defaultState(); }
   }
   function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {} }
 
@@ -37,94 +81,143 @@
 
   function calcLevel(xp) {
     let lvl = 1;
-    for (let i = 1; i < XP_PER_LEVEL.length; i++) { if (xp >= XP_PER_LEVEL[i]) lvl = i+1; else break; }
+    for (let i = 1; i < XP_PER_LEVEL.length; i++) { if (xp >= XP_PER_LEVEL[i]) lvl = i + 1; else break; }
     return Math.min(lvl, XP_PER_LEVEL.length);
   }
-  function xpForLevel(lvl)     { return XP_PER_LEVEL[Math.min(lvl-1, XP_PER_LEVEL.length-1)] || 0; }
-  function xpForNextLevel(lvl) { return XP_PER_LEVEL[Math.min(lvl,   XP_PER_LEVEL.length-1)] || XP_PER_LEVEL[XP_PER_LEVEL.length-1]; }
+  function xpForLevel(lvl)     { return XP_PER_LEVEL[Math.min(lvl - 1, XP_PER_LEVEL.length - 1)] || 0; }
+  function xpForNextLevel(lvl) { return XP_PER_LEVEL[Math.min(lvl,     XP_PER_LEVEL.length - 1)] || XP_PER_LEVEL[XP_PER_LEVEL.length - 1]; }
 
   const $ = (id) => document.getElementById(id);
-  const elLevel     = $('trk-level');
-  const elXpText    = $('trk-xp-text');
-  const elXpFill    = $('trk-xp-fill');
-  const elCoins     = $('trk-coins');
-  const elDoneCount = $('trk-done-count');
-  const elStreak    = $('trk-streak');
-  const elDailyBtn  = $('trk-daily-btn');
-  const elDailyHint = $('trk-daily-hint');
-  const elTasksList = $('tasks-list');
-  const elTasksEmpty= $('tasks-empty');
-  const elAddBtn    = $('trk-add-btn');
-  const elAddForm   = $('task-add-form');
-  const elSaveBtn   = $('task-save-btn');
-  const elCancelBtn = $('task-cancel-btn');
-  const elTitleIn   = $('task-title-input');
-  const elDescIn    = $('task-desc-input');
-  const elXpSel     = $('task-xp-select');
-  const elAchieve   = $('achieve-list');
-  const elLog       = $('event-log');
-  const elCharName  = $('trk-char-name');
-  const elAnimLabel = $('char-anim-label');
-  const canvas      = $('pixel-char');
-  const canvasWrap  = canvas ? canvas.closest('.char-canvas-wrap') : null;
+  const elLevel      = $('trk-level');
+  const elXpText     = $('trk-xp-text');
+  const elXpFill     = $('trk-xp-fill');
+  const elCoins      = $('trk-coins');
+  const elDoneCount  = $('trk-done-count');
+  const elStreak     = $('trk-streak');
+  const elDailyBtn   = $('trk-daily-btn');
+  const elDailyHint  = $('trk-daily-hint');
+  const elTasksList  = $('tasks-list');
+  const elTasksEmpty = $('tasks-empty');
+  const elAddBtn     = $('trk-add-btn');
+  const elAddForm    = $('task-add-form');
+  const elSaveBtn    = $('task-save-btn');
+  const elCancelBtn  = $('task-cancel-btn');
+  const elTitleIn    = $('task-title-input');
+  const elDescIn     = $('task-desc-input');
+  const elXpSel      = $('task-xp-select');
+  const elAchieve    = $('achieve-list');
+  const elLog        = $('event-log');
+  const elCharName   = $('trk-char-name');
+  const elAnimLabel  = $('char-anim-label');
+  const canvas       = $('pixel-char');
+  const canvasWrap   = canvas ? canvas.closest('.char-canvas-wrap') : null;
+  const shopCanvas   = $('shop-preview-canvas');
 
   /* ============================================================
-     ПИКСЕЛЬНЫЙ ПЕРСОНАЖ — улучшенный спрайт 16×16
+     ПИКСЕЛЬНЫЙ ПЕРСОНАЖ
      ============================================================ */
-  const C = canvas ? canvas.getContext('2d') : null;
-  const SC = 6; // scale: 1px = 6px → 96×96
+  const C  = canvas    ? canvas.getContext('2d')    : null;
+  const SC = 6; // scale
 
-  // Цвета
-  const COL = {
-    sk: '#f5c8a0', // кожа
-    hr: '#2a1a0a', // волосы
-    sh: '#3a6fff', // рубашка
-    sc: '#2a55dd', // рубашка тень
-    pt: '#1a2a5a', // штаны
-    bs: '#111111', // обувь
-    ey: '#111111', // глаза
-    eb: '#2a1a0a', // брови
-    mt: '#c06858', // рот
-    wh: '#ffffff', // белки глаз
-    bl: '#aaccff', // блик на глазах
-    bt: '#f5c842', // пуговица/деталь
+  const CMAP_BASE = {
+    H: '#2a1a0a', h: '#f5c8a0', w: '#ffffff', E: '#111111', s: '#f5c8a0',
+    M: '#c06858', S: '#3a6fff', P: '#1a2a5a', B: '#111111',
   };
 
-  // Спрайт: более читаемый человечек
-  // Строки 16 символов, 0=прозрачно
+  // Спрайт персонажа
   const SPR = [
-    '00000HHHHHH0000', // 0  волосы верх
-    '0000HhhhhhHH000', // 1  волосы
-    '0000HwEwwEwH000', // 2  глаза
-    '0000HssssssH000', // 3  нос/щёки
-    '0000HsMMMMsH000', // 4  рот
-    '00000HHHHHH0000', // 5  подбородок
-    '0000SSSSSSSS000', // 6  шея/плечи
-    '000SSSSSSSSSS00', // 7  плечи
-    '000SSSSSSSSSS00', // 8  торс
-    '000SSSSSSSSSS00', // 9  торс
-    '0000SSSSSSSS000', // 10 талия
-    '000PPPPPPPPPP00', // 11 штаны
-    '000PPPPPPPPPP00', // 12 штаны
-    '000PPPPPPPPPP00', // 13 штаны
-    '000BBBB0BBBBB00', // 14 обувь
-    '00BBBBB0BBBBB00', // 15 обувь
+    '00000HHHHHH0000',
+    '0000HhhhhhHH000',
+    '0000HwEwwEwH000',
+    '0000HssssssH000',
+    '0000HsMMMMsH000',
+    '00000HHHHHH0000',
+    '0000SSSSSSSS000',
+    '000SSSSSSSSSS00',
+    '000SSSSSSSSSS00',
+    '000SSSSSSSSSS00',
+    '0000SSSSSSSS000',
+    '000PPPPPPPPPP00',
+    '000PPPPPPPPPP00',
+    '000PPPPPPPPPP00',
+    '000BBBB0BBBBB00',
+    '00BBBBB0BBBBB00',
   ];
 
-  const CMAP = {
-    H:'#2a1a0a', h:'#f5c8a0', w:'#ffffff', E:'#111111', s:'#f5c8a0',
-    M:'#c06858', S:'#3a6fff', P:'#1a2a5a', B:'#111111',
-  };
+  // Кепка (рисуется поверх строк 0-1)
+  const CAP_SPR = [
+    '0000CCCCCCCC000',
+    '000CCCCCCCCCC00',
+  ];
 
-  function drawSpr(spr, ctx, scale, ox, oy) {
+  // Очки (строка 2)
+  const GLASSES_SPR = [
+    '0000GgGGGgGG000',
+  ];
+
+  function buildCmap() {
+    const m = Object.assign({}, CMAP_BASE);
+    if (state.equippedShirt)   m['S'] = state.equippedShirt;
+    if (state.equippedPants)   m['P'] = state.equippedPants;
+    return m;
+  }
+
+  function drawSpr(spr, ctx, scale, ox, oy, cmap) {
     spr.forEach((row, y) => {
       for (let x = 0; x < row.length; x++) {
         const ch = row[x];
         if (ch === '0') continue;
-        ctx.fillStyle = CMAP[ch] || '#fff';
+        ctx.fillStyle = cmap[ch] || '#fff';
         ctx.fillRect(ox + x * scale, oy + y * scale, scale, scale);
       }
     });
+  }
+
+  function drawCharFull(ctx, scale, ox, oy, bobY) {
+    const cmap = buildCmap();
+    ctx.save();
+    ctx.translate(0, bobY || 0);
+
+    // Аура
+    const auraItem = SHOP_AURAS.find(a => a.id === state.equippedAura);
+    if (auraItem && auraItem.color) {
+      const cx = ox + 8 * scale;
+      const cy = oy + 8 * scale;
+      const r  = auraItem.size * (scale / 6);
+      const grad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+      grad.addColorStop(0, auraItem.color + '55');
+      grad.addColorStop(0.5, auraItem.color + '22');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r * 1.1, r * 0.7, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Тело
+    drawSpr(SPR, ctx, scale, ox, oy, cmap);
+
+    // Кепка
+    if (state.equippedCap) {
+      const capCmap = { C: state.equippedCap, c: shadeColor(state.equippedCap, -30) };
+      drawSpr(CAP_SPR, ctx, scale, ox, oy, capCmap);
+    }
+
+    // Очки
+    if (state.equippedGlasses) {
+      const gCmap = { G: state.equippedGlasses, g: shadeColor(state.equippedGlasses, 40) };
+      drawSpr(GLASSES_SPR, ctx, scale, ox, oy + 2 * scale, gCmap);
+    }
+
+    ctx.restore();
+  }
+
+  function shadeColor(hex, amt) {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.min(255, Math.max(0, (num >> 16) + amt));
+    const g = Math.min(255, Math.max(0, ((num >> 8) & 0xff) + amt));
+    const b = Math.min(255, Math.max(0, (num & 0xff) + amt));
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
   }
 
   let currentAnim = 'idle';
@@ -134,17 +227,13 @@
     if (!C) return;
     const bob = Math.sin(Date.now() / 380) * 1.8;
     C.clearRect(0, 0, 96, 96);
-    C.save();
-    C.translate(0, bob);
-    drawSpr(SPR, C, SC, 0, 0);
-    C.restore();
+    drawCharFull(C, SC, 0, 0, bob);
   }
 
   function animCelebrate() {
     if (!C) return;
     celebFrames++;
     const t = celebFrames / 40;
-    // Прыжок вверх с поднятой рукой — имитируем через смещение и масштаб
     const jumpY = -Math.sin(t * Math.PI) * 22;
     const scl   = 1 + Math.sin(t * Math.PI) * 0.08;
     C.clearRect(0, 0, 96, 96);
@@ -152,15 +241,8 @@
     C.translate(48, 48 + jumpY);
     C.scale(scl, scl);
     C.translate(-48, -48);
-    drawSpr(SPR, C, SC, 0, 0);
-    // Рука вверх — рисуем отдельный пиксель
-    const armT = Math.sin(t * Math.PI);
-    if (armT > 0.3) {
-      C.fillStyle = CMAP['S'];
-      C.fillRect(0, Math.round(6 * SC - armT * 12), SC * 2, SC * 2);
-    }
+    drawCharFull(C, SC, 0, 0, 0);
     C.restore();
-
     if (celebFrames >= 80) {
       celebFrames = 0;
       currentAnim = 'idle';
@@ -186,14 +268,22 @@
   }
   if (C) gameLoop();
 
+  // Превью в магазине (статичный)
+  function drawShopPreview() {
+    if (!shopCanvas) return;
+    const ctx = shopCanvas.getContext('2d');
+    ctx.clearRect(0, 0, 96, 96);
+    drawCharFull(ctx, SC, 0, 0, 0);
+  }
+
   /* ============================================================
      РЕНДЕР
      ============================================================ */
   function render() {
-    const lvl   = calcLevel(state.xp);
-    const xpCur = state.xp - xpForLevel(lvl);
-    const xpNeed= xpForNextLevel(lvl) - xpForLevel(lvl);
-    const pct   = Math.min(100, Math.round((xpCur / xpNeed) * 100));
+    const lvl    = calcLevel(state.xp);
+    const xpCur  = state.xp - xpForLevel(lvl);
+    const xpNeed = xpForNextLevel(lvl) - xpForLevel(lvl);
+    const pct    = Math.min(100, Math.round((xpCur / xpNeed) * 100));
 
     if (elLevel)     elLevel.textContent     = lvl;
     if (elXpText)    elXpText.textContent    = `${state.xp} / ${xpForNextLevel(lvl)} XP`;
@@ -201,7 +291,6 @@
     if (elCoins)     elCoins.textContent     = state.coins + ' 🪙';
     if (elDoneCount) elDoneCount.textContent = state.doneTasks;
 
-    // Огонёк серии — анимированный span
     if (elStreak) {
       elStreak.innerHTML = `${state.streak} <span class="streak-fire">🔥</span>`;
     }
@@ -279,7 +368,10 @@
   /* ============================================================
      ЛОГИКА
      ============================================================ */
-  function addLog(text, type) { state.log.push({ text, type: type || 'log-info' }); if (state.log.length > 60) state.log = state.log.slice(-60); }
+  function addLog(text, type) {
+    state.log.push({ text, type: type || 'log-info' });
+    if (state.log.length > 60) state.log = state.log.slice(-60);
+  }
 
   function addXp(amount, refEl) {
     const oldLvl = calcLevel(state.xp);
@@ -288,14 +380,19 @@
     state.level  = newLvl;
     addLog(`+${amount} XP`, 'log-xp');
     if (refEl) spawnXpPopup(amount, refEl);
-    if (newLvl > oldLvl) { addLog(`🎉 Уровень ${newLvl}!`, 'log-level'); showLevelUp(newLvl); }
+    if (newLvl > oldLvl) {
+      // монеты за уровень
+      state.coins += LEVEL_UP_COINS;
+      addLog(`🎉 Уровень ${newLvl}! +${LEVEL_UP_COINS} монет`, 'log-level');
+      showLevelUp(newLvl);
+    }
     checkAchievements();
     saveState();
     render();
   }
 
   function spawnXpPopup(amount, refEl) {
-    const r = refEl.getBoundingClientRect();
+    const r  = refEl.getBoundingClientRect();
     const el = document.createElement('div');
     el.className = 'xp-popup';
     el.textContent = `+${amount} XP`;
@@ -311,7 +408,7 @@
     ov.innerHTML = `<div class="levelup-box">
       <div class="levelup-title">LEVEL UP!</div>
       <span class="levelup-num">${lvl}</span>
-      <div class="levelup-sub">Уровень ${lvl} достигнут. Продолжай в том же духе!</div>
+      <div class="levelup-sub">Уровень ${lvl} достигнут. +${LEVEL_UP_COINS} монет!</div>
       <button class="btn btn-neon btn-glow" style="padding:12px 28px;" id="lvlup-close">Продолжить</button>
     </div>`;
     document.body.appendChild(ov);
@@ -339,7 +436,165 @@
     saveState();
   }
 
-  /* ——— Дневной бонус ——— */
+  /* ============================================================
+     МАГАЗИН — логика
+     ============================================================ */
+  const shopOverlay    = $('shop-overlay');
+  const shopCloseBtn   = $('shop-close-btn');
+  const shopCoinsDisp  = $('shop-coins-display');
+  const shopClothesGrid= $('shop-clothes-grid');
+  const shopAuraGrid   = $('shop-aura-grid');
+  const shopTabs       = document.querySelectorAll('.shop-tab');
+  const shopSections   = { clothes: $('shop-tab-clothes'), aura: $('shop-tab-aura') };
+
+  function openShop() {
+    if (!shopOverlay) return;
+    shopOverlay.classList.remove('hidden');
+    shopOverlay.classList.add('shop-visible');
+    renderShop();
+    drawShopPreview();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeShop() {
+    if (!shopOverlay) return;
+    shopOverlay.classList.add('shop-hiding');
+    setTimeout(() => {
+      shopOverlay.classList.remove('shop-visible', 'shop-hiding');
+      shopOverlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 280);
+  }
+
+  $('trk-shop-btn')?.addEventListener('click', openShop);
+  shopCloseBtn?.addEventListener('click', closeShop);
+  shopOverlay?.addEventListener('click', (e) => { if (e.target === shopOverlay) closeShop(); });
+
+  // Вкладки
+  shopTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      shopTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const key = tab.dataset.tab;
+      Object.entries(shopSections).forEach(([k, el]) => {
+        if (el) el.classList.toggle('hidden', k !== key);
+      });
+    });
+  });
+
+  function isOwned(id)    { return state.ownedItems.includes(id); }
+  function isEquipped(id) {
+    return id === state.equippedCap || id === state.equippedShirt ||
+           id === state.equippedPants || id === state.equippedGlasses ||
+           id === state.equippedAura;
+  }
+
+  function renderShop() {
+    if (shopCoinsDisp) shopCoinsDisp.textContent = state.coins + ' 🪙';
+    renderShopGrid(shopClothesGrid, SHOP_CLOTHES);
+    renderShopGrid(shopAuraGrid, SHOP_AURAS);
+  }
+
+  function renderShopGrid(container, items) {
+    if (!container) return;
+    container.innerHTML = '';
+    items.forEach(item => {
+      const owned    = isOwned(item.id);
+      const equipped = isEquipped(item.id);
+      const canBuy   = !owned && state.coins >= item.price;
+      const isFree   = item.price === 0;
+
+      const card = document.createElement('div');
+      card.className = 'shop-card' + (equipped ? ' shop-card-equipped' : '') + (owned ? ' shop-card-owned' : '');
+      card.dataset.id = item.id;
+
+      let badge = '';
+      if (equipped)       badge = '<span class="shop-badge shop-badge-on">Надето</span>';
+      else if (owned)     badge = '<span class="shop-badge shop-badge-owned">Куплено</span>';
+      else if (isFree)    badge = '<span class="shop-badge shop-badge-free">Бесплатно</span>';
+
+      let colorDot = '';
+      if (item.color) {
+        colorDot = `<span class="shop-color-dot" style="background:${item.color};${item.id.includes('aura') ? 'box-shadow:0 0 8px ' + item.color + '88;' : ''}"></span>`;
+      }
+
+      card.innerHTML = `
+        <div class="shop-card-icon">${item.icon}${colorDot}</div>
+        <div class="shop-card-name">${item.name}</div>
+        <div class="shop-card-desc">${item.desc}</div>
+        ${badge}
+        <div class="shop-card-footer">
+          ${isFree ? '<span class="shop-price-free">Бесплатно</span>' : `<span class="shop-price">${item.price} 🪙</span>`}
+          ${renderShopBtn(item, owned, equipped, canBuy, isFree)}
+        </div>`;
+      container.appendChild(card);
+    });
+  }
+
+  function renderShopBtn(item, owned, equipped, canBuy, isFree) {
+    if (equipped) {
+      return `<button class="btn shop-btn shop-btn-unequip" data-action="unequip" data-id="${item.id}">Снять</button>`;
+    }
+    if (owned || isFree) {
+      return `<button class="btn shop-btn shop-btn-equip" data-action="equip" data-id="${item.id}">Надеть</button>`;
+    }
+    if (canBuy) {
+      return `<button class="btn shop-btn shop-btn-buy" data-action="buy" data-id="${item.id}">Купить</button>`;
+    }
+    return `<button class="btn shop-btn shop-btn-locked" disabled>Мало монет</button>`;
+  }
+
+  function handleShopClick(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id     = btn.dataset.id;
+    const action = btn.dataset.action;
+    const allItems = [...SHOP_CLOTHES, ...SHOP_AURAS];
+    const item = allItems.find(i => i.id === id);
+    if (!item) return;
+
+    if (action === 'buy') {
+      if (state.coins < item.price) return;
+      state.coins -= item.price;
+      state.ownedItems.push(id);
+      addLog(`🛍️ Куплено: ${item.name}`, 'log-bonus');
+      equipItem(item);
+    } else if (action === 'equip') {
+      equipItem(item);
+    } else if (action === 'unequip') {
+      unequipItem(item);
+    }
+
+    saveState();
+    render();
+    renderShop();
+    drawShopPreview();
+  }
+
+  function equipItem(item) {
+    if (item.type === 'cap')     state.equippedCap     = item.color;
+    if (item.type === 'shirt')   state.equippedShirt   = item.color;
+    if (item.type === 'pants')   state.equippedPants   = item.color;
+    if (item.type === 'glasses') state.equippedGlasses = item.color;
+    if (item.id.startsWith('aura_')) state.equippedAura = item.id;
+    addLog(`✨ Надето: ${item.name}`, 'log-info');
+  }
+
+  function unequipItem(item) {
+    if (item.type === 'cap')     state.equippedCap     = null;
+    if (item.type === 'shirt')   state.equippedShirt   = null;
+    if (item.type === 'pants')   state.equippedPants   = null;
+    if (item.type === 'glasses') state.equippedGlasses = null;
+    if (item.id.startsWith('aura_')) state.equippedAura = 'aura_white';
+    addLog(`👕 Снято: ${item.name}`, 'log-info');
+  }
+
+  shopClothesGrid?.addEventListener('click', handleShopClick);
+  shopAuraGrid?.addEventListener('click', handleShopClick);
+
+  /* ============================================================
+     СОБЫТИЯ
+     ============================================================ */
   elDailyBtn?.addEventListener('click', async () => {
     const today = new Date().toISOString().slice(0, 10);
     if (state.lastDailyDate === today) return;
@@ -355,23 +610,25 @@
     render();
   });
 
-  /* ——— Форма задания ——— */
   elAddBtn?.addEventListener('click', () => { elAddForm?.classList.toggle('hidden'); elTitleIn?.focus(); });
-  elCancelBtn?.addEventListener('click', () => { elAddForm?.classList.add('hidden'); if(elTitleIn) elTitleIn.value=''; if(elDescIn) elDescIn.value=''; });
+  elCancelBtn?.addEventListener('click', () => {
+    elAddForm?.classList.add('hidden');
+    if (elTitleIn) elTitleIn.value = '';
+    if (elDescIn)  elDescIn.value  = '';
+  });
   elSaveBtn?.addEventListener('click', () => {
     const title = elTitleIn?.value.trim();
     if (!title) { elTitleIn?.focus(); return; }
     const xp = Number(elXpSel?.value || 50);
-    state.tasks.unshift({ id:'t'+Date.now(), title, desc: elDescIn?.value.trim()||'', xp, done:false, createdAt: new Date().toISOString() });
+    state.tasks.unshift({ id: 't' + Date.now(), title, desc: elDescIn?.value.trim() || '', xp, done: false, createdAt: new Date().toISOString() });
     addLog(`📋 Задание: ${title}`, 'log-info');
     saveState(); render();
     elAddForm?.classList.add('hidden');
-    if(elTitleIn) elTitleIn.value='';
-    if(elDescIn)  elDescIn.value='';
+    if (elTitleIn) elTitleIn.value = '';
+    if (elDescIn)  elDescIn.value  = '';
   });
   elTitleIn?.addEventListener('keydown', (e) => { if (e.key === 'Enter') elSaveBtn?.click(); });
 
-  /* ——— Клики по заданиям ——— */
   elTasksList?.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -395,10 +652,12 @@
   });
 
   function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  /* ——— Инициализация ——— */
+  /* ============================================================
+     ИНИЦИАЛИЗАЦИЯ
+     ============================================================ */
   async function init() {
     let user = null;
     try { const r = await fetch('/api/profile'); if (r.ok) user = await r.json(); } catch {}
@@ -424,7 +683,15 @@
     const ctx = c.getContext?.('2d');
     if (!ctx) return;
     c.width = 200; c.height = 200;
-    drawSpr(SPR, ctx, 12, 4, 4);
+    const cmap = Object.assign({}, CMAP_BASE);
+    SPR.forEach((row, y) => {
+      for (let x = 0; x < row.length; x++) {
+        const ch = row[x];
+        if (ch === '0') continue;
+        ctx.fillStyle = cmap[ch] || '#fff';
+        ctx.fillRect(x * 12, y * 12, 12, 12);
+      }
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
