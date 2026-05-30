@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS tickets (
   subject VARCHAR(200) NOT NULL,
   body TEXT NOT NULL,
   status VARCHAR(40) DEFAULT 'new',
-  admin_reply TEXT DEFAULT '',
+  admin_reply TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -73,9 +73,9 @@ CREATE TABLE IF NOT EXISTS favorites (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Индексы
-CREATE INDEX IF NOT EXISTS idx_offers_source ON offers(source);
-CREATE INDEX IF NOT EXISTS idx_offers_category ON offers(category);
-CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
-CREATE INDEX IF NOT EXISTS idx_shop_user ON shop_inventory(user_id);
-CREATE INDEX IF NOT EXISTS idx_fav_user ON favorites(user_id);
+-- Индексы (игнорируем если уже есть)
+CREATE INDEX idx_offers_source ON offers(source);
+CREATE INDEX idx_offers_category ON offers(category);
+CREATE INDEX idx_tickets_status ON tickets(status);
+CREATE INDEX idx_shop_user ON shop_inventory(user_id);
+CREATE INDEX idx_fav_user ON favorites(user_id);
