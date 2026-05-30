@@ -1,5 +1,7 @@
--- FlowLance — полная схема БД
-CREATE DATABASE IF NOT EXISTS aggregator_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- FlowLance — полная схема БД v2
+-- Применить на сервере:
+--   mysql -u aggregator_user -p120398cvbn aggregator_db < /var/www/flowlance/database.sql
+
 USE aggregator_db;
 
 -- 1. Пользователи
@@ -10,11 +12,12 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   avatar_url VARCHAR(255) DEFAULT '',
   role ENUM('user','admin') DEFAULT 'user',
+  subscription ENUM('basic','pro','proplus') DEFAULT 'basic',
   bio TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Офферы (вакансии)
+-- 2. Офферы
 CREATE TABLE IF NOT EXISTS offers (
   id VARCHAR(40) PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -52,7 +55,7 @@ CREATE TABLE IF NOT EXISTS reviews_pending (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. Инвентарь магазина (купленные предметы)
+-- 5. Инвентарь магазина
 CREATE TABLE IF NOT EXISTS shop_inventory (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -72,10 +75,3 @@ CREATE TABLE IF NOT EXISTS favorites (
   UNIQUE KEY uniq_fav (user_id, offer_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
--- Индексы (игнорируем если уже есть)
-CREATE INDEX idx_offers_source ON offers(source);
-CREATE INDEX idx_offers_category ON offers(category);
-CREATE INDEX idx_tickets_status ON tickets(status);
-CREATE INDEX idx_shop_user ON shop_inventory(user_id);
-CREATE INDEX idx_fav_user ON favorites(user_id);
