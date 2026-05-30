@@ -158,6 +158,51 @@ async function ensureDb() {
       posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS tickets (
+      id VARCHAR(40) PRIMARY KEY,
+      email VARCHAR(120) NOT NULL,
+      name VARCHAR(120) DEFAULT '',
+      subject VARCHAR(200) NOT NULL,
+      body TEXT NOT NULL,
+      status VARCHAR(40) DEFAULT 'new',
+      admin_reply TEXT DEFAULT '',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS reviews_pending (
+      id VARCHAR(60) PRIMARY KEY,
+      user_id INT DEFAULT NULL,
+      name VARCHAR(80) NOT NULL,
+      email VARCHAR(120) DEFAULT '',
+      text TEXT NOT NULL,
+      rating TINYINT DEFAULT 5,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS shop_inventory (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      item_id VARCHAR(60) NOT NULL,
+      equipped TINYINT(1) DEFAULT 0,
+      bought_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY uniq_user_item (user_id, item_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS favorites (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      offer_id VARCHAR(40) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY uniq_fav (user_id, offer_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
     await ensureOffersExternalUrlColumn(pool);
     await pool.query(
       `UPDATE offers SET external_url = '' WHERE external_url LIKE '%google.com%'`
