@@ -1,4 +1,101 @@
 const siteMsg = document.getElementById('site-editor-msg');
+const usersRoot = document.getElementById('admin-users');
+
+const SUB_LABELS = { basic: 'Базовая', pro: 'Pro', proplus: 'Pro+' };
+const SUB_COLORS = { basic: '#888880', pro: '#48bb78', proplus: '#9f7aea' };
+
+async function loadUsers() {
+  if (!usersRoot) return;
+  usersRoot.innerHTML = '<p class="muted">Загрузка…</p>';
+  try {
+    const { users } = await api('/api/admin/users');
+    if (!users.length) { usersRoot.innerHTML = '<p class="muted">Пользователей нет.</p>'; return; }
+    usersRoot.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+          <thead>
+            <tr style="color:#888880;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08);">
+              <th style="padding:8px 10px;">ID</th>
+              <th style="padding:8px 10px;">Имя</th>
+              <th style="padding:8px 10px;">Email</th>
+              <th style="padding:8px 10px;">Роль</th>
+              <th style="padding:8px 10px;">Подписка</th>
+              <th style="padding:8px 10px;">Дата</th>
+              <th style="padding:8px 10px;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            ${users.map(u => renderUserRow(u)).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch (e) {
+    usersRoot.innerHTML = `<p class="muted">${escHtml(e.message)}</p>`;
+  }
+}
+
+function renderUserRow(u) {
+  const sub = u.subscription || 'basic';
+  const subColor = SUB_COLORS[sub] || '#888880';
+  const date = u.created_at ? new Date(u.created_at).toLocaleDateString('ru-RU') : '—';
+  return `<tr data-uid="${u.id}" style="border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseenter="this.style.background='rgba(255,255,255,0.03)'" onmouseleave="this.style.background=''">
+    <td style="padding:10px;color:#555550;">#${escHtml(String(u.id))}</td>
+    <td style="padding:10px;font-weight:600;color:#f5f5f0;">${escHtml(u.name || '—')}</td>
+    <td style="padding:10px;color:#888880;">${escHtml(u.email || '—')}</td>
+    <td style="padding:10px;">
+      <select class="user-role-sel" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:#f5f5f0;border-radius:8px;padding:4px 8px;font-size:0.82rem;">
+        <option value="user" ${u.role==='user'?'selected':''}>user</option>
+        <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
+      </select>
+    </td>
+    <td style="padding:10px;">
+      <select class="user-sub-sel" style="background:rgba(0,0,0,0.3);border:1px solid ${subColor}44;color:${subColor};border-radius:8px;padding:4px 8px;font-size:0.82rem;font-weight:700;">
+        <option value="basic" ${sub==='basic'?'selected':''}>Базовая</option>
+        <option value="pro" ${sub==='pro'?'selected':''}>Pro</option>
+        <option value="proplus" ${sub==='proplus'?'selected':''}>Pro+</option>
+      </select>
+    </td>
+    <td style="padding:10px;color:#555550;">${date}</td>
+    <td style="padding:10px;display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn btn-outline btn-small user-save-btn" style="font-size:0.78rem;padding:5px 10px;">Сохранить</button>
+      <button class="btn btn-small user-del-btn" style="font-size:0.78rem;padding:5px 10px;background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.3);color:#ff6b6b;">Удалить</button>
+    </td>
+  </tr>`;
+}
+
+document.getElementById('reload-users')?.addEventListener('click', loadUsers);
+
+usersRoot?.addEventListener('click', async (e) => {
+  const row = e.target.closest('[data-uid]');
+  if (!row) return;
+  const uid = row.dataset.uid;
+
+  if (e.target.closest('.user-save-btn')) {
+    const role = row.querySelector('.user-role-sel')?.value;
+    const subscription = row.querySelector('.user-sub-sel')?.value;
+    try {
+      await api(`/api/admin/users/${uid}`, { method: 'PATCH', body: JSON.stringify({ role, subscription }) });
+      showToast('✅ Пользователь обновлён');
+      // Обновляем цвет select подписки
+      const sel = row.querySelector('.user-sub-sel');
+      if (sel) sel.style.color = SUB_COLORS[subscription] || '#888880';
+    } catch (err) {
+      showToast('Ошибка: ' + (err.message || ''), 'err');
+    }
+  }
+
+  if (e.target.closest('.user-del-btn')) {
+    const name = row.querySelector('td:nth-child(2)')?.textContent || uid;
+    if (!confirm(`Удалить пользователя "${name}"? Это действие необратимо.`)) return;
+    try {
+      await api(`/api/admin/users/${uid}`, { method: 'DELETE' });
+      row.remove();
+      showToast('Пользователь удалён');
+    } catch (err) {
+      showToast('Ошибка: ' + (err.message || ''), 'err');
+    }
+  }
+});
 
 async function gateAdmin() {
   try {
@@ -255,6 +352,7 @@ reviewsRoot?.addEventListener('click', async (e) => {
   if (!ok) return;
   loadStats();
   loadSiteJson();
+  loadUsers();
   loadTickets();
   loadReviewsPending();
   loadPublishedReviews();

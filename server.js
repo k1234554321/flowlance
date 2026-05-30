@@ -140,10 +140,15 @@ async function ensureDb() {
       password_hash VARCHAR(255) NOT NULL,
       avatar_url VARCHAR(255) DEFAULT '',
       role ENUM('user', 'admin') DEFAULT 'user',
+      subscription ENUM('basic','pro','proplus') DEFAULT 'basic',
       bio TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+    // Добавляем колонку subscription если её нет (для существующих БД)
+    try {
+      await pool.query(`ALTER TABLE users ADD COLUMN subscription ENUM('basic','pro','proplus') DEFAULT 'basic'`);
+    } catch (e) { if (e.code !== 'ER_DUP_FIELDNAME' && e.errno !== 1060) throw e; }
     await pool.query(`
     CREATE TABLE IF NOT EXISTS offers (
       id VARCHAR(40) PRIMARY KEY,
@@ -742,7 +747,70 @@ app.post('/api/ai/chat', async (req, res) => {
   res.json({ reply });
 });
 
-app.get('/api/leaderboard', async (req, res) => {
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  if (!isDbEnabled()) {
+    const users = [...inMemoryUsers.values()].map(u => ({
+      id: u.id, name: u.name, email: u.email, role: u.role,
+      subscription: u.subscription || 'basic', created_at: u.created_at
+    }));
+    return res.json({ users });
+  }
+  try {
+    const pool = getPool();
+    const [rows] = await pool.query(
+      'SELECT id, name, email, role, subscription, created_at FROM users ORDER BY created_at DESC'
+    );
+    res.json({ users: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.patch('/api/admin/users/:id', requireAdmin, async (req, res) => {
+  const id = Number(req.params.id);
+  const { role, subscription } = req.body || {};
+  if (!isDbEnabled()) {
+    for (const [k, u] of inMemoryUsers.entries()) {
+      if (u.id === id) {
+        if (role) u.role = role;
+        if (subscription) u.subscription = subscription;
+        inMemoryUsers.set(k, u);
+        return res.json({ ok: true, user: u });
+      }
+    }
+    return res.status(404).json({ error: 'Пользователь не найден' });
+  }
+  try {
+    const pool = getPool();
+    const fields = [];
+    const vals = [];
+    if (role) { fields.push('role = ?'); vals.push(role); }
+    if (subscription !== undefined) { fields.push('subscription = ?'); vals.push(subscription); }
+    if (!fields.length) return res.status(400).json({ error: 'Нечего обновлять' });
+    vals.push(id);
+    await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, vals);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!isDbEnabled()) {
+    for (const [k, u] of inMemoryUsers.entries()) {
+      if (u.id === id) { inMemoryUsers.delete(k); return res.json({ ok: true }); }
+    }
+    return res.status(404).json({ error: 'Пользователь не найден' });
+  }
+  try {
+    const pool = getPool();
+    await pool.query('DELETE FROM users WHERE id = ?', [id]);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
   if (!isDbEnabled()) {
     return res.json({ users: [] });
   }
