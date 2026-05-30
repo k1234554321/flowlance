@@ -473,7 +473,15 @@
 
   $('trk-shop-btn')?.addEventListener('click', openShop);
   shopCloseBtn?.addEventListener('click', closeShop);
-  shopOverlay?.addEventListener('click', (e) => { if (e.target === shopOverlay) closeShop(); });
+  shopOverlay?.addEventListener('click', (e) => {
+    if (e.target === shopOverlay) closeShop();
+  });
+
+  // Единый делегированный обработчик на весь оверлей — ловит клики по кнопкам в карточках
+  shopOverlay?.addEventListener('click', (e) => {
+    if (e.target === shopOverlay) return; // закрытие уже обработано выше
+    handleShopClick(e);
+  });
 
   // Вкладки
   shopTabs.forEach(tab => {
@@ -552,16 +560,27 @@
   function handleShopClick(e) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const id     = btn.dataset.id;
-    const action = btn.dataset.action;
+    const id     = String(btn.dataset.id || '');
+    const action = String(btn.dataset.action || '');
+    if (!id || !action) return;
+
     const allItems = [...SHOP_CLOTHES, ...SHOP_AURAS];
     const item = allItems.find(i => i.id === id);
     if (!item) return;
 
+    const coins = Number(state.coins) || 0;
+    const price = Number(item.price) || 0;
+
     if (action === 'buy') {
-      if (state.coins < item.price) return;
-      state.coins -= item.price;
-      state.ownedItems.push(id);
+      if (coins < price) {
+        // визуальная подсказка
+        btn.textContent = 'Мало монет!';
+        setTimeout(() => { btn.textContent = 'Купить'; }, 1200);
+        return;
+      }
+      state.coins = coins - price;
+      if (!Array.isArray(state.ownedItems)) state.ownedItems = ['aura_white'];
+      if (!state.ownedItems.includes(id)) state.ownedItems.push(id);
       addLog(`🛍️ Куплено: ${item.name}`, 'log-bonus');
       equipItem(item);
     } else if (action === 'equip') {
