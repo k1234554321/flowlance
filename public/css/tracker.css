@@ -713,16 +713,16 @@
 }
 
 .shop-modal {
-  width: min(960px, 100%);
+  width: min(860px, 100%);
   max-height: 90vh;
   border-radius: 24px;
   padding: 28px 28px 24px;
-  display: grid;
-  grid-template-columns: 1fr 130px;
-  grid-template-rows: auto auto auto 1fr;
-  gap: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   overflow: hidden;
   animation: shopModalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  position: relative;
 }
 .shop-overlay.shop-hiding .shop-modal {
   animation: shopModalOut 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -743,32 +743,28 @@
   justify-content: space-between;
   gap: 12px;
   flex-shrink: 0;
-  grid-column: 1;
 }
 .shop-tabs {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
-  grid-column: 1;
 }
 .shop-section {
   overflow-y: auto;
-  max-height: 380px;
+  max-height: 400px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.1) transparent;
   padding-right: 4px;
-  grid-column: 1;
 }
 .shop-preview {
-  grid-column: 2;
-  grid-row: 1 / 5;
+  position: absolute;
+  right: 28px;
+  top: 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   pointer-events: none;
-  align-self: start;
-  padding-top: 8px;
+  z-index: 0;
 }
 .shop-title {
   font-size: 1.3rem;
@@ -989,14 +985,7 @@
   cursor: not-allowed;
 }
 
-/* Превью персонажа */
-.shop-preview {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-}
+/* Превью канвас */
 .shop-preview-canvas-wrap {
   padding: 12px;
   border-radius: 16px;

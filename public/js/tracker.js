@@ -454,11 +454,6 @@
     renderShop();
     drawShopPreview();
     document.body.style.overflow = 'hidden';
-    // Убедимся что обработчики точно навешены (на случай если DOM не был готов)
-    shopClothesGrid?.removeEventListener('click', handleShopClick);
-    shopAuraGrid?.removeEventListener('click', handleShopClick);
-    shopClothesGrid?.addEventListener('click', handleShopClick);
-    shopAuraGrid?.addEventListener('click', handleShopClick);
   }
 
   function closeShop() {
@@ -475,12 +470,6 @@
   shopCloseBtn?.addEventListener('click', closeShop);
   shopOverlay?.addEventListener('click', (e) => {
     if (e.target === shopOverlay) closeShop();
-  });
-
-  // Единый делегированный обработчик на весь оверлей — ловит клики по кнопкам в карточках
-  shopOverlay?.addEventListener('click', (e) => {
-    if (e.target === shopOverlay) return; // закрытие уже обработано выше
-    handleShopClick(e);
   });
 
   // Вкладки
