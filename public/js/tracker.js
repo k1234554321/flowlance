@@ -384,6 +384,7 @@
     saveState();
     render();
     if (typeof renderShop === 'function') renderShop();
+    syncTrackerToServer();
   }
 
   function spawnXpPopup(amount, refEl) {
@@ -616,6 +617,7 @@
       checkAchievements(); saveState(); render();
     }
     if (btn.dataset.action === 'delete') {
+      if (task.preset && window._flSub === 'basic') return; // нельзя удалять предустановленные
       state.tasks = state.tasks.filter((t) => t.id !== item.dataset.id);
       addLog(`🗑 Удалено: ${task.title}`, 'log-info');
       saveState(); render();
@@ -641,12 +643,63 @@
       return;
     }
     window._flUser = user;
+    window._flSub  = String(user.subscription || 'basic').toLowerCase();
     guestEl?.classList.add('hidden');
     appEl?.classList.remove('hidden');
     updateStreak();
     state.level = calcLevel(state.xp);
+    applySubscriptionRestrictions();
     render();
     renderShop();
+    // Синхронизируем XP/уровень с сервером для лидерборда
+    syncTrackerToServer();
+  }
+
+  function applySubscriptionRestrictions() {
+    const sub = window._flSub || 'basic';
+    const addBtn = $('trk-add-btn');
+    const addForm = $('task-add-form');
+    const tasksCard = document.querySelector('.tracker-tasks-card');
+
+    if (sub === 'basic') {
+      // Скрываем кнопку добавления заданий
+      if (addBtn) addBtn.style.display = 'none';
+      if (addForm) addForm.classList.add('hidden');
+      // Показываем предустановленные задания если список пуст
+      if (!state.tasks.length) {
+        state.tasks = [
+          { id: 'preset_1', title: 'Найти 3 подходящих заказа в ленте', desc: 'Используй фильтры для поиска', xp: 20, done: false, preset: true, createdAt: new Date().toISOString() },
+          { id: 'preset_2', title: 'Заполнить профиль полностью', desc: 'Имя, аватар и описание', xp: 50, done: false, preset: true, createdAt: new Date().toISOString() },
+          { id: 'preset_3', title: 'Получить дневной бонус 3 дня подряд', desc: 'Заходи каждый день', xp: 100, done: false, preset: true, createdAt: new Date().toISOString() },
+          { id: 'preset_4', title: 'Добавить заказ в избранное', desc: 'Открой ленту и нажми ★', xp: 20, done: false, preset: true, createdAt: new Date().toISOString() },
+          { id: 'preset_5', title: 'Изучить все биржи на странице Биржи', desc: 'Найди подходящую площадку', xp: 50, done: false, preset: true, createdAt: new Date().toISOString() },
+        ];
+        saveState();
+      }
+      // Добавляем баннер про подписку
+      if (tasksCard && !tasksCard.querySelector('.sub-banner')) {
+        const banner = document.createElement('div');
+        banner.className = 'sub-banner';
+        banner.innerHTML = `<span>🔒 Создание своих заданий доступно в <a href="/pricing" style="color:#48bb78;font-weight:700;">Pro</a></span>`;
+        banner.style.cssText = 'padding:10px 14px;border-radius:10px;background:rgba(72,187,120,0.08);border:1px solid rgba(72,187,120,0.2);font-size:0.82rem;color:#888880;margin-bottom:12px;';
+        tasksCard.insertBefore(banner, tasksCard.querySelector('.tasks-header')?.nextSibling || tasksCard.firstChild);
+      }
+    }
+  }
+
+  // Синхронизация трекера с сервером (для лидерборда)
+  let syncTimer = null;
+  function syncTrackerToServer() {
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(async () => {
+      try {
+        await fetch('/api/tracker/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ xp: state.xp, level: state.level, coins: state.coins })
+        });
+      } catch {}
+    }, 2000);
   }
 
   function drawGatePixel() {

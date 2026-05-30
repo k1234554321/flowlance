@@ -36,7 +36,10 @@
         <p class="cab-sub">Кратко о себе — заказчики видят это в профиле</p>
         <div class="cabinet-row">
           <div>
-            <p class="cab-username" id="cab-username">—</p>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <p class="cab-username" id="cab-username">—</p>
+              <span id="sub-badge" style="display:none;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:0.05em;"></span>
+            </div>
             <div class="progress-wrap">
               <p class="progress-label">Заполненность: <span id="portfolio-pct">0</span>%</p>
               <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
@@ -44,7 +47,10 @@
               </div>
             </div>
           </div>
-          <a class="btn btn-hub-solid" href="#profile-edit">Заполнить профиль</a>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+            <a class="btn btn-hub-solid" href="#profile-edit">Заполнить профиль</a>
+            <a href="/pricing" style="font-size:0.8rem;color:#888880;text-decoration:none;" id="sub-upgrade-link">Улучшить подписку →</a>
+          </div>
         </div>
       </section>
 

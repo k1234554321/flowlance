@@ -272,11 +272,11 @@
             const rankSymbol = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
 
             // Subscription badge
-            const role = String(user.role || '').toLowerCase();
+            const sub = String(user.subscription || '').toLowerCase();
             let badgeHtml = '';
-            if (role === 'proplus' || role === 'pro+') {
+            if (sub === 'proplus') {
               badgeHtml = '<span class="lb-badge lb-badge-proplus">[PRO+]</span>';
-            } else if (role === 'pro') {
+            } else if (sub === 'pro') {
               badgeHtml = '<span class="lb-badge lb-badge-pro">[PRO]</span>';
             }
 

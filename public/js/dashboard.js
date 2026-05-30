@@ -61,13 +61,29 @@ function renderProfile(u) {
   const sinceEl = document.getElementById('profile-since');
   const since = formatProfileSince(u.created_at);
   if (sinceEl) {
-    if (since) {
-      sinceEl.textContent = `Профиль создан: ${since}`;
-      sinceEl.hidden = false;
+    if (since) { sinceEl.textContent = `Профиль создан: ${since}`; sinceEl.hidden = false; }
+    else { sinceEl.hidden = true; }
+  }
+
+  // Бейдж подписки
+  const badge = document.getElementById('sub-badge');
+  const upgradeLink = document.getElementById('sub-upgrade-link');
+  if (badge) {
+    const sub = String(u.subscription || 'basic').toLowerCase();
+    if (sub === 'proplus') {
+      badge.textContent = '[PRO+]';
+      badge.style.cssText = 'display:inline-block;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:0.05em;background:rgba(159,122,234,0.15);color:#9f7aea;border:1px solid rgba(159,122,234,0.4);';
+      if (upgradeLink) upgradeLink.style.display = 'none';
+    } else if (sub === 'pro') {
+      badge.textContent = '[PRO]';
+      badge.style.cssText = 'display:inline-block;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:0.05em;background:rgba(72,187,120,0.15);color:#48bb78;border:1px solid rgba(72,187,120,0.4);';
+      if (upgradeLink) { upgradeLink.textContent = 'Улучшить до Pro+ →'; upgradeLink.href = '/pricing'; }
     } else {
-      sinceEl.hidden = true;
+      badge.textContent = 'Базовая';
+      badge.style.cssText = 'display:inline-block;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:0.05em;background:rgba(255,255,255,0.05);color:#888880;border:1px solid rgba(255,255,255,0.1);';
     }
   }
+
   renderPortfolio();
 }
 

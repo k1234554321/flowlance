@@ -209,6 +209,14 @@ async function ensureDb() {
     )
   `);
     await ensureOffersExternalUrlColumn(pool);
+    // tracker columns
+    for (const sql of [
+      "ALTER TABLE users ADD COLUMN tracker_xp INT DEFAULT 0",
+      "ALTER TABLE users ADD COLUMN tracker_level INT DEFAULT 1",
+      "ALTER TABLE users ADD COLUMN tracker_coins INT DEFAULT 0",
+    ]) {
+      await pool.query(sql).catch(e => { if (e.code !== 'ER_DUP_FIELDNAME' && e.errno !== 1060) {} });
+    }
     await pool.query(
       `UPDATE offers SET external_url = '' WHERE external_url LIKE '%google.com%'`
     ).catch(() => {});
@@ -747,6 +755,20 @@ app.post('/api/ai/chat', async (req, res) => {
   res.json({ reply });
 });
 
+app.post('/api/tracker/sync', requireAuth, async (req, res) => {
+  const { xp, level, coins } = req.body || {};
+  const uid = req.session.user.id;
+  if (!isDbEnabled()) return res.json({ ok: true });
+  try {
+    const pool = getPool();
+    await pool.query(
+      'UPDATE users SET tracker_xp=?, tracker_level=?, tracker_coins=? WHERE id=?',
+      [Number(xp)||0, Number(level)||1, Number(coins)||0, uid]
+    ).catch(() => {});
+    res.json({ ok: true });
+  } catch { res.json({ ok: false }); }
+});
+
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   if (!isDbEnabled()) {
     const users = [...inMemoryUsers.values()].map(u => ({
@@ -819,7 +841,7 @@ app.get('/api/leaderboard', async (req, res) => {
   try {
     const pool = getPool();
     const [rows] = await pool.query(
-      'SELECT id, name, avatar_url, role FROM users ORDER BY id ASC LIMIT 50'
+      'SELECT id, name, avatar_url, role, subscription, COALESCE(tracker_xp,0) as tracker_xp, COALESCE(tracker_level,1) as tracker_level FROM users ORDER BY tracker_xp DESC LIMIT 50'
     );
     res.json({ users: rows });
   } catch (error) {
