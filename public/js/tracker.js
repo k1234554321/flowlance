@@ -305,7 +305,6 @@
     renderTasks();
     renderAchievements();
     renderLog();
-    renderShop();
   }
 
   function renderTasks() {
@@ -384,6 +383,7 @@
     checkAchievements();
     saveState();
     render();
+    if (typeof renderShop === 'function') renderShop();
   }
 
   function spawnXpPopup(amount, refEl) {
@@ -646,6 +646,7 @@
     updateStreak();
     state.level = calcLevel(state.xp);
     render();
+    renderShop();
   }
 
   function drawGatePixel() {
