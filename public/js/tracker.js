@@ -305,6 +305,7 @@
     renderTasks();
     renderAchievements();
     renderLog();
+    renderShop();
   }
 
   function renderTasks() {
@@ -431,40 +432,12 @@
   }
 
   /* ============================================================
-     МАГАЗИН — логика
+     МАГАЗИН — логика (встроен на страницу)
      ============================================================ */
-  const shopOverlay    = $('shop-overlay');
-  const shopCloseBtn   = $('shop-close-btn');
-  const shopCoinsDisp  = $('shop-coins-display');
-  const shopClothesGrid= $('shop-clothes-grid');
-  const shopAuraGrid   = $('shop-aura-grid');
+  const shopCoinsDisp = $('shop-coins-display');
+  const shopTabClothes = $('shop-tab-clothes');
+  const shopTabAura    = $('shop-tab-aura');
   const shopTabs       = document.querySelectorAll('.shop-tab');
-  const shopSections   = { clothes: $('shop-tab-clothes'), aura: $('shop-tab-aura') };
-
-  function openShop() {
-    if (!shopOverlay) return;
-    shopOverlay.classList.remove('hidden');
-    shopOverlay.classList.add('shop-visible');
-    renderShop();
-    
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeShop() {
-    if (!shopOverlay) return;
-    shopOverlay.classList.add('shop-hiding');
-    setTimeout(() => {
-      shopOverlay.classList.remove('shop-visible', 'shop-hiding');
-      shopOverlay.classList.add('hidden');
-      document.body.style.overflow = '';
-    }, 280);
-  }
-
-  $('trk-shop-btn')?.addEventListener('click', openShop);
-  shopCloseBtn?.addEventListener('click', closeShop);
-  shopOverlay?.addEventListener('click', (e) => {
-    if (e.target === shopOverlay) closeShop();
-  });
 
   // Вкладки
   shopTabs.forEach(tab => {
@@ -472,13 +445,12 @@
       shopTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       const key = tab.dataset.tab;
-      Object.entries(shopSections).forEach(([k, el]) => {
-        if (el) el.classList.toggle('hidden', k !== key);
-      });
+      if (shopTabClothes) shopTabClothes.classList.toggle('hidden', key !== 'clothes');
+      if (shopTabAura)    shopTabAura.classList.toggle('hidden',    key !== 'aura');
     });
   });
 
-  function isOwned(id)    { return state.ownedItems.includes(id); }
+  function isOwned(id)    { return Array.isArray(state.ownedItems) && state.ownedItems.includes(id); }
   function isEquipped(id) {
     return id === state.equippedCap || id === state.equippedShirt ||
            id === state.equippedPants || id === state.equippedGlasses ||
@@ -486,9 +458,9 @@
   }
 
   function renderShop() {
-    if (shopCoinsDisp) shopCoinsDisp.textContent = state.coins + ' 🪙';
-    renderShopGrid(shopClothesGrid, SHOP_CLOTHES);
-    renderShopGrid(shopAuraGrid, SHOP_AURAS);
+    if (shopCoinsDisp) shopCoinsDisp.textContent = (Number(state.coins) || 0) + ' 🪙';
+    renderShopGrid(shopTabClothes, SHOP_CLOTHES);
+    renderShopGrid(shopTabAura,    SHOP_AURAS);
   }
 
   function renderShopGrid(container, items) {
@@ -497,56 +469,37 @@
     items.forEach(item => {
       const owned    = isOwned(item.id);
       const equipped = isEquipped(item.id);
-      const canBuy   = !owned && state.coins >= item.price;
+      const coins    = Number(state.coins) || 0;
+      const canBuy   = !owned && coins >= item.price && item.price > 0;
       const isFree   = item.price === 0;
 
       const card = document.createElement('div');
-      card.className = 'shop-card' + (equipped ? ' shop-card-equipped' : '') + (owned ? ' shop-card-owned' : '');
-      card.dataset.id = item.id;
+      card.className = 'shop-card' + (equipped ? ' shop-card-equipped' : '') + (owned && !equipped ? ' shop-card-owned' : '');
 
-      let badge = '';
-      if (equipped)       badge = '<span class="shop-badge shop-badge-on">Надето</span>';
-      else if (owned)     badge = '<span class="shop-badge shop-badge-owned">Куплено</span>';
-      else if (isFree)    badge = '<span class="shop-badge shop-badge-free">Бесплатно</span>';
-
-      let colorDot = '';
-      if (item.color) {
-        colorDot = `<span class="shop-color-dot" style="background:${item.color};${item.id.includes('aura') ? 'box-shadow:0 0 8px ' + item.color + '88;' : ''}"></span>`;
+      let btnHtml;
+      if (equipped) {
+        btnHtml = `<button class="shop-btn shop-btn-unequip" data-id="${item.id}" data-action="unequip">Снять</button>`;
+      } else if (owned || isFree) {
+        btnHtml = `<button class="shop-btn shop-btn-equip" data-id="${item.id}" data-action="equip">Надеть</button>`;
+      } else if (canBuy) {
+        btnHtml = `<button class="shop-btn shop-btn-buy" data-id="${item.id}" data-action="buy">Купить ${item.price} 🪙</button>`;
+      } else {
+        btnHtml = `<button class="shop-btn shop-btn-locked" disabled>Нужно ${item.price} 🪙</button>`;
       }
 
+      let dotStyle = item.color ? `background:${item.color};` : 'background:#444;';
+      if (item.id.startsWith('aura_') && item.color) dotStyle += `box-shadow:0 0 8px ${item.color};`;
+
       card.innerHTML = `
-        <div class="shop-card-icon">${item.icon}${colorDot}</div>
+        <div class="shop-card-icon">${item.icon}<span class="shop-color-dot" style="${dotStyle}"></span></div>
         <div class="shop-card-name">${item.name}</div>
         <div class="shop-card-desc">${item.desc}</div>
-        ${badge}
-        <div class="shop-card-footer">
-          ${isFree ? '<span class="shop-price-free">Бесплатно</span>' : `<span class="shop-price">${item.price} 🪙</span>`}
-          ${renderShopBtn(item, owned, equipped, canBuy, isFree)}
-        </div>`;
+        ${btnHtml}`;
       container.appendChild(card);
     });
   }
 
-  function renderShopBtn(item, owned, equipped, canBuy, isFree) {
-    if (equipped) {
-      return `<button class="btn shop-btn shop-btn-unequip" data-action="unequip" data-id="${item.id}">Снять</button>`;
-    }
-    if (owned || isFree) {
-      return `<button class="btn shop-btn shop-btn-equip" data-action="equip" data-id="${item.id}">Надеть</button>`;
-    }
-    if (canBuy) {
-      return `<button class="btn shop-btn shop-btn-buy" data-action="buy" data-id="${item.id}">Купить</button>`;
-    }
-    return `<button class="btn shop-btn shop-btn-locked" disabled>Мало монет</button>`;
-  }
-
-  function handleShopClick(e) {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const id     = String(btn.dataset.id || '');
-    const action = String(btn.dataset.action || '');
-    if (!id || !action) return;
-
+  function shopAction(id, action) {
     const allItems = [...SHOP_CLOTHES, ...SHOP_AURAS];
     const item = allItems.find(i => i.id === id);
     if (!item) return;
@@ -555,49 +508,60 @@
     const price = Number(item.price) || 0;
 
     if (action === 'buy') {
-      if (coins < price) {
-        // визуальная подсказка
-        btn.textContent = 'Мало монет!';
-        setTimeout(() => { btn.textContent = 'Купить'; }, 1200);
-        return;
-      }
+      if (coins < price) { showShopToast('Недостаточно монет!', 'error'); return; }
       state.coins = coins - price;
       if (!Array.isArray(state.ownedItems)) state.ownedItems = ['aura_white'];
       if (!state.ownedItems.includes(id)) state.ownedItems.push(id);
+      doEquip(item);
+      showShopToast(`✅ Куплено и надето: ${item.name}`);
       addLog(`🛍️ Куплено: ${item.name}`, 'log-bonus');
-      equipItem(item);
     } else if (action === 'equip') {
-      equipItem(item);
+      doEquip(item);
+      showShopToast(`✨ Надето: ${item.name}`);
     } else if (action === 'unequip') {
-      unequipItem(item);
+      doUnequip(item);
+      showShopToast(`👕 Снято: ${item.name}`);
     }
 
     saveState();
     render();
     renderShop();
-    
   }
 
-  function equipItem(item) {
-    if (item.type === 'cap')     state.equippedCap     = item.color;
-    if (item.type === 'shirt')   state.equippedShirt   = item.color;
-    if (item.type === 'pants')   state.equippedPants   = item.color;
-    if (item.type === 'glasses') state.equippedGlasses = item.color;
-    if (item.id.startsWith('aura_')) state.equippedAura = item.id;
-    addLog(`✨ Надето: ${item.name}`, 'log-info');
+  function doEquip(item) {
+    if (item.type === 'cap')          state.equippedCap     = item.color;
+    else if (item.type === 'shirt')   state.equippedShirt   = item.color;
+    else if (item.type === 'pants')   state.equippedPants   = item.color;
+    else if (item.type === 'glasses') state.equippedGlasses = item.color;
+    else if (item.id.startsWith('aura_')) state.equippedAura = item.id;
   }
 
-  function unequipItem(item) {
-    if (item.type === 'cap')     state.equippedCap     = null;
-    if (item.type === 'shirt')   state.equippedShirt   = null;
-    if (item.type === 'pants')   state.equippedPants   = null;
-    if (item.type === 'glasses') state.equippedGlasses = null;
-    if (item.id.startsWith('aura_')) state.equippedAura = 'aura_white';
-    addLog(`👕 Снято: ${item.name}`, 'log-info');
+  function doUnequip(item) {
+    if (item.type === 'cap')          state.equippedCap     = null;
+    else if (item.type === 'shirt')   state.equippedShirt   = null;
+    else if (item.type === 'pants')   state.equippedPants   = null;
+    else if (item.type === 'glasses') state.equippedGlasses = null;
+    else if (item.id.startsWith('aura_')) state.equippedAura = 'aura_white';
   }
 
-  shopClothesGrid?.addEventListener('click', handleShopClick);
-  shopAuraGrid?.addEventListener('click', handleShopClick);
+  function showShopToast(msg, type) {
+    const t = document.createElement('div');
+    t.className = 'shop-toast' + (type === 'error' ? ' shop-toast-error' : '');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('shop-toast-show'));
+    setTimeout(() => { t.classList.remove('shop-toast-show'); setTimeout(() => t.remove(), 400); }, 2500);
+  }
+
+  // Один обработчик на каждый грид
+  shopTabClothes?.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (btn) shopAction(btn.dataset.id, btn.dataset.action);
+  });
+  shopTabAura?.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (btn) shopAction(btn.dataset.id, btn.dataset.action);
+  });
 
   /* ============================================================
      СОБЫТИЯ

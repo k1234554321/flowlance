@@ -104,11 +104,6 @@
                 </button>
                 <p class="daily-hint" id="trk-daily-hint"></p>
               </div>
-
-              <!-- Магазин -->
-              <button class="btn btn-shop btn-block" id="trk-shop-btn">
-                🛍️ Магазин
-              </button>
             </div>
           </div>
 
@@ -167,44 +162,26 @@
           </div>
 
         </div><!-- /tracker-grid -->
+
+        <!-- ===== МАГАЗИН (встроен на страницу) ===== -->
+        <div id="shop-section" class="shop-inline reveal reveal-delay-3">
+          <div class="shop-inline-header">
+            <div>
+              <span class="pixel-label" style="font-size:9px;">МАГАЗИН</span>
+              <h2 class="shop-title">Кастомизация персонажа</h2>
+            </div>
+            <span class="shop-coins-badge" id="shop-coins-display">0 🪙</span>
+          </div>
+          <div class="shop-tabs">
+            <button class="shop-tab active" data-tab="clothes">👕 Одежда</button>
+            <button class="shop-tab" data-tab="aura">✨ Аура</button>
+          </div>
+          <div id="shop-tab-clothes" class="shop-grid" style="margin-top:14px;"></div>
+          <div id="shop-tab-aura"    class="shop-grid hidden" style="margin-top:14px;"></div>
+        </div>
+
       </div>
     </div><!-- /tracker-app -->
-
-    <!-- ===== МАГАЗИН ===== -->
-    <div id="shop-overlay" class="shop-overlay hidden" role="dialog" aria-modal="true" aria-label="Магазин">
-      <div class="shop-modal glass">
-        <div class="shop-header">
-          <div>
-            <span class="pixel-label" style="font-size:9px;">МАГАЗИН</span>
-            <h2 class="shop-title">Кастомизация</h2>
-          </div>
-          <div class="shop-header-right">
-            <span class="shop-coins-badge" id="shop-coins-display">0 🪙</span>
-            <button class="shop-close-btn" id="shop-close-btn" aria-label="Закрыть">✕</button>
-          </div>
-        </div>
-
-        <!-- Вкладки -->
-        <div class="shop-tabs">
-          <button class="shop-tab active" data-tab="clothes">👕 Одежда</button>
-          <button class="shop-tab" data-tab="aura">✨ Аура</button>
-        </div>
-
-        <!-- Одежда -->
-        <div class="shop-section" id="shop-tab-clothes">
-          <div class="shop-grid" id="shop-clothes-grid">
-            <!-- рендерится JS -->
-          </div>
-        </div>
-
-        <!-- Ауры -->
-        <div class="shop-section hidden" id="shop-tab-aura">
-          <div class="shop-grid" id="shop-aura-grid">
-            <!-- рендерится JS -->
-          </div>
-        </div>
-      </div>
-    </div>
 
     <script src="/js/page-enter.js"></script>
     <script src="/js/reveal-scroll.js"></script>
