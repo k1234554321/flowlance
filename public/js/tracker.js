@@ -454,6 +454,11 @@
     renderShop();
     drawShopPreview();
     document.body.style.overflow = 'hidden';
+    // Убедимся что обработчики точно навешены (на случай если DOM не был готов)
+    shopClothesGrid?.removeEventListener('click', handleShopClick);
+    shopAuraGrid?.removeEventListener('click', handleShopClick);
+    shopClothesGrid?.addEventListener('click', handleShopClick);
+    shopAuraGrid?.addEventListener('click', handleShopClick);
   }
 
   function closeShop() {
