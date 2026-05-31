@@ -271,11 +271,13 @@
             const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
             const rankSymbol = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
 
-            // Subscription badge
+            // Subscription badge + neon name for Pro+
             const sub = String(user.subscription || '').toLowerCase();
             let badgeHtml = '';
+            let usernameStyle = 'font-weight:600;color:#f5f5f0;font-size:0.95rem;';
             if (sub === 'proplus') {
               badgeHtml = '<span class="lb-badge lb-badge-proplus">[PRO+]</span>';
+              usernameStyle = 'font-weight:700;color:#9f7aea;font-size:0.95rem;text-shadow:0 0 12px rgba(159,122,234,0.8),0 0 24px rgba(159,122,234,0.4);';
             } else if (sub === 'pro') {
               badgeHtml = '<span class="lb-badge lb-badge-pro">[PRO]</span>';
             }
@@ -296,7 +298,7 @@
               <div class="lb-rank ${rankClass}">${rankSymbol}</div>
               ${avatarHtml}
               <div class="lb-info">
-                <div class="lb-username">${escapeHtml(user.name || 'Пользователь')}</div>
+                <div class="lb-username" style="${usernameStyle}">${escapeHtml(user.name || 'Пользователь')}</div>
                 <div class="lb-meta">${xp.toLocaleString('ru-RU')} XP</div>
               </div>
               ${badgeHtml}

@@ -113,21 +113,38 @@ function renderJournalAndFaq(c) {
 
 function renderReviews(c) {
   const grid = document.getElementById('reviews-hub-grid');
+  const dotsEl = document.getElementById('reviews-dots');
   if (!grid) return;
-  grid.innerHTML = (c.reviews || [])
-    .map(
-      (r, i) => `
-      <article class="review-tile hub-hover-card reveal reveal-delay-${(i % 4) + 1}">
-        <div class="review-stars-wrap">${window.FLStars?.renderStars(r.rating || 5) || ''}</div>
-        <div class="review-quote">“</div>
-        <p class="review-body">${esc(r.text)}</p>
-        <div class="review-name">${esc(r.name)}</div>
-        <div class="review-role">${esc(r.role || '')}</div>
-      </article>`
-    )
-    .join('');
+  const reviews = c.reviews || [];
+  if (!reviews.length) return;
+  function ex(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  grid.innerHTML = reviews.map(r =>
+    '<article class="review-tile hub-hover-card">' +
+    '<div class="review-stars-wrap">' + (window.FLStars ? window.FLStars.renderStars(r.rating||5) : '') + '</div>' +
+    '<div class="review-quote">&#8220;</div>' +
+    '<p class="review-body">' + ex(r.text) + '</p>' +
+    '<div class="review-name">' + ex(r.name) + '</div>' +
+    '<div class="review-role">' + ex(r.role||'') + '</div></article>'
+  ).join('');
+  const cards = Array.from(grid.querySelectorAll('.review-tile'));
+  const total = cards.length;
+  const VIS = 3;
+  let cur = 0, timer = null;
+  if (dotsEl) dotsEl.innerHTML = reviews.map((_,i) => '<button class="review-dot' + (i===0?' active':'') + '" data-dot="' + i + '"></button>').join('');
+  function show(idx) {
+    cur = ((idx%total)+total)%total;
+    cards.forEach((c,i) => { c.style.display = ((i-cur+total)%total < VIS) ? '' : 'none'; });
+    if (dotsEl) dotsEl.querySelectorAll('.review-dot').forEach((d,i) => d.classList.toggle('active', i===cur));
+  }
+  function go() { show(cur+1); }
+  function start() { clearInterval(timer); timer = setInterval(go, 3200); }
+  show(0);
+  if (dotsEl) dotsEl.addEventListener('click', function(e) { var b=e.target.closest('[data-dot]'); if(b){show(Number(b.dataset.dot));start();} });
+  var sec = document.getElementById('reviews-hub');
+  if (sec && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function(en){if(en[0].isIntersecting)start();else clearInterval(timer);},{threshold:0.2}).observe(sec);
+  } else start();
 }
-
 function easeOutCubic(t) {
   return 1 - (1 - t) ** 3;
 }
