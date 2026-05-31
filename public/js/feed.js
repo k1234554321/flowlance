@@ -230,7 +230,9 @@ offersGrid?.addEventListener('click', async (e) => {
 
 async function loadOffers() {
   try {
-    const offers = await api('/api/offers?limit=120');
+    const sub = window._feedSub || 'basic';
+    const limit = sub === 'basic' ? 24 : 120;
+    const offers = await api('/api/offers?limit=' + limit);
     state.offers = offers;
     await refreshFavIds();
     rebuildDynamicFilters();
@@ -280,5 +282,8 @@ function connectLive() {
   socket.on('offer:new', appendOffer);
 }
 
-loadOffers();
-connectLive();
+// Ждём пока checkFeedAccess установит _feedSub, потом грузим
+setTimeout(function() {
+  loadOffers();
+  connectLive();
+}, 300);

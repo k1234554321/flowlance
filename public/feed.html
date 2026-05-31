@@ -42,6 +42,11 @@
       </div>
 
       <div id="feed-content">
+      <!-- Баннер для базовой подписки -->
+      <div id="feed-basic-banner" style="display:none;margin:12px 0;padding:12px 18px;border-radius:12px;background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);font-size:0.88rem;color:#f5c842;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <span>🔒 Базовая подписка: показывается 24 предложения, расширенные фильтры недоступны</span>
+        <a href="/pricing" style="color:#f5c842;font-weight:700;text-decoration:none;white-space:nowrap;">Улучшить →</a>
+      </div>
       <section class="feed-hero glass reveal">
         <h1 class="feed-title hero-load-2">Актуальные заказы</h1>
         <p class="hero-sub hero-load-3">
@@ -51,7 +56,7 @@
 
       <section class="feed-filter-panel glass reveal">
         <div class="feed-filter-grid">
-          <label class="feed-field">
+          <label class="feed-field feed-filter-pro">
             <span>Период</span>
             <select id="period-filter">
               <option value="">За всё время</option>
@@ -83,11 +88,11 @@
               <option value="General">General</option>
             </select>
           </label>
-          <label class="feed-field feed-field-wide">
+          <label class="feed-field feed-field-wide feed-filter-pro">
             <span>Поиск по тексту</span>
             <input id="search-filter" type="search" placeholder="Ключевые слова, стек, название задачи" autocomplete="off" />
           </label>
-          <label class="feed-field">
+          <label class="feed-field feed-filter-pro">
             <span>Валюта</span>
             <select id="currency-filter">
               <option value="">Любая</option>
@@ -96,11 +101,11 @@
               <option value="RUB">RUB</option>
             </select>
           </label>
-          <label class="feed-field">
+          <label class="feed-field feed-filter-pro">
             <span>Бюджет от</span>
             <input id="price-min" type="number" min="0" placeholder="0" />
           </label>
-          <label class="feed-field">
+          <label class="feed-field feed-filter-pro">
             <span>до</span>
             <input id="price-max" type="number" min="0" placeholder="∞" />
           </label>
@@ -140,7 +145,18 @@
         try {
           const r = await fetch('/api/profile');
           if (!r.ok) throw new Error('not logged in');
-          // logged in — show content
+          const user = await r.json();
+          const sub = String(user.subscription || 'basic').toLowerCase();
+          window._feedSub = sub;
+
+          // Базовая подписка — скрываем расширенные фильтры и показываем баннер
+          if (sub === 'basic') {
+            document.querySelectorAll('.feed-filter-pro').forEach(el => {
+              el.style.display = 'none';
+            });
+            const banner = document.getElementById('feed-basic-banner');
+            if (banner) banner.style.display = 'flex';
+          }
         } catch {
           const gate = document.getElementById('feed-gate');
           const content = document.getElementById('feed-content');
