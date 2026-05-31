@@ -87,7 +87,7 @@
           <div class="tracker-char-col">
             <div class="tracker-char-card glass">
               <div class="char-name-row">
-                <span class="pixel-label">ПЕРСОНАЖ</span>
+                <span class="pixel-label" id="trk-char-label">ПЕРСОНАЖ</span>
                 <span class="char-name" id="trk-char-name">Фрилансер</span>
               </div>
               <div class="char-canvas-wrap">
@@ -97,6 +97,22 @@
               <div class="char-stats">
                 <div class="char-stat"><span class="cs-label">Задач выполнено</span><span class="cs-val" id="trk-done-count">0</span></div>
                 <div class="char-stat"><span class="cs-label">Серия дней</span><span class="cs-val" id="trk-streak">0 🔥</span></div>
+              </div>
+
+              <!-- Стиль персонажа -->
+              <div class="char-styles-wrap">
+                <span class="pixel-label" style="font-size:8px;">СТИЛЬ</span>
+                <div class="char-styles-row" id="char-styles-row">
+                  <!-- rendered by JS -->
+                </div>
+              </div>
+
+              <!-- Аура -->
+              <div class="char-styles-wrap">
+                <span class="pixel-label" style="font-size:8px;">АУРА</span>
+                <div class="char-styles-row" id="char-aura-row">
+                  <!-- rendered by JS -->
+                </div>
               </div>
 
               <!-- Ежедневный бонус -->
@@ -164,23 +180,6 @@
           </div>
 
         </div><!-- /tracker-grid -->
-
-        <!-- ===== МАГАЗИН (встроен на страницу) ===== -->
-        <div id="shop-section" class="shop-inline reveal reveal-delay-3">
-          <div class="shop-inline-header">
-            <div>
-              <span class="pixel-label" style="font-size:9px;">МАГАЗИН</span>
-              <h2 class="shop-title">Кастомизация персонажа</h2>
-            </div>
-            <span class="shop-coins-badge" id="shop-coins-display">0 🪙</span>
-          </div>
-          <div class="shop-tabs">
-            <button class="shop-tab active" data-tab="clothes">👕 Одежда</button>
-            <button class="shop-tab" data-tab="aura">✨ Аура</button>
-          </div>
-          <div id="shop-tab-clothes" class="shop-grid" style="margin-top:14px;"></div>
-          <div id="shop-tab-aura"    class="shop-grid hidden" style="margin-top:14px;"></div>
-        </div>
 
       </div>
     </div><!-- /tracker-app -->

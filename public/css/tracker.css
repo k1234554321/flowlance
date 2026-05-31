@@ -1185,3 +1185,47 @@
   border-color: rgba(255,107,107,0.4);
   color: #ff6b6b;
 }
+
+/* ============================================================
+   СТИЛИ ПЕРСОНАЖА — кнопки
+   ============================================================ */
+.char-styles-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.char-styles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.char-style-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: #888880;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+  line-height: 1.6;
+  text-align: center;
+}
+.char-style-btn:hover:not(:disabled) {
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.07);
+  color: #f5f5f0;
+  transform: translateY(-1px);
+}
+.char-style-btn.active {
+  border-color: rgba(159,122,234,0.6);
+  background: rgba(159,122,234,0.12);
+  color: #c4b5fd;
+}
+.char-style-btn.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

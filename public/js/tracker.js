@@ -1,12 +1,12 @@
 /* ============================================================
-   FlowLance Tracker v2.0 — логика + магазин
+   FlowLance Tracker v2.0 — логика + стили персонажа
    ============================================================ */
 (function () {
 
   const XP_PER_LEVEL = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200, 4000];
   const DAILY_XP = 30;
   const DAILY_COINS = 10;
-  const LEVEL_UP_COINS = 10; // монеты за каждый новый уровень
+  const LEVEL_UP_COINS = 10;
 
   const ACHIEVEMENTS = [
     { id: 'first_task',  icon: '🎯', name: 'Первый шаг',    desc: 'Выполни первое задание',      check: (s) => s.doneTasks >= 1 },
@@ -20,33 +20,24 @@
   ];
 
   /* ============================================================
-     МАГАЗИН — каталог
+     СТИЛИ ПЕРСОНАЖА
      ============================================================ */
-  const SHOP_CLOTHES = [
-    { id: 'cap_red',    type: 'cap',    name: 'Красная кепка',   icon: '🧢', price: 50,  color: '#e53e3e', desc: 'Классика' },
-    { id: 'cap_blue',   type: 'cap',    name: 'Синяя кепка',     icon: '🧢', price: 60,  color: '#3182ce', desc: 'Стиль' },
-    { id: 'cap_gold',   type: 'cap',    name: 'Золотая кепка',   icon: '🧢', price: 120, color: '#f5c842', desc: 'Редкая' },
-    { id: 'shirt_red',  type: 'shirt',  name: 'Красная майка',   icon: '👕', price: 50,  color: '#e53e3e', desc: 'Огонь' },
-    { id: 'shirt_green',type: 'shirt',  name: 'Зелёная майка',   icon: '👕', price: 50,  color: '#38a169', desc: 'Свежесть' },
-    { id: 'shirt_purple',type:'shirt',  name: 'Фиолетовая майка',icon: '👕', price: 80,  color: '#805ad5', desc: 'Редкая' },
-    { id: 'shirt_gold', type: 'shirt',  name: 'Золотая майка',   icon: '👕', price: 150, color: '#f5c842', desc: 'Легенда' },
-    { id: 'pants_red',  type: 'pants',  name: 'Красные штаны',   icon: '👖', price: 60,  color: '#e53e3e', desc: 'Дерзко' },
-    { id: 'pants_green',type: 'pants',  name: 'Зелёные штаны',   icon: '👖', price: 60,  color: '#38a169', desc: 'Природа' },
-    { id: 'pants_purple',type:'pants',  name: 'Фиолетовые штаны',icon: '👖', price: 90,  color: '#805ad5', desc: 'Редкие' },
-    { id: 'glasses_sun',type: 'glasses',name: 'Солнечные очки',  icon: '🕶️', price: 70,  color: '#1a1a1a', desc: 'Крутяк' },
-    { id: 'glasses_neon',type:'glasses',name: 'Неоновые очки',   icon: '🕶️', price: 130, color: '#00d4ff', desc: 'Киберпанк' },
-    { id: 'glasses_gold',type:'glasses',name: 'Золотые очки',    icon: '🕶️', price: 200, color: '#f5c842', desc: 'Элита' },
+  const CHAR_STYLES = [
+    { id: 'style_1', label: 'Стиль 1', shirt: '#3a6fff', pants: '#1a2a5a', titleOverride: null,   unlockLevel: 1, requireSub: null },
+    { id: 'style_2', label: 'Стиль 2', shirt: '#805ad5', pants: '#553c9a', titleOverride: null,   unlockLevel: 5, requireSub: null },
+    { id: 'style_3', label: 'Стиль 3', shirt: '#38a169', pants: '#276749', titleOverride: null,   unlockLevel: 1, requireSub: null },
+    { id: 'style_4', label: 'Стиль 4', shirt: '#1a1a1a', pants: '#0a0a0a', titleOverride: 'КОРОЛЬ', unlockLevel: 1, requireSub: 'pro' },
   ];
 
-  const SHOP_AURAS = [
-    { id: 'aura_none',   name: 'Без ауры',        icon: '⬜', price: 0,   color: null,      size: 0,   desc: 'Стандарт' },
-    { id: 'aura_white',  name: 'Белая аура',       icon: '🤍', price: 0,   color: '#ffffff', size: 18,  desc: 'По умолчанию' },
-    { id: 'aura_green',  name: 'Зелёная аура',     icon: '💚', price: 200, color: '#48bb78', size: 24,  desc: 'Природная сила' },
-    { id: 'aura_purple', name: 'Фиолетовая аура',  icon: '💜', price: 400, color: '#9f7aea', size: 32,  desc: 'Мистическая' },
-    { id: 'aura_black',  name: 'Чёрная аура',      icon: '🖤', price: 500, color: '#1a1a2e', size: 40,  desc: 'Тёмная сила' },
+  const AURAS = [
+    { id: 'aura_none',   name: '✕',  color: null,      size: 0  },
+    { id: 'aura_white',  name: '🤍', color: '#ffffff', size: 18 },
+    { id: 'aura_green',  name: '💚', color: '#48bb78', size: 24 },
+    { id: 'aura_purple', name: '💜', color: '#9f7aea', size: 32 },
+    { id: 'aura_black',  name: '🖤', color: '#1a1a2e', size: 40 },
   ];
 
-  let STORE_KEY = 'fl_tracker_v1'; // будет обновлён в init() под конкретного пользователя
+  let STORE_KEY = 'fl_tracker_v1';
 
   function defaultState() {
     return {
@@ -54,10 +45,8 @@
       lastLoginDate: null, lastDailyDate: null, totalDailyClaims: 0,
       unlockedAchievements: [], tasks: [],
       log: [{ text: 'Добро пожаловать в Прогресс!', type: 'log-info' }],
-      // магазин
-      ownedItems: ['aura_white'],   // по умолчанию белая аура
-      equippedCap: null,
-      equippedShirt: null,
+      equippedStyle: 'style_1',
+      equippedAura: 'aura_white',
       equippedPants: null,
       equippedGlasses: null,
       equippedAura: 'aura_white',
@@ -68,10 +57,8 @@
     try {
       const r = localStorage.getItem(STORE_KEY);
       const s = r ? Object.assign(defaultState(), JSON.parse(r)) : defaultState();
-      // миграция: убедимся что поля магазина есть
-      if (!Array.isArray(s.ownedItems)) s.ownedItems = ['aura_white'];
-      if (!s.ownedItems.includes('aura_white')) s.ownedItems.push('aura_white');
-      if (s.equippedAura === undefined) s.equippedAura = 'aura_white';
+      if (!s.equippedStyle) s.equippedStyle = 'style_1';
+      if (!s.equippedAura)  s.equippedAura  = 'aura_white';
       return s;
     } catch { return defaultState(); }
   }
@@ -157,8 +144,9 @@
 
   function buildCmap() {
     const m = Object.assign({}, CMAP_BASE);
-    if (state.equippedShirt)   m['S'] = state.equippedShirt;
-    if (state.equippedPants)   m['P'] = state.equippedPants;
+    const style = CHAR_STYLES.find(s => s.id === state.equippedStyle) || CHAR_STYLES[0];
+    m['S'] = style.shirt;
+    m['P'] = style.pants;
     return m;
   }
 
@@ -179,7 +167,7 @@
     ctx.translate(0, bobY || 0);
 
     // Аура
-    const auraItem = SHOP_AURAS.find(a => a.id === state.equippedAura);
+    const auraItem = AURAS.find(a => a.id === state.equippedAura);
     if (auraItem && auraItem.color) {
       const cx = ox + 8 * scale;
       const cy = oy + 8 * scale;
@@ -383,7 +371,7 @@
     checkAchievements();
     saveState();
     render();
-    if (typeof renderShop === 'function') renderShop();
+    
     syncTrackerToServer();
   }
 
@@ -433,136 +421,61 @@
   }
 
   /* ============================================================
-     МАГАЗИН — логика (встроен на страницу)
+     СТИЛИ И АУРЫ — рендер кнопок
      ============================================================ */
-  const shopCoinsDisp = $('shop-coins-display');
-  const shopTabClothes = $('shop-tab-clothes');
-  const shopTabAura    = $('shop-tab-aura');
-  const shopTabs       = document.querySelectorAll('.shop-tab');
-
-  // Вкладки
-  shopTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      shopTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const key = tab.dataset.tab;
-      if (shopTabClothes) shopTabClothes.classList.toggle('hidden', key !== 'clothes');
-      if (shopTabAura)    shopTabAura.classList.toggle('hidden',    key !== 'aura');
-    });
-  });
-
-  function isOwned(id)    { return Array.isArray(state.ownedItems) && state.ownedItems.includes(id); }
-  function isEquipped(id) {
-    return id === state.equippedCap || id === state.equippedShirt ||
-           id === state.equippedPants || id === state.equippedGlasses ||
-           id === state.equippedAura;
-  }
-
-  function renderShop() {
-    if (shopCoinsDisp) shopCoinsDisp.textContent = (Number(state.coins) || 0) + ' 🪙';
-    renderShopGrid(shopTabClothes, SHOP_CLOTHES);
-    renderShopGrid(shopTabAura,    SHOP_AURAS);
-  }
-
-  function renderShopGrid(container, items) {
-    if (!container) return;
-    container.innerHTML = '';
-    items.forEach(item => {
-      const owned    = isOwned(item.id);
-      const equipped = isEquipped(item.id);
-      const coins    = Number(state.coins) || 0;
-      const canBuy   = !owned && coins >= item.price && item.price > 0;
-      const isFree   = item.price === 0;
-
-      const card = document.createElement('div');
-      card.className = 'shop-card' + (equipped ? ' shop-card-equipped' : '') + (owned && !equipped ? ' shop-card-owned' : '');
-
-      let btnHtml;
-      if (equipped) {
-        btnHtml = `<button class="shop-btn shop-btn-unequip" data-id="${item.id}" data-action="unequip">Снять</button>`;
-      } else if (owned || isFree) {
-        btnHtml = `<button class="shop-btn shop-btn-equip" data-id="${item.id}" data-action="equip">Надеть</button>`;
-      } else if (canBuy) {
-        btnHtml = `<button class="shop-btn shop-btn-buy" data-id="${item.id}" data-action="buy">Купить ${item.price} 🪙</button>`;
+  function renderStyles() {
+    const row = $('char-styles-row');
+    if (!row) return;
+    row.innerHTML = '';
+    const lvl = state.level || 1;
+    const sub = window._flSub || 'basic';
+    CHAR_STYLES.forEach(style => {
+      const levelLocked = style.unlockLevel > lvl;
+      const subLocked   = style.requireSub && sub !== style.requireSub && sub !== 'proplus';
+      const locked      = levelLocked || subLocked;
+      const active      = state.equippedStyle === style.id;
+      const btn = document.createElement('button');
+      btn.className = 'char-style-btn' + (active ? ' active' : '') + (locked ? ' locked' : '');
+      btn.title = locked
+        ? (levelLocked ? `Открывается на уровне ${style.unlockLevel}` : 'Требуется Pro подписка')
+        : style.label;
+      if (locked) {
+        btn.innerHTML = `${style.label}<br><span style="font-size:7px;">${levelLocked ? '🔒 Ур.' + style.unlockLevel : '🔒 Pro'}</span>`;
+        btn.disabled = true;
       } else {
-        btnHtml = `<button class="shop-btn shop-btn-locked" disabled>Нужно ${item.price} 🪙</button>`;
+        btn.textContent = style.label;
+        btn.addEventListener('click', () => {
+          state.equippedStyle = style.id;
+          // Обновляем заголовок персонажа
+          const lbl = $('trk-char-label');
+          if (lbl) lbl.textContent = style.titleOverride || 'ПЕРСОНАЖ';
+          saveState();
+          renderStyles();
+        });
       }
-
-      let dotStyle = item.color ? `background:${item.color};` : 'background:#444;';
-      if (item.id.startsWith('aura_') && item.color) dotStyle += `box-shadow:0 0 8px ${item.color};`;
-
-      card.innerHTML = `
-        <div class="shop-card-icon">${item.icon}<span class="shop-color-dot" style="${dotStyle}"></span></div>
-        <div class="shop-card-name">${item.name}</div>
-        <div class="shop-card-desc">${item.desc}</div>
-        ${btnHtml}`;
-      container.appendChild(card);
+      row.appendChild(btn);
     });
   }
 
-  function shopAction(id, action) {
-    const allItems = [...SHOP_CLOTHES, ...SHOP_AURAS];
-    const item = allItems.find(i => i.id === id);
-    if (!item) return;
-
-    const coins = Number(state.coins) || 0;
-    const price = Number(item.price) || 0;
-
-    if (action === 'buy') {
-      if (coins < price) { showShopToast('Недостаточно монет!', 'error'); return; }
-      state.coins = coins - price;
-      if (!Array.isArray(state.ownedItems)) state.ownedItems = ['aura_white'];
-      if (!state.ownedItems.includes(id)) state.ownedItems.push(id);
-      doEquip(item);
-      showShopToast(`✅ Куплено и надето: ${item.name}`);
-      addLog(`🛍️ Куплено: ${item.name}`, 'log-bonus');
-    } else if (action === 'equip') {
-      doEquip(item);
-      showShopToast(`✨ Надето: ${item.name}`);
-    } else if (action === 'unequip') {
-      doUnequip(item);
-      showShopToast(`👕 Снято: ${item.name}`);
-    }
-
-    saveState();
-    render();
-    renderShop();
+  function renderAuras() {
+    const row = $('char-aura-row');
+    if (!row) return;
+    row.innerHTML = '';
+    AURAS.forEach(aura => {
+      const active = state.equippedAura === aura.id;
+      const btn = document.createElement('button');
+      btn.className = 'char-style-btn' + (active ? ' active' : '');
+      btn.title = aura.id === 'aura_none' ? 'Без ауры' : aura.name;
+      btn.textContent = aura.name;
+      if (aura.color) btn.style.textShadow = `0 0 8px ${aura.color}`;
+      btn.addEventListener('click', () => {
+        state.equippedAura = aura.id;
+        saveState();
+        renderAuras();
+      });
+      row.appendChild(btn);
+    });
   }
-
-  function doEquip(item) {
-    if (item.type === 'cap')          state.equippedCap     = item.color;
-    else if (item.type === 'shirt')   state.equippedShirt   = item.color;
-    else if (item.type === 'pants')   state.equippedPants   = item.color;
-    else if (item.type === 'glasses') state.equippedGlasses = item.color;
-    else if (item.id.startsWith('aura_')) state.equippedAura = item.id;
-  }
-
-  function doUnequip(item) {
-    if (item.type === 'cap')          state.equippedCap     = null;
-    else if (item.type === 'shirt')   state.equippedShirt   = null;
-    else if (item.type === 'pants')   state.equippedPants   = null;
-    else if (item.type === 'glasses') state.equippedGlasses = null;
-    else if (item.id.startsWith('aura_')) state.equippedAura = 'aura_white';
-  }
-
-  function showShopToast(msg, type) {
-    const t = document.createElement('div');
-    t.className = 'shop-toast' + (type === 'error' ? ' shop-toast-error' : '');
-    t.textContent = msg;
-    document.body.appendChild(t);
-    requestAnimationFrame(() => t.classList.add('shop-toast-show'));
-    setTimeout(() => { t.classList.remove('shop-toast-show'); setTimeout(() => t.remove(), 400); }, 2500);
-  }
-
-  // Один обработчик на весь блок магазина — не зависит от hidden вкладок
-  const shopSection = $('shop-section');
-  shopSection?.addEventListener('click', e => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    // Не реагируем на клики по вкладкам
-    if (btn.classList.contains('shop-tab')) return;
-    shopAction(btn.dataset.id, btn.dataset.action);
-  });
 
   /* ============================================================
      СОБЫТИЯ
@@ -653,8 +566,12 @@
     state.level = calcLevel(state.xp);
     applySubscriptionRestrictions();
     render();
-    renderShop();
-    // Синхронизируем XP/уровень с сервером для лидерборда
+    renderStyles();
+    renderAuras();
+    // Обновляем заголовок персонажа
+    const style = CHAR_STYLES.find(s => s.id === state.equippedStyle);
+    const lbl = $('trk-char-label');
+    if (lbl && style?.titleOverride) lbl.textContent = style.titleOverride;
     syncTrackerToServer();
   }
 
@@ -726,3 +643,4 @@
   else init();
 
 })();
+
