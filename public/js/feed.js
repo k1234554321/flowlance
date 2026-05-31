@@ -231,7 +231,7 @@ offersGrid?.addEventListener('click', async (e) => {
 async function loadOffers() {
   try {
     const sub = window._feedSub || 'basic';
-    const limit = sub === 'basic' ? 24 : 120;
+    const limit = sub === 'basic' ? 24 : 500;
     const offers = await api('/api/offers?limit=' + limit);
     state.offers = offers;
     await refreshFavIds();
