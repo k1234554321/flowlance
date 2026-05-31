@@ -231,9 +231,19 @@ offersGrid?.addEventListener('click', async (e) => {
 async function loadOffers() {
   try {
     const sub = window._feedSub || 'basic';
-    const limit = sub === 'basic' ? 24 : 500;
+    const limit = 500;
     const offers = await api('/api/offers?limit=' + limit);
-    state.offers = offers;
+    // Базовая подписка — только недорогие предложения (до 5000 RUB / 500 USD)
+    if (sub === 'basic') {
+      state.offers = offers.filter(o => {
+        const max = Number(o.budget_max) || 0;
+        const cur = String(o.currency || '').toUpperCase();
+        if (cur === 'RUB') return max <= 5000;
+        return max <= 500; // USD/EUR
+      });
+    } else {
+      state.offers = offers;
+    }
     await refreshFavIds();
     rebuildDynamicFilters();
     renderOffers();
