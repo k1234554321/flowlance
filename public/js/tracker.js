@@ -23,19 +23,13 @@
      СТИЛИ ПЕРСОНАЖА
      ============================================================ */
   const CHAR_STYLES = [
-    { id: 'style_1', label: 'Стиль 1', shirt: '#3a6fff', pants: '#1a2a5a', titleOverride: null,   unlockLevel: 1, requireSub: null },
-    { id: 'style_2', label: 'Стиль 2', shirt: '#805ad5', pants: '#553c9a', titleOverride: null,   unlockLevel: 5, requireSub: null },
-    { id: 'style_3', label: 'Стиль 3', shirt: '#38a169', pants: '#276749', titleOverride: null,   unlockLevel: 1, requireSub: null },
-    { id: 'style_4', label: 'Стиль 4', shirt: '#1a1a1a', pants: '#0a0a0a', titleOverride: 'КОРОЛЬ', unlockLevel: 1, requireSub: 'pro' },
+    { id: 'style_1', label: 'Стиль 1', shirt: '#3a6fff', pants: '#1a2a5a', titleOverride: null,     unlockLevel: 1,  requireSub: null },
+    { id: 'style_2', label: 'Стиль 2', shirt: '#805ad5', pants: '#553c9a', titleOverride: null,     unlockLevel: 5,  requireSub: null },
+    { id: 'style_3', label: 'Стиль 3', shirt: '#38a169', pants: '#276749', titleOverride: null,     unlockLevel: 10, requireSub: null },
+    { id: 'style_4', label: 'Стиль 4', shirt: '#1a1a1a', pants: '#0a0a0a', titleOverride: 'КОРОЛЬ', unlockLevel: 1,  requireSub: 'pro' },
   ];
 
-  const AURAS = [
-    { id: 'aura_none',   name: '✕',  color: null,      size: 0  },
-    { id: 'aura_white',  name: '🤍', color: '#ffffff', size: 18 },
-    { id: 'aura_green',  name: '💚', color: '#48bb78', size: 24 },
-    { id: 'aura_purple', name: '💜', color: '#9f7aea', size: 32 },
-    { id: 'aura_black',  name: '🖤', color: '#1a1a2e', size: 40 },
-  ];
+  // Ауры убраны по запросу пользователя
 
   let STORE_KEY = 'fl_tracker_v1';
 
@@ -165,22 +159,6 @@
     const cmap = buildCmap();
     ctx.save();
     ctx.translate(0, bobY || 0);
-
-    // Аура
-    const auraItem = AURAS.find(a => a.id === state.equippedAura);
-    if (auraItem && auraItem.color) {
-      const cx = ox + 8 * scale;
-      const cy = oy + 8 * scale;
-      const r  = auraItem.size * (scale / 6);
-      const grad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
-      grad.addColorStop(0, auraItem.color + '55');
-      grad.addColorStop(0.5, auraItem.color + '22');
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, r * 1.1, r * 0.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
 
     // Тело
     drawSpr(SPR, ctx, scale, ox, oy, cmap);
@@ -457,25 +435,7 @@
     });
   }
 
-  function renderAuras() {
-    const row = $('char-aura-row');
-    if (!row) return;
-    row.innerHTML = '';
-    AURAS.forEach(aura => {
-      const active = state.equippedAura === aura.id;
-      const btn = document.createElement('button');
-      btn.className = 'char-style-btn' + (active ? ' active' : '');
-      btn.title = aura.id === 'aura_none' ? 'Без ауры' : aura.name;
-      btn.textContent = aura.name;
-      if (aura.color) btn.style.textShadow = `0 0 8px ${aura.color}`;
-      btn.addEventListener('click', () => {
-        state.equippedAura = aura.id;
-        saveState();
-        renderAuras();
-      });
-      row.appendChild(btn);
-    });
-  }
+  function renderAuras() { /* ауры убраны */ }
 
   /* ============================================================
      СОБЫТИЯ
@@ -567,7 +527,6 @@
     applySubscriptionRestrictions();
     render();
     renderStyles();
-    renderAuras();
     // Обновляем заголовок персонажа
     const style = CHAR_STYLES.find(s => s.id === state.equippedStyle);
     const lbl = $('trk-char-label');

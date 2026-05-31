@@ -112,34 +112,50 @@ function renderJournalAndFaq(c) {
 }
 
 function renderReviews(c) {
+  const wrap = document.getElementById('reviews-carousel-wrap');
   const grid = document.getElementById('reviews-hub-grid');
   const dotsEl = document.getElementById('reviews-dots');
   if (!grid) return;
   const reviews = c.reviews || [];
   if (!reviews.length) return;
   function ex(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  // Контейнер-слайдер
+  grid.style.cssText = 'display:flex;transition:transform 0.6s cubic-bezier(0.22,1,0.36,1);will-change:transform;';
+  if (wrap) wrap.style.cssText = 'overflow:hidden;position:relative;';
+
   grid.innerHTML = reviews.map(r =>
-    '<article class="review-tile hub-hover-card">' +
+    '<article class="review-tile hub-hover-card" style="min-width:100%;box-sizing:border-box;">' +
     '<div class="review-stars-wrap">' + (window.FLStars ? window.FLStars.renderStars(r.rating||5) : '') + '</div>' +
     '<div class="review-quote">&#8220;</div>' +
     '<p class="review-body">' + ex(r.text) + '</p>' +
     '<div class="review-name">' + ex(r.name) + '</div>' +
     '<div class="review-role">' + ex(r.role||'') + '</div></article>'
   ).join('');
-  const cards = Array.from(grid.querySelectorAll('.review-tile'));
-  const total = cards.length;
-  const VIS = 3;
+
+  const total = reviews.length;
   let cur = 0, timer = null;
-  if (dotsEl) dotsEl.innerHTML = reviews.map((_,i) => '<button class="review-dot' + (i===0?' active':'') + '" data-dot="' + i + '"></button>').join('');
-  function show(idx) {
-    cur = ((idx%total)+total)%total;
-    cards.forEach((c,i) => { c.style.display = ((i-cur+total)%total < VIS) ? '' : 'none'; });
-    if (dotsEl) dotsEl.querySelectorAll('.review-dot').forEach((d,i) => d.classList.toggle('active', i===cur));
+
+  if (dotsEl) {
+    dotsEl.innerHTML = reviews.map((_,i) =>
+      '<button class="review-dot' + (i===0?' active':'') + '" data-dot="' + i + '"></button>'
+    ).join('');
   }
-  function go() { show(cur+1); }
-  function start() { clearInterval(timer); timer = setInterval(go, 3200); }
+
+  function show(idx) {
+    cur = ((idx % total) + total) % total;
+    grid.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    if (dotsEl) dotsEl.querySelectorAll('.review-dot').forEach(function(d,i){d.classList.toggle('active',i===cur);});
+  }
+
+  function start() { clearInterval(timer); timer = setInterval(function(){show(cur+1);}, 3200); }
+
   show(0);
-  if (dotsEl) dotsEl.addEventListener('click', function(e) { var b=e.target.closest('[data-dot]'); if(b){show(Number(b.dataset.dot));start();} });
+  if (dotsEl) dotsEl.addEventListener('click', function(e){
+    var b = e.target.closest('[data-dot]');
+    if (b) { show(Number(b.dataset.dot)); start(); }
+  });
+
   var sec = document.getElementById('reviews-hub');
   if (sec && 'IntersectionObserver' in window) {
     new IntersectionObserver(function(en){if(en[0].isIntersecting)start();else clearInterval(timer);},{threshold:0.2}).observe(sec);
