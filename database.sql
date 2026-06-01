@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS reviews_pending (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. Инвентарь магазина
+-- 5. Стили одежды персонажа
 CREATE TABLE IF NOT EXISTS shop_inventory (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
