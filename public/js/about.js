@@ -31,6 +31,8 @@ form?.addEventListener('submit', async (e) => {
     subject: document.getElementById('ticket-subject').value.trim(),
     body: document.getElementById('ticket-body').value.trim()
   };
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Отправка...'; }
   try {
     const r = await fetch('/api/tickets', {
       method: 'POST',
@@ -39,9 +41,11 @@ form?.addEventListener('submit', async (e) => {
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || `Ошибка ${r.status}`);
-    showToast('Обращение принято — ответим на почту');
+    showNotification('✅ Обращение принято — ответим на почту в течение суток', 'success');
     form.reset();
   } catch (err) {
-    showToast(err.message || 'Не удалось отправить', 'err');
+    showNotification(err.message || 'Не удалось отправить', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Отправить обращение'; }
   }
 });

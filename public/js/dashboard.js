@@ -167,15 +167,33 @@ function initReviewStars() {
 reviewForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const text = document.getElementById('review-text')?.value?.trim() || '';
-  const rating = Number(
-    document.querySelector('#review-stars-picker input[type="hidden"]')?.value || 5
-  );
+  const ratingInput = document.querySelector('#review-stars-picker input[type="hidden"]');
+  const rating = Number(ratingInput?.value || 5);
+
+  if (text.length < 15) {
+    showNotification('Напиши минимум 15 символов в отзыве', 'error');
+    return;
+  }
+
+  const btn = reviewForm.querySelector('button[type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Отправка...'; }
+
   try {
     await api('/api/reviews', { method: 'POST', body: JSON.stringify({ text, rating }) });
-    showToast('Отзыв отправлен на модерацию');
+    showNotification('✅ Отзыв отправлен на модерацию — опубликуем после проверки', 'success');
     reviewForm.reset();
+    // Сброс звёзд
+    const picker = document.getElementById('review-stars-picker');
+    if (picker && window.FLStars) {
+      picker.innerHTML = window.FLStars.renderStars(5, { interactive: true, name: 'rating' });
+      window.FLStars.bindStarPicker(picker, (n) => {
+        if (ratingInput) ratingInput.value = String(n);
+      });
+    }
   } catch (err) {
-    showError(err);
+    showNotification(err.message || 'Ошибка при отправке отзыва', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Отправить на модерацию'; }
   }
 });
 
