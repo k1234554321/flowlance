@@ -156,19 +156,23 @@ logoutLink?.addEventListener('click', async (e) => {
 
 function initReviewStars() {
   const picker = document.getElementById('review-stars-picker');
-  const hidden = document.getElementById('review-rating');
-  if (!picker || !window.FLStars) return;
+  if (!picker) return;
+  // Ждём пока FLStars загрузится
+  if (!window.FLStars) {
+    setTimeout(initReviewStars, 100);
+    return;
+  }
   picker.innerHTML = window.FLStars.renderStars(5, { interactive: true, name: 'rating' });
   window.FLStars.bindStarPicker(picker, (n) => {
-    if (hidden) hidden.value = String(n);
+    const h = document.getElementById('review-rating');
+    if (h) h.value = String(n);
   });
 }
 
 reviewForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const text = document.getElementById('review-text')?.value?.trim() || '';
-  const ratingInput = document.querySelector('#review-stars-picker input[type="hidden"]');
-  const rating = Number(ratingInput?.value || 5);
+  const rating = Number(document.getElementById('review-rating')?.value || 5);
 
   if (text.length < 15) {
     showNotification('Напиши минимум 15 символов в отзыве', 'error');
@@ -180,16 +184,10 @@ reviewForm?.addEventListener('submit', async (e) => {
 
   try {
     await api('/api/reviews', { method: 'POST', body: JSON.stringify({ text, rating }) });
-    showNotification('✅ Отзыв отправлен на модерацию — опубликуем после проверки', 'success');
-    reviewForm.reset();
-    // Сброс звёзд
-    const picker = document.getElementById('review-stars-picker');
-    if (picker && window.FLStars) {
-      picker.innerHTML = window.FLStars.renderStars(5, { interactive: true, name: 'rating' });
-      window.FLStars.bindStarPicker(picker, (n) => {
-        if (ratingInput) ratingInput.value = String(n);
-      });
-    }
+    showNotification('Отзыв отправлен на модерацию — опубликуем после проверки', 'success');
+    document.getElementById('review-text').value = '';
+    document.getElementById('review-rating').value = '5';
+    initReviewStars(); // сбрасываем звёзды
   } catch (err) {
     showNotification(err.message || 'Ошибка при отправке отзыва', 'error');
   } finally {
