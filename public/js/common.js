@@ -39,7 +39,6 @@ function formatDate(date) {
 
 
 function showNotification(message, type) {
-  // Удаляем предыдущее если есть
   document.querySelectorAll('.fl-notification').forEach(n => n.remove());
 
   const el = document.createElement('div');
@@ -47,15 +46,15 @@ function showNotification(message, type) {
   const isSuccess = type === 'success';
   el.style.cssText = [
     'position:fixed',
-    'bottom:32px',
+    'top:24px',
     'left:50%',
-    'transform:translateX(-50%) translateY(24px)',
-    'z-index:9999',
+    'transform:translateX(-50%) translateY(-20px)',
+    'z-index:99999',
     'padding:14px 24px 14px 18px',
     'border-radius:16px',
     'font-size:0.92rem',
     'font-weight:600',
-    'max-width:460px',
+    'max-width:480px',
     'width:calc(100% - 40px)',
     'display:flex',
     'align-items:center',
@@ -64,9 +63,10 @@ function showNotification(message, type) {
     'transition:opacity 0.35s,transform 0.35s cubic-bezier(0.22,1,0.36,1)',
     'pointer-events:none',
     'backdrop-filter:blur(12px)',
+    '-webkit-backdrop-filter:blur(12px)',
     isSuccess
-      ? 'background:rgba(10,10,10,0.95);border:1px solid rgba(110,231,160,0.45);color:#6ee7a0;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(110,231,160,0.1)'
-      : 'background:rgba(10,10,10,0.95);border:1px solid rgba(255,107,107,0.45);color:#ff6b6b;box-shadow:0 8px 32px rgba(0,0,0,0.5)'
+      ? 'background:rgba(10,10,10,0.97);border:1px solid rgba(110,231,160,0.5);color:#6ee7a0;box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 0 1px rgba(110,231,160,0.1)'
+      : 'background:rgba(10,10,10,0.97);border:1px solid rgba(255,107,107,0.5);color:#ff6b6b;box-shadow:0 8px 40px rgba(0,0,0,0.6)'
   ].join(';');
 
   const icon = document.createElement('span');
@@ -82,13 +82,15 @@ function showNotification(message, type) {
   document.body.appendChild(el);
 
   requestAnimationFrame(() => {
-    el.style.opacity = '1';
-    el.style.transform = 'translateX(-50%) translateY(0)';
+    requestAnimationFrame(() => {
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) translateY(0)';
+    });
   });
 
   setTimeout(() => {
     el.style.opacity = '0';
-    el.style.transform = 'translateX(-50%) translateY(16px)';
+    el.style.transform = 'translateX(-50%) translateY(-16px)';
     setTimeout(() => el.remove(), 400);
   }, 4000);
 }
